@@ -38,4 +38,5 @@ RUN rm -rf /root/.cache/uv /tmp/*
 
 EXPOSE 7860
 
-CMD ["python", "webui.py"]
+# Dùng python3 vì nền GPU (ubuntu 22.04) chỉ có python3, không có lệnh python
+CMD ["python3", "webui.py"]
