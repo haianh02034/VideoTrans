@@ -82,7 +82,7 @@ class AssembleMixin:
         
         is_novoice_mp4(self.cfg.novoice_mp4, self.uuid)
         if not Path(self.cfg.novoice_mp4).exists():
-            raise VideoTransError(f'{self.cfg.novoice_mp4} 不存在')
+            raise VideoTransError(tr('file not exists', self.cfg.novoice_mp4))
 
         if self.should_dubbing and not vail_file(self.cfg.target_wav):
             raise VideoTransError(f"{tr('Dubbing')}{tr('anerror')}:{self.cfg.target_wav}")
@@ -432,4 +432,4 @@ class AssembleMixin:
             )
             return True
         except subprocess.CalledProcessError as e:
-            raise FFmpegError(f"尝试使用硬件执行命令出错[CalledProcessError]:{e.stderr}\n{e.stdout},{e}") from e
+            raise FFmpegError(tr("Error executing command with hardware acceleration") + f"[CalledProcessError]:{e.stderr}\n{e.stdout},{e}") from e

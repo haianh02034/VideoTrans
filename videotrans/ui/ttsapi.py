@@ -114,7 +114,27 @@ class Ui_ttsapiform(object):
     # setupUi
 
     def retranslateUi(self, ttsapiform):
-        if defaulelang == 'zh':
+        if defaulelang == 'vi':
+            tips = """
+Sẽ gửi dữ liệu application/www-urlencode tới địa chỉ API đã điền bằng phương thức POST:
+
+text: văn bản cần tổng hợp / chuỗi
+language: mã ngôn ngữ của văn bản (zh-cn,zh-tw,en,ja,ko,ru,de,fr,tr,th,vi,ar,hi,hu,es,pt,it) / chuỗi
+voice: tên giọng đọc / chuỗi
+rate: giá trị tăng/giảm tốc, 0 hoặc '+số%' '-số%', là phần trăm tăng giảm so với tốc độ bình thường / chuỗi
+ostype: loại hệ điều hành win32 hoặc mac hoặc linux / chuỗi
+extra: tham số bổ sung / chuỗi
+
+Mong đợi API trả về dữ liệu định dạng json:
+{
+    code: 0 = tổng hợp thành công, số lớn hơn 0 là thất bại
+    msg: ok = tổng hợp thành công, giá trị khác là lý do thất bại
+    data: khi thành công, trả về địa chỉ url đầy đủ của tệp mp3 để phần mềm tải về. Khi thất bại thì để trống.
+}
+
+
+"""
+        elif defaulelang == 'zh':
             tips = """
 将以POST请求向填写的API地址发送application/www-urlencode数据：
 

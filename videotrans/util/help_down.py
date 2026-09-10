@@ -162,7 +162,7 @@ def check_and_down_hf(model_id, repo_id, local_dir, callback=None, allow_list=No
                 except OSError as e:
                     logger.exception(f"清理临时文件失败：{junk} {e}", exc_info=True)
     except Exception as e:
-        msg = f'下载模型失败，你可以打开以下网址，将所有文件下载到\n {local_dir} 文件夹内\n' if defaulelang == 'zh' else f'The model download failed. You can try opening the following URL and downloading all files to the {local_dir} folder.'
+        msg = f'Tải mô hình thất bại, bạn có thể mở địa chỉ sau và tải toàn bộ tệp về thư mục\n {local_dir}\n' if defaulelang == 'vi' else (f'下载模型失败，你可以打开以下网址，将所有文件下载到\n {local_dir} 文件夹内\n' if defaulelang == 'zh' else f'The model download failed. You can try opening the following URL and downloading all files to the {local_dir} folder.')
         from videotrans.configure.excepts import DownloadModelsError
         raise DownloadModelsError(f'{msg}\n[https://huggingface.co/{repo_id}/tree/main]\n{e}')
     finally:
@@ -362,7 +362,7 @@ def check_and_down_ms(model_id, callback=None, local_dir=None) -> bool:
             return True
     except Exception as e:
         local_dir = f'{ROOT_DIR}/models/models/{model_id}/' if not local_dir else local_dir
-        msg = f'下载模型失败，你可以打开以下网址，将所有文件下载到\n {local_dir} 文件夹内\n' if defaulelang == 'zh' else f'The model download failed. You can try opening the following URL and downloading all files to the {local_dir} folder.'
+        msg = f'Tải mô hình thất bại, bạn có thể mở địa chỉ sau và tải toàn bộ tệp về thư mục\n {local_dir}\n' if defaulelang == 'vi' else (f'下载模型失败，你可以打开以下网址，将所有文件下载到\n {local_dir} 文件夹内\n' if defaulelang == 'zh' else f'The model download failed. You can try opening the following URL and downloading all files to the {local_dir} folder.')
         from videotrans.configure.excepts import DownloadModelsError
         raise DownloadModelsError(f'{msg}\n[https://modelscope.cn/models/{model_id}/tree/main]\n{e}')
     finally:

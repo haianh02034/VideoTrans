@@ -853,6 +853,26 @@
 			"VITS":"VITS_EN_CN",
 			"ZipVoice":"ZipVoice_EN_CN",
 			"auto":"Automatic detection",
-			"check or download models":"Check if the model exists..."
+			"check or download models":"Check if the model exists...",
+			"API request instructions":"API request instructions",
+			"fishtts api placeholder":"Fill in the API starting with http. Fish-speech 1.5.0 default: http://127.0.0.1:8080/v1/tts",
+			"gptsovits refaudio tips":"RefAudio#AudioText#LangCode (must be wav, 3-10 seconds, otherwise a 400 error occurs)",
+			"gptsovits api_v2 tips":"Must be checked if using api_v2.py",
+			"gptsovits api placeholder":"Fill in the API address (not the webui address). Start api.py or api_v2.py. Default: http://127.0.0.1:9880",
+			"Glossary id tips":"Glossary id, separate multiple ids with commas",
+			"Please input Azure speech key":"Please fill in the Azure speech key",
+			"Two audio files must be selected":"Two audio files must be selected",
+			"recognapi format error":"Recognition error. Expected data like:\n{}\n\nBut actually returned: {}",
+			"Unknown error":"Unknown error",
+			"No recognition result in returned data":"No recognition result in the returned data",
+			"Failed to format srt before saving subtitles":"Failed to format the srt before saving subtitles",
+			"file not exists":"{} does not exist",
+			"Error executing command with hardware acceleration":"Error executing the command with hardware acceleration",
+			"Subtitle length is 0, cannot continue dubbing":"Subtitle length is 0, dubbing cannot continue",
+			"Please check baidu appid":"Please check whether the appid is correct and whether the corresponding service has been enabled",
+			"A plain text model is required":"A plain text model is required, but {} may be a multimodal model",
+			"Please check doubao appid and access token":"Please check whether the appid and access token are correct",
+			"This voice may need separate purchase":"The official version of this voice may need to be purchased separately in the ByteDance console",
+			"cosyvoice3 streaming tips":"Please modify the official webui.py file for CosyVoice3, search for the line streaming=True , change it to streaming=False , then save and restart CosyVoice3.\nSee https://pyvideotrans.com/cosyvoice"
 
 }

@@ -7,7 +7,7 @@ from typing import List, Union
 
 import requests
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_not_exception_type, before_log, after_log
-from videotrans.configure.config import settings,params,logger
+from videotrans.configure.config import settings,params,logger,tr
 from videotrans.configure.excepts import NO_RETRY_EXCEPT, TranslateSrtError, StopTask
 from videotrans.translator._base import BaseTrans
 from videotrans.util import tools
@@ -40,7 +40,7 @@ class Baidu(BaseTrans):
 
         if "error_code" in res or "trans_result" not in res or len(res['trans_result']) < 1:
             logger.debug(f'Baidu 返回响应:{resraw}')
-            raise StopTask('请检查appid是否正确，或是否已开通对应服务服务是否开通' if int(res.get('error_code',0))==52003 else res['error_msg'])
+            raise StopTask(tr('Please check baidu appid') if int(res.get('error_code',0))==52003 else res['error_msg'])
 
         result = [tools.cleartext(tres['dst']) for tres in res['trans_result']]
         if not result or len(result) < 1:

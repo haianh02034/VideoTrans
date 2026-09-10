@@ -134,7 +134,7 @@ class PreviewWidget(QGraphicsView):
     def update_preview(self, style):
         self.clear_items()
 
-        text =  '你好啊，亲爱的朋友们！' if defaulelang=='zh' else  'Hello, my dear friend. hope your every day beautiful'
+        text = 'Xin chào các bạn thân mến!' if defaulelang == 'vi' else ('你好啊，亲爱的朋友们！' if defaulelang == 'zh' else 'Hello, my dear friend. hope your every day beautiful')
 
         font = QFont(style['Fontname'], style['Fontsize'])
         font.setBold(bool(style['Bold']))

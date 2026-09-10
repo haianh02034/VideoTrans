@@ -92,10 +92,10 @@ class Ui_tencentform(object):
         QtCore.QMetaObject.connectSlotsByName(tencentform)
 
     def retranslateUi(self, tencentform):
-        tencentform.setWindowTitle("腾讯翻译")
+        tencentform.setWindowTitle(tr("Tencent"))
         self.label.setText("SecretId")
-        self.label_term.setText("术语库id")
-        self.tencent_term.setPlaceholderText("术语库id,多个以英文逗号隔开")
+        self.label_term.setText(tr("Glossary id"))
+        self.tencent_term.setPlaceholderText(tr("Glossary id tips"))
         self.label_2.setText("SecretKey")
         self.set_tencent.setText(tr("Save"))
         self.test.setText(tr("Test"))

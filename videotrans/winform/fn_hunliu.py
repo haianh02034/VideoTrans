@@ -79,7 +79,7 @@ def openwin():
         audio1 = winobj.hun_file1.text()
         audio2 = winobj.hun_file2.text()
         if not audio1 or not audio2:
-            tools.show_error(tr("必须选择视频"))
+            tools.show_error(tr("Two audio files must be selected"))
             return
 
         winobj.hun_startbtn.setText(

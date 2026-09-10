@@ -33,20 +33,21 @@ if sys.platform == "win32":
 # ---------------------------------------------------------------------------
 TEXT_DB: Dict[str, Dict[str, str]] = {
     # --- Log messages ---
-    "exec_stt_task": {"zh": "[执行任务] 语音转录 (STT)", "en": "[Task] Speech Transcription (STT)"},
-    "exec_tts_task": {"zh": "[执行任务] 语音合成 (TTS)", "en": "[Task] Text-to-Speech (TTS)"},
-    "exec_sts_task": {"zh": "[执行任务] 字幕翻译 (STS)", "en": "[Task] Subtitle Translation (STS)"},
-    "exec_vtv_task": {"zh": "[执行任务] 视频翻译 (VTV)", "en": "[Task] Video Translation (VTV)"},
-    "process_file":  {"zh": "[处理文件] {}", "en": "[File] {}"},
-    "param_list":    {"zh": "[参数列表] {}", "en": "[Params] {}"},
-    "output_dir":    {"zh": "[输出目录] {}", "en": "[Output Dir] {}"},
-    "done":          {"zh": "[完成] 任务执行完毕", "en": "[Done] Task completed successfully"},
-    "failed":        {"zh": "[失败] 任务执行出错: {}", "en": "[Failed] Task error: {}"},
+    "exec_stt_task": {"zh": "[执行任务] 语音转录 (STT)", "en": "[Task] Speech Transcription (STT)", "vi": "[Tác vụ] Nhận dạng giọng nói (STT)"},
+    "exec_tts_task": {"zh": "[执行任务] 语音合成 (TTS)", "en": "[Task] Text-to-Speech (TTS)", "vi": "[Tác vụ] Tổng hợp giọng nói (TTS)"},
+    "exec_sts_task": {"zh": "[执行任务] 字幕翻译 (STS)", "en": "[Task] Subtitle Translation (STS)", "vi": "[Tác vụ] Dịch phụ đề (STS)"},
+    "exec_vtv_task": {"zh": "[执行任务] 视频翻译 (VTV)", "en": "[Task] Video Translation (VTV)", "vi": "[Tác vụ] Dịch video (VTV)"},
+    "process_file":  {"zh": "[处理文件] {}", "en": "[File] {}", "vi": "[Tập tin] {}"},
+    "param_list":    {"zh": "[参数列表] {}", "en": "[Params] {}", "vi": "[Tham số] {}"},
+    "output_dir":    {"zh": "[输出目录] {}", "en": "[Output Dir] {}", "vi": "[Thư mục đầu ra] {}"},
+    "done":          {"zh": "[完成] 任务执行完毕", "en": "[Done] Task completed successfully", "vi": "[Hoàn tất] Tác vụ hoàn thành thành công"},
+    "failed":        {"zh": "[失败] 任务执行出错: {}", "en": "[Failed] Task error: {}", "vi": "[Thất bại] Lỗi thực thi: {}"},
 
     # --- Argparse descriptions ---
     "cli_desc": {
         "zh": "pyVideoTrans 命令行模式\n文档: https://pyvideotrans.com/cli",
-        "en": "pyVideoTrans CLI Mode\nDocs: https://pyvideotrans.com/cli"
+        "en": "pyVideoTrans CLI Mode\nDocs: https://pyvideotrans.com/cli",
+        "vi": "pyVideoTrans Chế độ dòng lệnh\nTài liệu: https://pyvideotrans.com/cli"
     },
     "cli_epilog": {
         "zh": "示例:\n"
@@ -62,110 +63,131 @@ TEXT_DB: Dict[str, Dict[str, str]] = {
               "  %(prog)s --task sts --name \"D:/demo.srt\" --target_language_code en\n"
               "  %(prog)s --task vtv --name \"D:/demo.mp4\" --source_language_code zh-cn --target_language_code en --voice_role \"en-US-GuyNeural\"\n"
               "  %(prog)s --list providers\n"
+              "  %(prog)s --list languages",
+        "vi": "Ví dụ:\n"
+              "  %(prog)s --task stt --name \"D:/demo.mp4\" --recogn_type 0 --model_name large-v3\n"
+              "  %(prog)s --task tts --name \"D:/demo.srt\" --tts_type 0 --voice_role \"zh-CN-YunyangNeural\"\n"
+              "  %(prog)s --task sts --name \"D:/demo.srt\" --target_language_code en\n"
+              "  %(prog)s --task vtv --name \"D:/demo.mp4\" --source_language_code zh-cn --target_language_code en --voice_role \"en-US-GuyNeural\"\n"
+              "  %(prog)s --list providers\n"
               "  %(prog)s --list languages"
     },
     "help_task": {
         "zh": "任务类型: stt(语音转录), tts(文字配音), sts(字幕翻译), vtv(视频翻译)",
-        "en": "Task type: stt(Speech to Text), tts(Text to Speech), sts(Subtitle Trans), vtv(Video Trans)"
+        "en": "Task type: stt(Speech to Text), tts(Text to Speech), sts(Subtitle Trans), vtv(Video Trans)",
+        "vi": "Loại tác vụ: stt(Nhận dạng giọng nói), tts(Văn bản thành giọng nói), sts(Dịch phụ đề), vtv(Dịch video)"
     },
     "help_name": {
         "zh": "待处理文件的绝对路径 (请使用双引号包裹含空格的路径)",
-        "en": "Absolute path of the file to process (wrap in quotes if path contains spaces)"
+        "en": "Absolute path of the file to process (wrap in quotes if path contains spaces)",
+        "vi": "Đường dẫn tuyệt đối của tập tin cần xử lý (dùng dấu ngoặc kép nếu đường dẫn có khoảng trắng)"
     },
     "help_list": {
         "zh": "列出可用选项: providers(渠道), languages(语言), models(模型)",
-        "en": "List available options: providers, languages, models"
+        "en": "List available options: providers, languages, models",
+        "vi": "Liệt kê tùy chọn: providers(kênh), languages(ngôn ngữ), models(mô hình)"
     },
     "help_output_dir": {
         "zh": "输出目录 (默认: 与输入文件同级的 _video_out 目录)",
-        "en": "Output directory (default: _video_out alongside input file)"
+        "en": "Output directory (default: _video_out alongside input file)",
+        "vi": "Thư mục đầu ra (mặc định: _video_out cùng cấp với tập tin đầu vào)"
     },
     "help_log_level": {
         "zh": "日志级别: DEBUG, INFO, WARNING, ERROR (默认: WARNING)",
-        "en": "Log level: DEBUG, INFO, WARNING, ERROR (default: WARNING)"
+        "en": "Log level: DEBUG, INFO, WARNING, ERROR (default: WARNING)",
+        "vi": "Mức log: DEBUG, INFO, WARNING, ERROR (mặc định: WARNING)"
     },
     "help_verbose": {
         "zh": "显示详细输出 (等同于 --log-level INFO)",
-        "en": "Show verbose output (equivalent to --log-level INFO)"
+        "en": "Show verbose output (equivalent to --log-level INFO)",
+        "vi": "Hiển thị đầu ra chi tiết (tương đương --log-level INFO)"
     },
     "help_quiet": {
         "zh": "静默模式,仅输出错误",
-        "en": "Quiet mode, only output errors"
+        "en": "Quiet mode, only output errors",
+        "vi": "Chế độ im lặng, chỉ hiển thị lỗi"
     },
 
     # --- STT params ---
-    "group_stt":       {"zh": "STT (语音转录) 参数", "en": "STT (Speech Transcription) Parameters"},
-    "help_recogn_type": {"zh": "语音识别渠道编号", "en": "Speech recognition provider index"},
-    "help_detect_lang":  {"zh": "音频视频发音语言", "en": "Source language of audio/video"},
+    "group_stt":       {"zh": "STT (语音转录) 参数", "en": "STT (Speech Transcription) Parameters", "vi": "STT (Tham số nhận dạng giọng nói)"},
+    "help_recogn_type": {"zh": "语音识别渠道编号", "en": "Speech recognition provider index", "vi": "Chỉ mục kênh nhận dạng giọng nói"},
+    "help_detect_lang":  {"zh": "音频视频发音语言", "en": "Source language of audio/video", "vi": "Ngôn ngữ của audio/video nguồn"},
     "help_model_name": {
         "zh": "语音识别模型名称\nfaster-whisper(0) 和 openai-whisper(1) 可选: {}\n其他渠道请在软件界面中查看",
-        "en": "ASR model name\nfaster-whisper(0) & openai-whisper(1) options: {}\nOthers: check GUI"
+        "en": "ASR model name\nfaster-whisper(0) & openai-whisper(1) options: {}\nOthers: check GUI",
+        "vi": "Tên mô hình nhận dạng giọng nói\nfaster-whisper(0) & openai-whisper(1) tùy chọn: {}\nKênh khác: xem trong giao diện"
     },
-    "help_cuda":           {"zh": "启用CUDA加速", "en": "Enable CUDA acceleration"},
-    "help_remove_noise":   {"zh": "启用降噪", "en": "Enable noise reduction"},
-    "help_enable_diariz":  {"zh": "启用说话人识别", "en": "Enable speaker diarization"},
-    "help_nums_diariz":    {"zh": "指定说话人数量", "en": "Number of speakers"},
-    "help_rephrase":       {"zh": "重新断句 (0=默认, 1=LLM断句)", "en": "Rephrase (0=default, 1=LLM)"},
-    "help_fix_punc":       {"zh": "恢复标点符号", "en": "Restore punctuation"},
+    "help_cuda":           {"zh": "启用CUDA加速", "en": "Enable CUDA acceleration", "vi": "Bật tăng tốc CUDA"},
+    "help_remove_noise":   {"zh": "启用降噪", "en": "Enable noise reduction", "vi": "Bật khử nhiễu"},
+    "help_enable_diariz":  {"zh": "启用说话人识别", "en": "Enable speaker diarization", "vi": "Bật nhận dạng người nói"},
+    "help_nums_diariz":    {"zh": "指定说话人数量", "en": "Number of speakers", "vi": "Số lượng người nói"},
+    "help_rephrase":       {"zh": "重新断句 (0=默认, 1=LLM断句)", "en": "Rephrase (0=default, 1=LLM)", "vi": "Tách câu lại (0=mặc định, 1=LLM)"},
+    "help_fix_punc":       {"zh": "恢复标点符号", "en": "Restore punctuation", "vi": "Khôi phục dấu câu"},
 
     # --- TTS params ---
-    "group_tts":         {"zh": "TTS (文字配音) 参数", "en": "TTS (Text-to-Speech) Parameters"},
-    "help_tts_type":     {"zh": "配音渠道编号", "en": "TTS provider index"},
-    "help_voice_role":   {"zh": "音色名称 (TTS模式必选)", "en": "Voice role name (required for TTS)"},
-    "help_voice_rate":   {"zh": "语速 (如 +20%%, -10%%)", "en": "Speech rate (e.g. +20%%, -10%%)"},
-    "help_volume":       {"zh": "音量 (如 +50%%, -30%%)", "en": "Volume (e.g. +50%%, -30%%)"},
-    "help_pitch":        {"zh": "音调 (如 +10Hz, -5Hz)", "en": "Pitch (e.g. +10Hz, -5Hz)"},
-    "help_voice_autorate": {"zh": "自动加速音频以对齐字幕", "en": "Auto-speed audio to match subtitles"},
-    "help_align_sub_audio": {"zh": "强制修改字幕以对齐音频", "en": "Force subtitle adjustment to align with audio"},
+    "group_tts":         {"zh": "TTS (文字配音) 参数", "en": "TTS (Text-to-Speech) Parameters", "vi": "TTS (Tham số tổng hợp giọng nói)"},
+    "help_tts_type":     {"zh": "配音渠道编号", "en": "TTS provider index", "vi": "Chỉ mục kênh lồng tiếng"},
+    "help_voice_role":   {"zh": "音色名称 (TTS模式必选)", "en": "Voice role name (required for TTS)", "vi": "Tên giọng đọc (bắt buộc với TTS)"},
+    "help_voice_rate":   {"zh": "语速 (如 +20%%, -10%%)", "en": "Speech rate (e.g. +20%%, -10%%)", "vi": "Tốc độ giọng đọc (VD: +20%%, -10%%)"},
+    "help_volume":       {"zh": "音量 (如 +50%%, -30%%)", "en": "Volume (e.g. +50%%, -30%%)", "vi": "Âm lượng (VD: +50%%, -30%%)"},
+    "help_pitch":        {"zh": "音调 (如 +10Hz, -5Hz)", "en": "Pitch (e.g. +10Hz, -5Hz)", "vi": "Cao độ (VD: +10Hz, -5Hz)"},
+    "help_voice_autorate": {"zh": "自动加速音频以对齐字幕", "en": "Auto-speed audio to match subtitles", "vi": "Tự động tăng tốc âm thanh để khớp phụ đề"},
+    "help_align_sub_audio": {"zh": "强制修改字幕以对齐音频", "en": "Force subtitle adjustment to align with audio", "vi": "Buộc điều chỉnh phụ đề để khớp với âm thanh"},
 
     # --- Translation params ---
-    "group_trans":        {"zh": "Translation (翻译) 参数", "en": "Translation Parameters"},
-    "help_translate_type": {"zh": "翻译渠道编号", "en": "Translation provider index"},
-    "help_source_lang":   {"zh": "源语言代码 (STS默认auto, VTV必选)", "en": "Source language (auto for STS, required for VTV)"},
-    "help_target_lang":   {"zh": "目标语言代码 (必选)", "en": "Target language (required)"},
+    "group_trans":        {"zh": "Translation (翻译) 参数", "en": "Translation Parameters", "vi": "Tham số dịch thuật"},
+    "help_translate_type": {"zh": "翻译渠道编号", "en": "Translation provider index", "vi": "Chỉ mục kênh dịch thuật"},
+    "help_source_lang":   {"zh": "源语言代码 (STS默认auto, VTV必选)", "en": "Source language (auto for STS, required for VTV)", "vi": "Mã ngôn ngữ nguồn (auto cho STS, bắt buộc cho VTV)"},
+    "help_target_lang":   {"zh": "目标语言代码 (必选)", "en": "Target language (required)", "vi": "Mã ngôn ngữ đích (bắt buộc)"},
 
     # --- VTV extra params ---
-    "group_vtv":           {"zh": "VTV (视频翻译) 额外参数", "en": "VTV Extra Parameters"},
-    "help_video_autorate": {"zh": "自动慢速视频以对齐字幕", "en": "Auto-slow video to match subtitles"},
-    "help_is_separate":    {"zh": "分离人声背景声", "en": "Separate vocals and background"},
-    "help_recogn2pass":    {"zh": "二次语音识别", "en": "Enable 2-pass recognition"},
-    "help_subtitle_type":  {"zh": "字幕类型 (0=无, 1=硬, 2=软, 3=硬双, 4=软双)", "en": "Subtitle type (0=None, 1=Hard, 2=Soft, 3=Hard Dual, 4=Soft Dual)"},
-    "help_clear_cache":    {"zh": "完成后清理缓存 (默认)", "en": "Clear cache after finish (default)"},
-    "help_no_clear_cache": {"zh": "不清理缓存", "en": "Do not clear cache"},
+    "group_vtv":           {"zh": "VTV (视频翻译) 额外参数", "en": "VTV Extra Parameters", "vi": "Tham số bổ sung VTV (Dịch video)"},
+    "help_video_autorate": {"zh": "自动慢速视频以对齐字幕", "en": "Auto-slow video to match subtitles", "vi": "Tự động giảm tốc video để khớp phụ đề"},
+    "help_is_separate":    {"zh": "分离人声背景声", "en": "Separate vocals and background", "vi": "Tách giọng nói và nhạc nền"},
+    "help_recogn2pass":    {"zh": "二次语音识别", "en": "Enable 2-pass recognition", "vi": "Bật nhận dạng giọng nói lần 2"},
+    "help_subtitle_type":  {"zh": "字幕类型 (0=无, 1=硬, 2=软, 3=硬双, 4=软双)", "en": "Subtitle type (0=None, 1=Hard, 2=Soft, 3=Hard Dual, 4=Soft Dual)", "vi": "Loại phụ đề (0=Không, 1=Cứng, 2=Mềm, 3=Cứng song ngữ, 4=Mềm song ngữ)"},
+    "help_clear_cache":    {"zh": "完成后清理缓存 (默认)", "en": "Clear cache after finish (default)", "vi": "Xóa bộ nhớ đệm sau khi hoàn tất (mặc định)"},
+    "help_no_clear_cache": {"zh": "不清理缓存", "en": "Do not clear cache", "vi": "Không xóa bộ nhớ đệm"},
 
     # --- Error messages ---
     "err_missing_task": {
         "zh": "缺少 --task 参数,可选值: stt, tts, sts, vtv\n使用 --help 查看详细帮助",
-        "en": "Missing --task parameter. Choose: stt, tts, sts, vtv\nUse --help for details"
+        "en": "Missing --task parameter. Choose: stt, tts, sts, vtv\nUse --help for details",
+        "vi": "Thiếu tham số --task. Chọn: stt, tts, sts, vtv\nDùng --help để xem chi tiết"
     },
     "err_file_not_found": {
         "zh": "文件不存在: {}\n请检查路径是否正确,含空格的路径请用双引号包裹",
-        "en": "File not found: {}\nCheck path, wrap space-containing paths in quotes"
+        "en": "File not found: {}\nCheck path, wrap space-containing paths in quotes",
+        "vi": "Không tìm thấy tập tin: {}\nKiểm tra đường dẫn, dùng ngoặc kép nếu có khoảng trắng"
     },
     "err_tts_role_required": {
         "zh": "TTS 模式下 --voice_role 是必选参数\n使用 --list providers 查看可用渠道和音色",
-        "en": "--voice_role is required for TTS mode\nUse --list providers to see available options"
+        "en": "--voice_role is required for TTS mode\nUse --list providers to see available options",
+        "vi": "--voice_role là bắt buộc cho chế độ TTS\nDùng --list providers để xem tùy chọn"
     },
     "err_sts_target_required": {
         "zh": "--target_language_code 是必选参数\n使用 --list languages 查看可用语言",
-        "en": "--target_language_code is required\nUse --list languages to see available options"
+        "en": "--target_language_code is required\nUse --list languages to see available options",
+        "vi": "--target_language_code là bắt buộc\nDùng --list languages để xem ngôn ngữ khả dụng"
     },
     "err_vtv_missing": {
         "zh": "VTV 模式缺少必选参数: {}",
-        "en": "VTV mode missing required params: {}"
+        "en": "VTV mode missing required params: {}",
+        "vi": "Chế độ VTV thiếu tham số bắt buộc: {}"
     },
-    "miss_source_lang": {"zh": "--source_language_code", "en": "--source_language_code"},
-    "miss_target_lang": {"zh": "--target_language_code", "en": "--target_language_code"},
+    "miss_source_lang": {"zh": "--source_language_code", "en": "--source_language_code", "vi": "--source_language_code"},
+    "miss_target_lang": {"zh": "--target_language_code", "en": "--target_language_code", "vi": "--target_language_code"},
 
     # --- List output ---
     "list_providers_header": {
         "zh": "\n=== 可用渠道 ===\n\n--- 语音识别 (STT) ---",
-        "en": "\n=== Available Providers ===\n\n--- Speech Recognition (STT) ---"
+        "en": "\n=== Available Providers ===\n\n--- Speech Recognition (STT) ---",
+        "vi": "\n=== Kênh khả dụng ===\n\n--- Nhận dạng giọng nói (STT) ---"
     },
-    "list_trans_header":     {"zh": "\n--- 翻译 (Translation) ---", "en": "\n--- Translation ---"},
-    "list_tts_header":       {"zh": "\n--- 配音 (TTS) ---", "en": "\n--- Text-to-Speech (TTS) ---"},
-    "list_languages_header": {"zh": "\n=== 可用语言代码 ===", "en": "\n=== Available Language Codes ==="},
-    "list_models_header":    {"zh": "\n=== faster-whisper 可用模型 ===", "en": "\n=== faster-whisper Models ==="},
+    "list_trans_header":     {"zh": "\n--- 翻译 (Translation) ---", "en": "\n--- Translation ---", "vi": "\n--- Dịch thuật ---"},
+    "list_tts_header":       {"zh": "\n--- 配音 (TTS) ---", "en": "\n--- Text-to-Speech (TTS) ---", "vi": "\n--- Tổng hợp giọng nói (TTS) ---"},
+    "list_languages_header": {"zh": "\n=== 可用语言代码 ===", "en": "\n=== Available Language Codes ===", "vi": "\n=== Mã ngôn ngữ khả dụng ==="},
+    "list_models_header":    {"zh": "\n=== faster-whisper 可用模型 ===", "en": "\n=== faster-whisper Models ===", "vi": "\n=== Mô hình faster-whisper khả dụng ==="},
 }
 
 
@@ -526,7 +548,7 @@ def main() -> int:
     from videotrans.configure.config import defaulelang, app_cfg
 
     # Set language for CLI output
-    set_lang(defaulelang if defaulelang in ('zh', 'en') else 'en')
+    set_lang(defaulelang if defaulelang in ('zh', 'en', 'vi') else 'en')
 
     # Build parser and parse args
     parser = build_parser()

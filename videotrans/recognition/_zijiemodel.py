@@ -6,7 +6,7 @@ from typing import List,  Union
 
 import requests
 from videotrans.configure.excepts import SpeechToTextError
-from videotrans.configure.config import params, logger
+from videotrans.configure.config import params, logger, tr
 from videotrans.recognition._base import BaseRecogn
 from videotrans.task.taskcfg import SrtItem
 from videotrans.util import tools
@@ -60,14 +60,14 @@ class ZijieRecogn(BaseRecogn):
         response.raise_for_status()
         code = response.headers.get('X-Api-Status-Code')
         if not code:
-            raise SpeechToTextError(f"未知错误:{response.text=},{response.headers=}")
+            raise SpeechToTextError(tr("Unknown error") + f":{response.text=},{response.headers=}")
         if str(code) != "20000000":
-            raise SpeechToTextError(_error.get(str(code), '未知错误'))
+            raise SpeechToTextError(_error.get(str(code), tr('Unknown error')))
 
         res = response.json()
         seg_list = res.get('result', {}).get('utterances')
         if not seg_list:
-            raise SpeechToTextError(f'返回数据中无识别结果:{response=}')
+            raise SpeechToTextError(tr('No recognition result in returned data') + f':{response=}')
 
         srt_list = []
         speaker_list = []

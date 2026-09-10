@@ -287,7 +287,275 @@ heads = {
     "dubbing": "字幕配音调整",
     "prompt_init": "Whisper模型提示词"
 }
-if defaulelang != 'zh':
+if defaulelang == 'vi':
+    notices = {
+        "common": {
+            "lang": "Đặt ngôn ngữ giao diện phần mềm. Cần khởi động lại để có hiệu lực.",
+            "countdown_sec": "Số giây đếm ngược khi dịch một video đơn lẻ (đặt 0 để bỏ qua cửa sổ chỉnh sửa).",
+            "homedir": "Thư mục lưu kết quả của các chức năng độc lập (nhận dạng, lồng tiếng, dịch phụ đề). Mặc định là thư mục 'output'.",
+
+            "retry_nums": "Số lần thử lại sau khi thất bại",
+
+            "llm_chunk_size": "Khi tách câu bằng LLM, mỗi lần gửi bao nhiêu dòng phụ đề. Giá trị càng lớn thì tách câu càng tốt, gửi hết một lần là tối ưu nhất, nhưng bị giới hạn bởi token đầu ra tối đa và ngữ cảnh (max_token). Đầu vào quá dài có thể vượt giới hạn của AI và gây lỗi. Mặc định 20 dòng.",
+            "llm_ai_type": "Kênh AI dùng khi tách câu bằng LLM, hiện hỗ trợ OpenAI ChatGPT hoặc DeepSeek.",
+
+            "dont_notify": "Tắt thông báo trên màn hình khi tác vụ hoàn tất hoặc thất bại.",
+
+            "batch_nums": "Khi dịch video hàng loạt, đặt số video dịch đồng thời mỗi đợt. Mặc định 0 là không giới hạn.",
+            "show_more_settings": "Để tránh rối vì quá nhiều tham số, giao diện chính mặc định ẩn phần lớn tham số. Chọn mục này sẽ hiện toàn bộ tham số.",
+
+            "process_max": "Số tác vụ CPU chạy đồng thời tối đa. Càng lớn càng nhanh nhưng có thể tràn bộ nhớ, không nên vượt quá số nhân CPU.",
+            "process_max_gpu": "Số tác vụ GPU chạy đồng thời. Trừ khi có nhiều card hoặc VRAM lớn hơn 24GB, hãy đặt là 1.",
+            "multi_gpus": "Nếu có nhiều card đồ họa cùng dung lượng VRAM, có thể bật mục này và đặt tùy chọn ở trên thành 2 hoặc bằng số card.",
+
+        },
+        "video": {
+            "crf": "Hệ số chất lượng video (CRF). 0 = không mất dữ liệu (tệp rất lớn), 51 = chất lượng thấp (tệp nhỏ).",
+            "preset": "Cân bằng giữa tốc độ mã hóa và chất lượng (ultrafast, medium, slow...). Càng nhanh thì tệp càng lớn.",
+            "video_codec": "Bộ mã hóa video: libx264 (tương thích tốt hơn) hoặc libx265 (nén cao hơn).",
+            "out_video_ext": "Định dạng video đầu ra (mp4/mkv)",
+            "fps_mode": "Khi có xử lý làm chậm video, tốc độ khung hình biến thiên (VFR) cho kết quả tốt hơn, còn tốc độ khung hình cố định (CFR) tương thích tốt hơn.",
+
+            "force_lib": "Ép mã hóa bằng phần mềm (chậm hơn nhưng tương thích hơn). Mặc định ưu tiên mã hóa phần cứng.",
+            "hw_decode": "Khi dựng video, ưu tiên giải mã phần cứng; nhanh nhưng dễ gặp lỗi.",
+            "ffmpeg_cmd": "Tham số dòng lệnh FFmpeg tùy chỉnh, được chèn vào trước tham số tệp đầu ra.",
+        },
+        "whisper": {
+            "vad_type": "Chọn VAD",
+            "threshold": "VAD: xác suất tối thiểu để một đoạn âm thanh được coi là giọng nói.",
+            "no_speech_threshold": "Ngưỡng không có giọng nói",
+            "max_speech_duration_s": "VAD: độ dài tối đa (giây) của một đoạn nói trước khi bị tách.",
+            "min_silence_duration_ms": "VAD: khoảng lặng tối thiểu (ms) để đánh dấu kết thúc một đoạn.",
+
+
+            "max_speech_duration_s2": "Độ dài đoạn nói tối đa (giây) khi nhận dạng lần 2. Giới hạn độ dài tối đa của một đoạn nói, vượt quá sẽ bị tách cưỡng bức. Đơn vị: giây.",
+            "min_speech_duration_ms2": "Độ dài đoạn nói tối thiểu (ms) khi nhận dạng lần 2. Nếu một dòng phụ đề ngắn hơn giá trị này sẽ được thử gộp vào dòng kề bên. Đơn vị: mili giây.",
+
+            "min_speech_duration_ms": "Nếu một dòng phụ đề ngắn hơn giá trị này (ms) thì thử gộp vào dòng phụ đề kề bên.",
+
+            "merge_short_sub": "Chỉ khi chọn mục này thì các phụ đề ngắn mới được gộp lại",
+            "whisper_prepare": "Có nên cắt trước âm thanh thành từng câu bằng VAD rồi mới gửi cho mô hình Whisper nhận dạng không?\nNếu dùng giọng nhân bản, hãy chọn mục này và đặt đoạn nói tối thiểu là 3000, đoạn nói tối đa là 10 để tăng độ tin cậy khi nhân bản giọng.",
+            "speaker_type": "Mô hình dùng để phân tách người nói. Mặc định là mô hình tích hợp, hỗ trợ tiếng Trung và tiếng Anh.\nNếu chọn pyannote thì bắt buộc phải có token của https://huggingface.co\nvà phải đồng ý thỏa thuận cấp phép của tổ chức pyannote.\n\nXem hướng dẫn chi tiết tại:\nhttps://pvt9.com/shuohuaren",
+            "hf_token": "Điền token của bạn trên huggingface.co, nếu không sẽ không dùng được pyannote. Xem hướng dẫn chi tiết:\nhttps://pvt9.com/shuohuaren",
+
+            "cuda_com_type": "Kiểu dữ liệu tính toán cho faster-whisper (int8, float16, float32...). int8 = ít tài nguyên, nhanh, độ chính xác thấp; float32 = nhiều tài nguyên, chậm, chính xác cao.",
+            "beam_size": "Độ chính xác khi nhận dạng (1-5). Càng cao càng chính xác nhưng tốn VRAM hơn.",
+            "best_of": "Độ chính xác khi nhận dạng (1-5). Càng cao càng chính xác nhưng tốn VRAM hơn.",
+            "condition_on_previous_text": "Dùng văn bản trước đó làm ngữ cảnh (tốn GPU hơn, có thể gây lặp lại).",
+            "temperature": "Nhiệt độ (temperature)",
+            "repetition_penalty": "Tăng giá trị này giúp giảm lặp lại",
+            "compression_ratio_threshold": "Giảm giá trị này giúp giảm lặp lại",
+            "hotwords": "Từ khóa ưu tiên (hotwords)",
+
+            "model_list": "Danh sách tên mô hình cho chế độ faster-whisper, cách nhau bằng dấu phẩy.",
+            "Whisper_cpp_models": "Danh sách tên mô hình cho chế độ whisper.cpp, cách nhau bằng dấu phẩy.",
+            "gemini_recogn_chunk": "Số lát cắt âm thanh mỗi lần gửi khi nhận dạng bằng Gemini. Giá trị lớn tăng độ chính xác nhưng cũng tăng tỉ lệ thất bại.",
+            "zh_hant_s": "Ép chuyển tiếng Trung phồn thể nhận dạng được sang giản thể.",
+            "del_end_punc": "Xóa dấu câu ở cuối mỗi dòng phụ đề?"
+
+        },
+        "trans": {
+            "trans_thread": "Số dòng phụ đề gửi mỗi lần với kênh dịch truyền thống.",
+            "aitrans_thread": "Số dòng phụ đề gửi mỗi lần với kênh dịch AI.",
+            "translation_wait": "Thời gian nghỉ (giây) giữa các lần gửi yêu cầu dịch, để tránh bị giới hạn tần suất.",
+            "aisendsrt": "Gửi nguyên nội dung định dạng SRT khi dịch bằng AI.",
+            "aitrans_temperature": "Nhiệt độ của mô hình AI, mặc định 1.0",
+            "aitrans_context": "Kênh dịch AI dịch toàn bộ phụ đề trong một lần, cho chất lượng dịch tốt nhất.\n[Lưu ý quan trọng]\n1. Bắt buộc dùng mô hình cao cấp hỗ trợ ngữ cảnh cực dài (mô hình AI trực tuyến hàng đầu).\n2. Phản hồi có thể chậm, biểu hiện là dữ liệu trả về trễ."
+        },
+        "dubbing": {
+            "dubbing_thread": "Số luồng lồng tiếng chạy đồng thời.",
+            "dubbing_wait": "Thời gian nghỉ (giây) giữa các lần gửi yêu cầu lồng tiếng, để tránh bị giới hạn tần suất.",
+            "remove_dubb_silence": "Xóa khoảng lặng đệm ở đầu và cuối mỗi đoạn lồng tiếng. Chọn mục này giúp khớp hình tiếng tốt hơn, nhưng đoạn kết có thể nghe hơi gấp.",
+            "save_segment_audio": "Lưu tệp lồng tiếng riêng của từng dòng phụ đề.",
+            "normal_text": "Chuẩn hóa văn bản trước khi lồng tiếng",
+            "edgetts_max_concurrent_tasks": "Kênh EdgeTTS lồng tiếng đồng thời càng nhiều thì càng nhanh, nhưng dễ bị chặn do giới hạn tần suất.",
+            "edgetts_retry_nums": "Số lần thử lại sau khi kênh EdgeTTS thất bại",
+            "chattts_voice": "Giá trị seed giọng đọc của ChatTTS.",
+            "noise_separate_nums": "Số luồng tách giọng nói và nhạc nền càng nhiều thì càng nhanh, nhưng càng tốn tài nguyên.",
+            "uvr_models": "Chọn mô hình dùng khi tách nhạc nền.",
+        },
+        "justify": {
+
+            "max_audio_speed_rate": "Hệ số tăng tốc âm thanh tối đa. Mặc định: 100.",
+            "max_video_pts_rate": "Hệ số làm chậm video tối đa. Mặc định: 10 (không được vượt quá 10).",
+            "cjk_len": "Số ký tự mỗi dòng với phụ đề tiếng Trung, Nhật, Hàn; vượt quá sẽ xuống dòng",
+            "other_len": "Số từ mỗi dòng với phụ đề các ngôn ngữ khác; vượt quá sẽ xuống dòng"
+        },
+
+        "prompt_init": {
+            "initial_prompt_zh-cn": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Trung giản thể.",
+            "initial_prompt_zh-tw": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Trung phồn thể.",
+            "initial_prompt_en": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Anh.",
+            "initial_prompt_fr": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Pháp.",
+            "initial_prompt_de": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Đức.",
+            "initial_prompt_ja": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Nhật.",
+            "initial_prompt_ko": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Hàn.",
+            "initial_prompt_km": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Khmer.",
+            "initial_prompt_ru": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Nga.",
+            "initial_prompt_es": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Tây Ban Nha.",
+            "initial_prompt_th": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Thái.",
+            "initial_prompt_it": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Ý.",
+            "initial_prompt_pt": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Bồ Đào Nha.",
+            "initial_prompt_vi": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Việt.",
+            "initial_prompt_ar": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Ả Rập.",
+            "initial_prompt_tr": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Thổ Nhĩ Kỳ.",
+            "initial_prompt_hi": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Hindi.",
+            "initial_prompt_hu": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Hungary.",
+            "initial_prompt_uk": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Ukraina.",
+            "initial_prompt_id": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Indonesia.",
+            "initial_prompt_ms": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Mã Lai.",
+            "initial_prompt_kk": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Kazakh.",
+            "initial_prompt_cs": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Séc.",
+            "initial_prompt_pl": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Ba Lan.",
+            "initial_prompt_nl": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Hà Lan.",
+            "initial_prompt_sv": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Thụy Điển.",
+            "initial_prompt_he": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Do Thái.",
+            "initial_prompt_bn": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Bengal.",
+            "initial_prompt_fa": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Ba Tư.",
+            "initial_prompt_ur": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Urdu.",
+            "initial_prompt_yue": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Quảng Đông.",
+            "initial_prompt_nb": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Na Uy.",
+            "initial_prompt_ro": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Romania.",
+            "initial_prompt_el": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Hy Lạp.",
+            "initial_prompt_fil": "Prompt khởi tạo của mô hình Whisper cho giọng tiếng Philippines."
+        }
+    }
+
+    titles = {
+        "cjk_len": "Số ký tự mỗi dòng (Trung/Nhật/Hàn)",
+        "other_len": "Số từ mỗi dòng (ngôn ngữ khác)",
+        "process_max": "Số tác vụ CPU [khởi động lại]",
+        "process_max_gpu": "Số tác vụ GPU [khởi động lại]",
+        "multi_gpus": "Chế độ nhiều GPU [khởi động lại]",
+        "max_audio_speed_rate": "Hệ số tăng tốc âm thanh tối đa",
+        "max_video_pts_rate": "Hệ số làm chậm video tối đa",
+        "batch_nums": "Số video mỗi đợt dịch",
+        "dont_notify": "Tắt thông báo màn hình",
+        "llm_ai_type": "Kênh AI dùng để tách câu bằng LLM",
+        "prompt_init": "Prompt khởi tạo mô hình Whisper",
+        "gemini_recogn_chunk": "Số lát cắt mỗi đợt nhận dạng Gemini",
+        "llm_chunk_size": "Số phụ đề gửi mỗi lần khi tách câu bằng LLM",
+        "hw_decode": "FFmpeg giải mã video bằng CUDA",
+        "ai302_models": "Danh sách mô hình dịch 302.AI",
+        "ai302tts_models": "Danh sách mô hình 302.AI-TTS",
+        "aitrans_temperature": "Nhiệt độ AI khi dịch phụ đề",
+        "aitrans_context": "Kênh AI dịch toàn bộ phụ đề trong một lần",
+        "no_speech_threshold": "Ngưỡng không có giọng nói",
+        "temperature": "Nhiệt độ (temperature)",
+        "hotwords": "Từ khóa ưu tiên (hotwords)",
+        "remove_dubb_silence": "Xóa khoảng lặng đệm mỗi đoạn lồng tiếng",
+        "normal_text": "Chuẩn hóa văn bản",
+        "uvr_models": "Mô hình tách nhạc nền",
+        "del_end_punc": "Xóa dấu câu cuối dòng phụ đề?",
+        "out_video_ext": "Định dạng video đầu ra (mp4/mkv)",
+
+        "retry_nums": "Số lần thử lại sau khi thất bại",
+        "fps_mode": "Tốc độ khung hình biến thiên (vfr)/cố định (cfr)",
+
+        "repetition_penalty": "Mức phạt lặp lại",
+        "compression_ratio_threshold": "Ngưỡng tỉ lệ nén",
+
+        "whisper_prepare": "Cắt trước âm thanh cho mô hình Whisper",
+        "vad_type": "Chọn VAD",
+
+        "speaker_type": "Mô hình phân tách người nói",
+
+        "hf_token": "Token huggingface.co của bạn",
+
+        "show_more_settings": "Hiện toàn bộ tham số?",
+
+        "edgetts_max_concurrent_tasks": "Số tác vụ EdgeTTS đồng thời",
+        "edgetts_retry_nums": "Số lần thử lại khi EdgeTTS lỗi",
+
+        "noise_separate_nums": "Số luồng tách giọng/nhạc nền",
+        "openairecognapi_model": "Mô hình nhận dạng OpenAI",
+        "chatgpt_model": "Danh sách mô hình ChatGPT",
+        "openaitts_model": "Danh sách mô hình OpenAI TTS",
+        "azure_model": "Danh sách mô hình Azure",
+        "localllm_model": "Danh sách mô hình LLM cục bộ",
+        "zijiehuoshan_model": "Điểm truy cập suy luận ByteDance Volcano",
+        "model_list": "Mô hình faster-whisper",
+        "Whisper_cpp_models": "Mô hình whisper.cpp",
+        "homedir": "Thư mục đầu ra chức năng độc lập",
+        "lang": "Ngôn ngữ giao diện phần mềm",
+        "save_segment_audio": "Lưu tệp lồng tiếng của từng dòng phụ đề",
+        "crf": "Kiểm soát chất lượng video đầu ra (CRF)",
+        "force_lib": "Ép mã hóa video bằng phần mềm?",
+        "preset": "Mức nén video đầu ra",
+        "ffmpeg_cmd": "Tham số dòng lệnh FFmpeg tùy chỉnh",
+        "video_codec": "Mã hóa H.264/H.265",
+        "threshold": "VAD: ngưỡng xác suất giọng nói",
+        "max_speech_duration_s": "VAD: đoạn nói dài nhất (giây)",
+        "min_speech_duration_ms": "VAD: đoạn nói ngắn nhất (ms)",
+
+        "max_speech_duration_s2": "Nhận dạng lần 2: dài nhất (giây)",
+        "min_speech_duration_ms2": "Nhận dạng lần 2: ngắn nhất (ms)",
+
+        "min_silence_duration_ms": "VAD: khoảng lặng tối thiểu để tách (ms)",
+        "merge_short_sub": "Gộp các phụ đề ngắn",
+        "trans_thread": "Số dòng mỗi lần dịch (kênh truyền thống)",
+        "aitrans_thread": "Số dòng mỗi lần dịch (kênh AI)",
+        "dubbing_thread": "Số luồng lồng tiếng đồng thời",
+        "countdown_sec": "Đếm ngược khi tạm dừng dịch video đơn",
+        "backaudio_volume": "Hệ số âm lượng nhạc nền",
+        "loop_backaudio": "Lặp nhạc nền",
+        "cuda_com_type": "Kiểu dữ liệu tính toán",
+        "beam_size": "Độ chính xác nhận dạng (beam_size)",
+        "best_of": "Độ chính xác nhận dạng (best_of)",
+        "condition_on_previous_text": "Bật nhận biết ngữ cảnh",
+        "zh_hant_s": "Chuyển phụ đề Trung phồn thể sang giản thể",
+        "chattts_voice": "Giá trị seed giọng ChatTTS",
+        "translation_wait": "Nghỉ (giây) sau mỗi yêu cầu dịch",
+        "dubbing_wait": "Nghỉ (giây) sau mỗi yêu cầu lồng tiếng",
+        "gemini_model": "Danh sách mô hình Gemini",
+        "aisendsrt": "Gửi nguyên định dạng SRT khi dịch AI",
+        "initial_prompt_zh-cn": "Prompt khởi tạo cho tiếng Trung giản thể",
+        "initial_prompt_zh-tw": "Prompt khởi tạo cho tiếng Trung phồn thể",
+        "initial_prompt_en": "Prompt khởi tạo cho tiếng Anh",
+        "initial_prompt_fr": "Prompt khởi tạo cho tiếng Pháp",
+        "initial_prompt_de": "Prompt khởi tạo cho tiếng Đức",
+        "initial_prompt_ja": "Prompt khởi tạo cho tiếng Nhật",
+        "initial_prompt_ko": "Prompt khởi tạo cho tiếng Hàn",
+        "initial_prompt_ru": "Prompt khởi tạo cho tiếng Nga",
+        "initial_prompt_es": "Prompt khởi tạo cho tiếng Tây Ban Nha",
+        "initial_prompt_th": "Prompt khởi tạo cho tiếng Thái",
+        "initial_prompt_it": "Prompt khởi tạo cho tiếng Ý",
+        "initial_prompt_pt": "Prompt khởi tạo cho tiếng Bồ Đào Nha",
+        "initial_prompt_vi": "Prompt khởi tạo cho tiếng Việt",
+        "initial_prompt_ar": "Prompt khởi tạo cho tiếng Ả Rập",
+        "initial_prompt_tr": "Prompt khởi tạo cho tiếng Thổ Nhĩ Kỳ",
+        "initial_prompt_hi": "Prompt khởi tạo cho tiếng Hindi",
+        "initial_prompt_hu": "Prompt khởi tạo cho tiếng Hungary",
+        "initial_prompt_km": "Prompt khởi tạo cho tiếng Khmer",
+        "initial_prompt_ro": "Prompt khởi tạo cho tiếng Romania",
+        "initial_prompt_uk": "Prompt khởi tạo cho tiếng Ukraina",
+        "initial_prompt_id": "Prompt khởi tạo cho tiếng Indonesia",
+        "initial_prompt_ms": "Prompt khởi tạo cho tiếng Mã Lai",
+        "initial_prompt_kk": "Prompt khởi tạo cho tiếng Kazakh",
+        "initial_prompt_cs": "Prompt khởi tạo cho tiếng Séc",
+        "initial_prompt_pl": "Prompt khởi tạo cho tiếng Ba Lan",
+        "initial_prompt_nl": "Prompt khởi tạo cho tiếng Hà Lan",
+        "initial_prompt_bn": "Prompt khởi tạo cho tiếng Bengal",
+        "initial_prompt_nb": "Prompt khởi tạo cho tiếng Na Uy",
+        "initial_prompt_el": "Prompt khởi tạo cho tiếng Hy Lạp",
+        "initial_prompt_he": "Prompt khởi tạo cho tiếng Do Thái",
+        "initial_prompt_sv": "Prompt khởi tạo cho tiếng Thụy Điển",
+        "initial_prompt_fa": "Prompt khởi tạo cho tiếng Ba Tư",
+        "initial_prompt_ur": "Prompt khởi tạo cho tiếng Urdu",
+        "initial_prompt_yue": "Prompt khởi tạo cho tiếng Quảng Đông",
+        "initial_prompt_fil": "Prompt khởi tạo cho tiếng Philippines"
+    }
+
+    heads = {
+        "common": "Chung",
+        "video": "Video đầu ra",
+        "whisper": "Cài đặt nhận dạng",
+        "justify": "Đồng bộ",
+        "trans": "Dịch thuật",
+        "dubbing": "Lồng tiếng",
+        "prompt_init": "Prompt Whisper"
+    }
+elif defaulelang != 'zh':
     notices = {
         "common": {
             "lang": "Set the software's interface language. Requires a restart to take effect.",

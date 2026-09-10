@@ -79,7 +79,7 @@ class APIRecogn(BaseRecogn):
                 "data":"SRT格式字符串"
             }
             testdata=json.dumps(testdata,ensure_ascii=False)
-            raise SpeechToTextError(f'识别出错,应返回类似数据:\n{testdata}\n\n但实际返回: {res}')
+            raise SpeechToTextError(tr('recognapi format error', testdata, res))
         self.signal(
             text=tools.get_srt_from_list(res['data']),
             type='replace_subtitle'

@@ -25,7 +25,7 @@ class Ui_qwenttslocal(object):
 
         h1_prompt = QtWidgets.QHBoxLayout()
         self.instruct_text = QLineEdit()
-        h1_prompt.addWidget(QLabel('自定义音色提示词' if defaulelang=='zh' else 'Custom Voice Prompt'))
+        h1_prompt.addWidget(QLabel('Prompt giọng tùy chỉnh' if defaulelang == 'vi' else ('自定义音色提示词' if defaulelang == 'zh' else 'Custom Voice Prompt')))
         h1_prompt.addWidget(self.instruct_text)
         v1.addLayout(h1_prompt)
         

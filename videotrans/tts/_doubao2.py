@@ -6,7 +6,7 @@ from typing import Union, Dict, List
 from tenacity import retry_if_not_exception_type, stop_after_attempt, wait_fixed, before_log, after_log, retry
 
 from videotrans.configure.excepts import StopTask, NO_RETRY_EXCEPT
-from videotrans.configure.config import logger, params, settings
+from videotrans.configure.config import logger, params, settings, tr
 from videotrans.tts._base import BaseTTS
 from videotrans.util import tools
 import requests
@@ -81,9 +81,9 @@ class Doubao2TTS(BaseTTS):
         response = requests.post(url, headers=headers, json=payload, stream=True)
 
         if response.status_code in [404, 402, 401, 400]:
-            raise StopTask('请检查 appid 和 access token 参数是否正确')
+            raise StopTask(tr('Please check doubao appid and access token'))
         if response.status_code == 403:
-            raise StopTask('该角色正式版可能需要在字节后台单独开通购买')
+            raise StopTask(tr('This voice may need separate purchase'))
 
         response.raise_for_status()
         logger.debug(f"code: {response.status_code} header: {response.headers}")

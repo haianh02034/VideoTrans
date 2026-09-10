@@ -5,7 +5,7 @@ from typing import List, Union
 import dashscope
 from tenacity import retry, retry_if_not_exception_type, wait_fixed, stop_after_attempt, before_log, after_log
 from videotrans.configure.excepts import TranslateSrtError, NO_RETRY_EXCEPT
-from videotrans.configure.config import params, logger, settings
+from videotrans.configure.config import params, logger, settings, tr
 from videotrans.translator._base import BaseTrans
 from videotrans.util import tools
 
@@ -77,7 +77,7 @@ class QwenMT(BaseTrans):
 
         if response.code or not response.output:
             if "url error" in response.message:
-                raise TranslateSrtError(f'需要纯文本模型，但 {model_name} 可能是多模态模型')
+                raise TranslateSrtError(tr('A plain text model is required', model_name))
             raise TranslateSrtError(response.message)
         if not response.output.choices:
             raise TranslateSrtError(f'qwen-mt returned empty choices')

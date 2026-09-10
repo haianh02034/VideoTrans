@@ -77,7 +77,19 @@ class Ui_transapiform(object):
     # setupUi
 
     def retranslateUi(self, transapiform):
-        if defaulelang == 'zh':
+        if defaulelang == 'vi':
+            tips = """
+Sẽ gửi dữ liệu application/www-urlencode tới địa chỉ API đã điền bằng phương thức GET:
+text: văn bản cần dịch / chuỗi
+source_language: mã ngôn ngữ gốc zh,en,ja,ko,ru,de,fr,tr,th,vi,ar,hi,hu,es,pt,it / chuỗi
+target_language: mã ngôn ngữ đích zh,en,ja,ko,ru,de,fr,tr,th,vi,ar,hi,hu,es,pt,it / chuỗi
+Mong đợi API trả về dữ liệu định dạng json:
+{
+    code: 0 = thành công, số lớn hơn 0 là thất bại, msg: ok = thành công, giá trị khác là lý do thất bại, text: văn bản đã dịch
+}
+API dịch miễn phí dựa trên cloudflare và m2m100: github.com/jianchang512/translate-api
+"""
+        elif defaulelang == 'zh':
             tips = """
 将以GET请求向填写的API地址发送application/www-urlencode数据：
 text:需要翻译的文本/字符串
@@ -104,7 +116,7 @@ Usage: github.com/jianchang512/translate-api
         transapiform.setWindowTitle(
             tr("Customizing the Translate API"))
         self.label_3.setText(tr("Secret"))
-        self.miyue.setPlaceholderText("填写密钥")
+        self.miyue.setPlaceholderText(tr("Secret"))
 
         self.tips.setPlainText(tips)
 

@@ -70,19 +70,13 @@ class Ui_watermark(object):
         pos = QtWidgets.QHBoxLayout()
         self.labelpos = QtWidgets.QLabel()
         self.compos = QtWidgets.QComboBox()
-        self.compos.addItems([
-                                 "左上角",
-                                 "右上角",
-                                 "右下角",
-                                 "左下角",
-                                 "居 中"
-                             ] if defaulelang == 'zh' else [
-            "Upper left",
-            "Upper right",
-            "Bottom right",
-            "Bottom left",
-            "Center"
-        ])
+        if defaulelang == 'vi':
+            _poslist = ["Trên trái", "Trên phải", "Dưới phải", "Dưới trái", "Chính giữa"]
+        elif defaulelang == 'zh':
+            _poslist = ["左上角", "右上角", "右下角", "左下角", "居 中"]
+        else:
+            _poslist = ["Upper left", "Upper right", "Bottom right", "Bottom left", "Center"]
+        self.compos.addItems(_poslist)
         pos.addWidget(self.labelpos)
         pos.addWidget(self.compos)
         self.verticalLayout.addLayout(pos)

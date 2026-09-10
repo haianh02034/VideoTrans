@@ -94,7 +94,7 @@ class DubbingMixin:
         self.queue_tts = copy.deepcopy(queue_tts)
 
         if not self.queue_tts or len(self.queue_tts) < 1:
-            raise RuntimeError(f'字幕长度为0，无法继续配音')
+            raise RuntimeError(tr('Subtitle length is 0, cannot continue dubbing'))
 
         if len([it.get("ref_wav") for it in self.queue_tts if it.get("ref_wav")]) > 0:
             self._create_ref_from_vocal()

@@ -37,7 +37,7 @@ class Ui_fishttsform(object):
 
         self.label_5 = QLabel(fishttsform)
         self.label_5.setObjectName("label_5")
-        self.label_5.setText('API请求说明')
+        self.label_5.setText(tr("API request instructions"))
         v1.addWidget(self.label_5)
 
         self.tips = QPlainTextEdit(fishttsform)
@@ -104,6 +104,6 @@ references[0][text]:参考音频中的语音文本
         fishttsform.setWindowTitle("Fish-speech API " +tr('This channel needs deployed and started before available'))
         self.tips.setPlainText(tips)
         self.save.setText(tr("Save"))
-        self.api_url.setPlaceholderText("填写http开头的API,Fish-speech 1.5.0默认 http://127.0.0.1:8080/v1/tts")
+        self.api_url.setPlaceholderText(tr("fishtts api placeholder"))
         self.label.setText("Fish-speech API")
         self.test.setText(tr("Test"))

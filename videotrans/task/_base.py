@@ -83,7 +83,7 @@ class BaseTask(BaseCon):
                 f.write(txt)
         except Exception as e:
             from videotrans.configure.excepts import VideoTransError
-            raise VideoTransError(f'保存字幕前格式化srt失败:{file=}') from e
+            raise VideoTransError(tr('Failed to format srt before saving subtitles') + f':{file=}') from e
 
         self.signal(text=Path(file).read_text(encoding='utf-8', errors="ignore"), type='replace_subtitle')
         return True

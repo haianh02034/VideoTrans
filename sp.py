@@ -38,14 +38,14 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-# 抑制警告
+# Chặn cảnh báo Qt
 def suppress_qt_warnings(msg_type, context, message):
     if "QThreadStorage" in message:
         return
 
 
 def cleanup():
-    """强制清理函数"""
+    """Dọn dẹp bộ nhớ khi thoát"""
     try:
         if 'app' in globals():
             app.quit()
@@ -56,10 +56,10 @@ def cleanup():
 
 def show_global_error_dialog(exctype, value, tb):
     tb_str = "".join(traceback.format_exception(exctype, value, tb))
-    QMessageBox.critical(None, 'Error', tb_str)
+    QMessageBox.critical(None, 'Lỗi', tb_str)
 
 
-# 启动画面
+# Màn hình khởi động
 class StartWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -71,7 +71,7 @@ class StartWindow(QWidget):
 
         self.resize(560, 350)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # 窗口背景透明
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # Nền trong suốt
 
         self.background_label = QLabel(self)
         self.pixmap = QPixmap("./videotrans/styles/logo.png")
@@ -79,10 +79,10 @@ class StartWindow(QWidget):
         self.background_label.setScaledContents(True)
         self.background_label.setGeometry(self.rect())
 
-        # 背景上叠加文字
+        # Văn bản chồng lên nền
         v_layout = QVBoxLayout(self)
         v_layout.addStretch(1)
-        self.status_label = QLabel(f"pyVideoTrans {VERSION} Loading...")
+        self.status_label = QLabel(f"pyVideoTrans {VERSION} Đang tải...")
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.status_label.setStyleSheet("font-size:16px; color:white; background-color:transparent;")
 
@@ -90,11 +90,11 @@ class StartWindow(QWidget):
         v_layout.setContentsMargins(0, 0, 0, 20)
 
     def closeEvent(self, event):
-        # 释放启动画面的资源
+        # Giải phóng tài nguyên màn hình khởi động
         if hasattr(self, 'pixmap') and self.pixmap:
             self.pixmap = None
 
-        # 如果主窗口不存在，则退出应用程序
+        # Thoát ứng dụng nếu chưa có cửa sổ chính
         if self.main_window is None:
             QApplication.instance().quit()
 
@@ -103,10 +103,10 @@ class StartWindow(QWidget):
     def update_lable(self, t):
         print(f'{int(time.time())}:{t}')
         if t == 'end':
-            self.status_label.setText(f'Total time {int(time.time() - self.start_time)}s')
+            self.status_label.setText(f'Tổng thời gian {int(time.time() - self.start_time)}s')
             QTimer.singleShot(1000, lambda: self.close())
         else:
-            self.status_label.setText(f'{t}  {int(time.time() - self.start_time)}s')
+            self.status_label.setText(f'{t}  {int(time.time()) - self.start_time}s')
         QApplication.processEvents()
 
     def center(self):
@@ -116,7 +116,7 @@ class StartWindow(QWidget):
             self.move(center_point.x() - self.width() // 2, center_point.y() - self.height() // 2)
 
 
-# 启动主窗口
+# Khởi động cửa sổ chính
 def initialize_full_app(start_window, app_instance):
     if sys.stdout is None or sys.stderr is None:
         try:
@@ -132,19 +132,19 @@ def initialize_full_app(start_window, app_instance):
 
     sys.excepthook = show_global_error_dialog
 
-    # 命令行参数
+    # Tham số dòng lệnh
     parser = argparse.ArgumentParser()
-    parser.add_argument('--lang', type=str, help='Set the application language (e.g., en, zh)')
+    parser.add_argument('--lang', type=str, help='Đặt ngôn ngữ ứng dụng (VD: en, zh, vi)')
     cli_args, unknown = parser.parse_known_args()
     if cli_args.lang:
         os.environ['PYVIDEOTRANS_LANG'] = cli_args.lang.lower()
-    start_window.update_lable('Loading resources...')
+    start_window.update_lable('Đang tải tài nguyên...')
     QApplication.processEvents()
-    # 导入qss image 资源
+    # Nhập tài nguyên qss image
     import videotrans.ui.dark.darkstyle_rc
     with open('./videotrans/styles/style.qss', 'r', encoding='utf-8') as f:
         app_instance.setStyleSheet(f.read())
-    start_window.update_lable('Loading main window...')
+    start_window.update_lable('Đang tải cửa sổ chính...')
     QApplication.processEvents()
 
     from videotrans.mainwin.main_win import MainWindow
@@ -154,7 +154,7 @@ def initialize_full_app(start_window, app_instance):
         w, h = int(screen.width() * 0.85), int(screen.height() * 0.85)
         size = sets.value("windowSize", QSize(w, h))
         w, h = size.width(), size.height()
-        start_window.update_lable('Initializing UI...')
+        start_window.update_lable('Đang khởi tạo giao diện...')
         QApplication.processEvents()
         start_window.main_window = MainWindow(width=w, height=h,callback=start_window.update_lable)
     except Exception as e:
@@ -164,7 +164,7 @@ def initialize_full_app(start_window, app_instance):
 
 
 if __name__ == "__main__":
-    # Windows 打包需要
+    # Cần cho đóng gói Windows
     import multiprocessing
 
     multiprocessing.freeze_support()
@@ -183,7 +183,7 @@ if __name__ == "__main__":
         signal.signal(signal.SIGINT, handle_exit)
         signal.signal(signal.SIGTERM, handle_exit)
 
-    # 设置 HighDpi
+    # Cài đặt HighDpi
     try:
         QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
     except AttributeError:
@@ -196,7 +196,7 @@ if __name__ == "__main__":
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Critical)
         msg_box.setWindowTitle('Error')
-        msg_box.setText('请解压后再双击 sp.exe，不可直接压缩包内使用')
+        msg_box.setText('Vui lòng giải nén trước khi chạy sp.exe, không thể chạy trực tiếp từ file nén')
         msg_box.setWindowFlags(msg_box.windowFlags() | Qt.WindowStaysOnTopHint)
         msg_box.exec()
         app.quit()
