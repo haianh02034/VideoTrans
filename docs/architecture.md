@@ -1,99 +1,95 @@
-# Phiên Dịch Video 技术架构与实现原理
+# Kiến trúc kỹ thuật và nguyên lý hoạt động của Phiên Dịch Video
 
-`Phiên Dịch Video` 是一款功能强大的开源视频翻译配音工具（v4.03），能够将视频自动翻译并配上目标语言的语音。其核心设计理念是模块化、多线程流水线，通过灵活的标志位组合支持多种工作模式。
-
-![](https://pvtr2.pyvideotrans.com/1760167240539_image.png)
+`Phiên Dịch Video` là công cụ mã nguồn mở dịch và lồng tiếng video (v4.04), có thể tự động dịch video rồi lồng tiếng bằng ngôn ngữ đích. Tư tưởng thiết kế cốt lõi là mô-đun hóa và dây chuyền đa luồng, dùng các tổ hợp cờ linh hoạt để hỗ trợ nhiều chế độ làm việc khác nhau.
 
 ---
 
-## 一、核心处理流程
+## 1. Luồng xử lý cốt lõi
 
-![](https://pvtr2.pyvideotrans.com/1760165489380_image.png)
+Phần mềm chia quá trình dịch và lồng tiếng video thành **9 giai đoạn độc lập**, tạo thành một dây chuyền tự động. Mỗi tác vụ dùng 5 cờ boolean (`should_recogn`, `should_trans`, `should_dubbing`, `should_hebing`, `should_separate`) để quyết định bỏ qua giai đoạn nào, nhờ đó hỗ trợ được nhiều chế độ làm việc.
 
-软件将视频翻译配音过程分解为 **9 个独立阶段**，形成一条自动化的处理流水线。每个任务通过 5 个布尔标志位（`should_recogn`、`should_trans`、`should_dubbing`、`should_hebing`、`should_separate`）控制哪些阶段被跳过，从而支持不同的工作模式。
+### 1.1 Chín giai đoạn xử lý
 
-### 1.1 九个处理阶段
-
-| 阶段 | 方法 | 职责 |
+| Giai đoạn | Phương thức | Nhiệm vụ |
 |------|------|------|
-| **① 预处理** | `prepare()` | 从视频中分离无声视频流和原始音频流；可选人声/背景分离（UVR/Spleeter）；可选降噪；创建缓存目录和输出目录 |
-| **② 语音识别** | `recogn()` | 调用 ASR 引擎（默认 Faster-Whisper，支持 22 种渠道）将音频转录为带时间戳的 SRT 字幕；可选标点恢复、LLM 重新断句 |
-| **③ 说话人分离** | `diariz()` | 调用说话人分离模型（built、ali_CAM、pyannote、reverb 四种后端），将字幕按说话人归类标注 |
-| **④ 字幕翻译** | `trans()` | 将原始语言 SRT 字幕通过翻译渠道（24 种渠道）翻译为目标语言字幕；支持双语字幕输出 |
-| **⑤ 配音** | `dubbing()` | 根据目标语言字幕内容和时间戳，调用 TTS 引擎（34 种渠道）逐条生成配音音频；支持声音克隆（从原始音频截取参考片段） |
-| **⑥ 音画对齐** | `align()` | 通过 `SpeedRate` 类处理：配音加速、视频慢放、去除字幕间隙静音、字幕音频强制对齐；完成后可选调节音量 |
-| **⑦ 二次识别** | `recogn2pass()` | 对配音音频再次进行 ASR，生成时间轴精确且短小的字幕（仅在启用配音且非双字幕嵌入时执行） |
-| **⑧ 最终合成** | `assembling()` | 将无声视频流、配音音频、背景音乐、目标语言字幕合并为最终视频文件（ffmpeg） |
-| **⑨ 收尾** | `task_done()` | 将输出文件从临时目录移动到指定输出目录，清理临时文件，发送完成通知 |
+| **① Tiền xử lý** | `prepare()` | Tách luồng video câm và luồng âm thanh gốc khỏi video; tùy chọn tách giọng nói/nhạc nền (UVR/Spleeter); tùy chọn khử nhiễu; tạo thư mục đệm và thư mục đầu ra |
+| **② Nhận dạng giọng nói** | `recogn()` | Gọi công cụ ASR (mặc định Faster-Whisper, hỗ trợ 26 kênh) để chuyển âm thanh thành phụ đề SRT có dấu thời gian; tùy chọn khôi phục dấu câu, tách câu bằng LLM |
+| **③ Phân tách người nói** | `diariz()` | Gọi mô hình phân tách người nói (bốn nền: built, ali_CAM, pyannote, reverb) để gán nhãn người nói cho từng dòng phụ đề |
+| **④ Dịch phụ đề** | `trans()` | Dịch phụ đề SRT ngôn ngữ gốc sang ngôn ngữ đích qua kênh dịch (24 kênh); hỗ trợ xuất phụ đề song ngữ |
+| **⑤ Lồng tiếng** | `dubbing()` | Dựa vào nội dung và dấu thời gian phụ đề đích, gọi công cụ TTS (34 kênh) tạo từng đoạn lồng tiếng; hỗ trợ nhân bản giọng (cắt đoạn tham chiếu từ âm thanh gốc) |
+| **⑥ Đồng bộ hình tiếng** | `align()` | Xử lý qua lớp `SpeedRate`: tăng tốc lồng tiếng, làm chậm video, xóa khoảng lặng giữa phụ đề, ép đồng bộ phụ đề với âm thanh; xong có thể chỉnh âm lượng |
+| **⑦ Nhận dạng lần 2** | `recogn2pass()` | Chạy ASR lại trên chính tệp lồng tiếng để tạo phụ đề có dấu thời gian chuẩn và câu ngắn gọn (chỉ chạy khi có lồng tiếng và không nhúng phụ đề song ngữ) |
+| **⑧ Dựng video cuối** | `assembling()` | Ghép luồng video câm, âm thanh lồng tiếng, nhạc nền và phụ đề ngôn ngữ đích thành tệp video cuối (ffmpeg) |
+| **⑨ Kết thúc** | `task_done()` | Chuyển tệp kết quả từ thư mục tạm sang thư mục đầu ra đã chỉ định, dọn tệp tạm, gửi thông báo hoàn tất |
 
-### 1.2 流程控制标志位
+### 1.2 Các cờ điều khiển luồng
 
-定义在 `phiendichvideo/task/_base.py:20-29`，五个标志位在 `TransCreate.__post_init__()` 中根据配置自动计算：
+Định nghĩa tại `phiendichvideo/task/_base.py:20-29`, năm cờ này được tính tự động trong `TransCreate.__post_init__()` dựa trên cấu hình:
 
 ```python
-should_recogn: bool    # 是否需要语音识别（无已有字幕则为 True）
-should_trans: bool     # 是否需要翻译（源语言 ≠ 目标语言则为 True）
-should_dubbing: bool   # 是否需要配音（选择了配音角色且非 'No' 则为 True）
-should_hebing: bool    # 是否需要嵌入合并（非 'tiqu' 模式且有配音或字幕嵌入则为 True）
-should_separate: bool  # 是否需要人声背景分离
+should_recogn: bool    # có cần nhận dạng giọng nói không (True nếu chưa có phụ đề sẵn)
+should_trans: bool     # có cần dịch không (True nếu ngôn ngữ nguồn ≠ ngôn ngữ đích)
+should_dubbing: bool   # có cần lồng tiếng không (True nếu đã chọn giọng và khác 'No')
+should_hebing: bool    # có cần nhúng và ghép không (True nếu không phải chế độ 'tiqu' và có lồng tiếng hoặc nhúng phụ đề)
+should_separate: bool  # có cần tách giọng nói khỏi nhạc nền không
 ```
 
-### 1.3 模式切换示例
+### 1.3 Ví dụ chuyển chế độ
 
-不同功能通过标志位组合实现：
+Các chức năng khác nhau được tạo ra bằng tổ hợp cờ:
 
-| 功能 | should_recogn | should_trans | should_dubbing | should_hebing |
+| Chức năng | should_recogn | should_trans | should_dubbing | should_hebing |
 |------|:---:|:---:|:---:|:---:|
-| 视频翻译配音（标准模式） | ✓ | ✓ | ✓ | ✓ |
-| 视频/音频转字幕（tiqu） | ✓ | 可选 | ✗ | ✗ |
-| 字幕配音 | ✗ | ✗ | ✓ | ✓ |
-| 仅翻译字幕文件 | ✗ | ✓ | ✗ | ✗ |
+| Dịch và lồng tiếng video (chế độ chuẩn) | ✓ | ✓ | ✓ | ✓ |
+| Chuyển video/audio thành phụ đề (tiqu) | ✓ | tùy chọn | ✗ | ✗ |
+| Lồng tiếng cho phụ đề | ✗ | ✗ | ✓ | ✓ |
+| Chỉ dịch tệp phụ đề | ✗ | ✓ | ✗ | ✗ |
 
-### 1.4 任务子类体系
+### 1.4 Hệ thống lớp con của tác vụ
 
-`BaseTask` 有四个具体子类，各自对应不同的使用场景：
+`BaseTask` có bốn lớp con cụ thể, mỗi lớp ứng với một tình huống sử dụng:
 
-| 子类 | 文件 | 继承的 TaskCfg | 使用场景 |
+| Lớp con | Tệp | TaskCfg kế thừa | Tình huống dùng |
 |------|------|----------------|---------|
-| `TransCreate` | `task/trans_create.py` | `TaskCfgVTT` | 完整视频翻译配音（标准模式 / tiqu 提取模式） |
-| `SpeechToText` | `task/speech2text.py` | `TaskCfgSTT` | 批量语音转字幕 |
-| `DubbingSrt` | `task/dubbing.py` | `TaskCfgTTS` | 批量为字幕配音 |
-| `TranslateSrt` | `task/translate_srt.py` | `TaskCfgSTS` | 批量翻译 SRT 字幕 |
+| `TransCreate` | `task/trans_create.py` | `TaskCfgVTT` | Dịch và lồng tiếng video đầy đủ (chế độ chuẩn / chế độ trích tiqu) |
+| `SpeechToText` | `task/speech2text.py` | `TaskCfgSTT` | Chuyển giọng nói thành phụ đề hàng loạt |
+| `DubbingSrt` | `task/dubbing.py` | `TaskCfgTTS` | Lồng tiếng hàng loạt cho phụ đề |
+| `TranslateSrt` | `task/translate_srt.py` | `TaskCfgSTS` | Dịch hàng loạt tệp phụ đề SRT |
 
 ---
 
-## 二、任务配置数据类体系
+## 2. Hệ thống lớp dữ liệu cấu hình tác vụ
 
-v4.03 重构了任务配置为分层继承的 `@dataclass` 体系（`phiendichvideo/task/taskcfg.py`，261 行）：
+Bản v4.03 đã tái cấu trúc cấu hình tác vụ thành hệ thống `@dataclass` kế thừa phân tầng (`phiendichvideo/task/taskcfg.py`, 261 dòng):
 
 ```
-@dataclass TaskCfgBase              ← 通用字段（路径、语言代码、缓存目录等）
-    ├── @dataclass TaskCfgSTT       ← 语音识别相关字段（recogn_type, model_name, rephrase 等）
-    ├── @dataclass TaskCfgTTS       ← 配音相关字段（tts_type, voice_role, voice_autorate 等）
-    ├── @dataclass TaskCfgSTS       ← 翻译相关字段（translate_type）
-    └── @dataclass TaskCfgVTT       ← 视频翻译全量字段（继承 STT + TTS + STS，新增视频特有字段）
+@dataclass TaskCfgBase              ← trường dùng chung (đường dẫn, mã ngôn ngữ, thư mục đệm...)
+    ├── @dataclass TaskCfgSTT       ← trường liên quan nhận dạng (recogn_type, model_name, rephrase...)
+    ├── @dataclass TaskCfgTTS       ← trường liên quan lồng tiếng (tts_type, voice_role, voice_autorate...)
+    ├── @dataclass TaskCfgSTS       ← trường liên quan dịch (translate_type)
+    └── @dataclass TaskCfgVTT       ← toàn bộ trường dịch video (kế thừa STT + TTS + STS, thêm trường riêng của video)
 ```
 
-辅助数据类：
+Các lớp dữ liệu hỗ trợ:
 
-| 数据类 | 文件 | 用途 |
+| Lớp dữ liệu | Tệp | Công dụng |
 |--------|------|------|
-| `InputFile` | `task/taskcfg.py` | 输入文件元信息（name, dirname, noextname, basename, ext, uuid, target_dir），支持 dict 式访问 |
-| `SignMsg` | `task/taskcfg.py` | 信号消息体（type, uuid, text），提供 `is_stop()` 和 `is_error()` 方法判断状态，在 Worker 线程与主线程间传递 |
-| `SrtItem` | `task/taskcfg.py` | 单条字幕数据（text, start_time, end_time, startraw, endraw, line, time, spk, filename） |
+| `InputFile` | `task/taskcfg.py` | Siêu dữ liệu tệp đầu vào (name, dirname, noextname, basename, ext, uuid, target_dir), truy cập được kiểu dict |
+| `SignMsg` | `task/taskcfg.py` | Nội dung thông điệp tín hiệu (type, uuid, text), có `is_stop()` và `is_error()` để kiểm tra trạng thái, dùng để truyền giữa luồng Worker và luồng chính |
+| `SrtItem` | `task/taskcfg.py` | Dữ liệu một dòng phụ đề (text, start_time, end_time, startraw, endraw, line, time, spk, filename) |
 
-`SrtItem` 支持同时用属性访问（`item.text`）和字典访问（`item['text']`），并可通过 `items()` 迭代。
+`SrtItem` cho phép truy cập vừa theo thuộc tính (`item.text`) vừa theo kiểu từ điển (`item['text']`), và duyệt được qua `items()`.
 
 ---
 
-## 三、多线程异步任务处理架构
+## 3. Kiến trúc xử lý tác vụ bất đồng bộ đa luồng
 
-软件采用基于 **"生产者-消费者"模式** 的多线程多队列架构。`MultVideo` 线程充当生产者，将任务对象推入流水线的第一个队列；9 种专用 `BaseWorker` 子类作为消费者，各自监听专属队列。
+Phần mềm dùng kiến trúc đa luồng nhiều hàng đợi theo **mô hình "nhà sản xuất - người tiêu thụ"**. Luồng `MultVideo` đóng vai nhà sản xuất, đẩy đối tượng tác vụ vào hàng đợi đầu tiên của dây chuyền; 9 lớp con `BaseWorker` chuyên biệt đóng vai người tiêu thụ, mỗi lớp lắng nghe một hàng đợi riêng.
 
-### 3.1 队列流水线
+### 3.1 Dây chuyền hàng đợi
 
 ```
-                     MultVideo (生产者)
+                     MultVideo (nhà sản xuất)
                            │
                     app_cfg.prepare_queue
                            ▼
@@ -145,12 +141,12 @@ taskdone_queue
  ▼
 WorkerTaskDone (×1)
  │
-(end)
+(kết thúc)
 ```
 
-### 3.2 Worker 基类设计
+### 3.2 Thiết kế lớp cơ sở Worker
 
-所有工作线程继承自 `BaseWorker(QThread)`（`phiendichvideo/task/job.py:13-66`）：
+Mọi luồng làm việc đều kế thừa `BaseWorker(QThread)` (`phiendichvideo/task/job.py:13-66`):
 
 ```python
 class BaseWorker(QThread):
@@ -160,261 +156,261 @@ class BaseWorker(QThread):
 
     def run(self):
         while True:
-            if app_cfg.exit_soft:          # 全局软退出标志
+            if app_cfg.exit_soft:          # cờ thoát mềm toàn cục
                 return
             try:
-                trk = self.queue.get(timeout=1)  # 阻塞1秒取任务
+                trk = self.queue.get(timeout=1)  # chờ lấy tác vụ tối đa 1 giây
             except Empty:
                 continue
-            if trk.uuid in app_cfg.stoped_uuid_set:  # 任务已停止
+            if trk.uuid in app_cfg.stoped_uuid_set:  # tác vụ đã bị dừng
                 continue
             try:
-                self.process_task(trk)       # 子类实现具体逻辑
+                self.process_task(trk)       # lớp con cài đặt logic cụ thể
             except Exception as e:
-                self.handle_error(e, trk)    # 统一错误处理
+                self.handle_error(e, trk)    # xử lý lỗi tập trung
 ```
 
-每个子类重写以下方法：
+Mỗi lớp con ghi đè các phương thức sau:
 
-| 方法 | 说明 |
+| Phương thức | Mô tả |
 |------|------|
-| `process_task(trk)` | **必须** — 执行阶段逻辑，并将 trk 路由到下一个队列 |
-| `get_error_prefix(trk)` | 可选 — 返回错误前缀字符串（如 `"识别出错[Faster-Whisper]"`） |
-| `cleanup_on_error(trk)` | 可选 — 出错时的清理逻辑 |
+| `process_task(trk)` | **Bắt buộc** — thực hiện logic của giai đoạn và định tuyến trk sang hàng đợi kế tiếp |
+| `get_error_prefix(trk)` | Tùy chọn — trả về chuỗi tiền tố lỗi (ví dụ `"Lỗi nhận dạng[Faster-Whisper]"`) |
+| `cleanup_on_error(trk)` | Tùy chọn — logic dọn dẹp khi gặp lỗi |
 
-`handle_error()` 统一调用 `get_msg_from_except()` 解析异常为用户可读信息，然后通过 `trk.signal()` 发送错误消息。
+`handle_error()` gọi thống nhất `get_msg_from_except()` để chuyển ngoại lệ thành thông báo dễ hiểu cho người dùng, rồi gửi thông điệp lỗi qua `trk.signal()`.
 
-### 3.3 Worker 路由决策逻辑
+### 3.3 Logic định tuyến của Worker
 
-每个 Worker 在执行完 `process_task(trk)` 后，根据 `trk` 的标志位决定下一跳队列：
+Sau khi chạy xong `process_task(trk)`, mỗi Worker dựa vào các cờ của `trk` để quyết định hàng đợi kế tiếp:
 
 ```
 WorkerPrepare    →  regcon_queue | trans_queue | dubb_queue | assemb_queue | taskdone_queue
-WorkerRegcon     →  diariz_queue  (无条件)
-WorkerDiariz     →  trans_queue | dubb_queue | assemb_queue | taskdone_queue  (diariz 异常不阻断流程)
+WorkerRegcon     →  diariz_queue  (không điều kiện)
+WorkerDiariz     →  trans_queue | dubb_queue | assemb_queue | taskdone_queue  (lỗi diariz không chặn luồng)
 WorkerTrans      →  dubb_queue | assemb_queue | taskdone_queue
-WorkerDubb       →  align_queue  (无条件)
-WorkerAlign      →  regcon2_queue | assemb_queue | taskdone_queue  (regcon2 仅当有 recogn2pass 属性时)
+WorkerDubb       →  align_queue  (không điều kiện)
+WorkerAlign      →  regcon2_queue | assemb_queue | taskdone_queue  (regcon2 chỉ khi có thuộc tính recogn2pass)
 WorkerRegcon2Pass → assemb_queue | taskdone_queue
-WorkerAssemb     →  taskdone_queue  (无条件)
-WorkerTaskDone   →  (终止)
+WorkerAssemb     →  taskdone_queue  (không điều kiện)
+WorkerTaskDone   →  (kết thúc)
 ```
 
-### 3.4 线程数量动态计算
+### 3.4 Tính số luồng động
 
-`start_thread()`（`phiendichvideo/task/job.py:206-245`）根据 GPU 配置动态决定各 Worker 的实例数：
+`start_thread()` (`phiendichvideo/task/job.py:206-245`) quyết định số thực thể của từng Worker dựa trên cấu hình GPU:
 
-| Worker | 实例数 | 原因 |
+| Worker | Số thực thể | Lý do |
 |--------|--------|------|
-| `WorkerPrepare` | 1 ~ 4 | GPU 密集型操作（视频编解码） |
-| `WorkerRegcon` | 1 ~ 4 | GPU 密集型（ASR 推理） |
-| `WorkerDiariz` | 1 ~ 4 | GPU 密集型（说话人分离） |
-| `WorkerTrans` | **固定 1** | API 调用，避免并发限流 |
-| `WorkerDubb` | **固定 1** | TTS API 调用，避免并发限流 |
-| `WorkerRegcon2Pass` | **固定 1** | 辅助阶段 |
-| `WorkerAlign` | **固定 1** | 音画对齐为单线程 |
-| `WorkerAssemb` | 1 ~ 4 | GPU 密集型（ffmpeg 编码） |
-| `WorkerTaskDone` | **固定 1** | 文件移动/清理 |
+| `WorkerPrepare` | 1 ~ 4 | Nặng về GPU (mã hóa/giải mã video) |
+| `WorkerRegcon` | 1 ~ 4 | Nặng về GPU (suy luận ASR) |
+| `WorkerDiariz` | 1 ~ 4 | Nặng về GPU (phân tách người nói) |
+| `WorkerTrans` | **cố định 1** | Gọi API, tránh bị giới hạn tần suất |
+| `WorkerDubb` | **cố định 1** | Gọi API TTS, tránh bị giới hạn tần suất |
+| `WorkerRegcon2Pass` | **cố định 1** | Giai đoạn phụ trợ |
+| `WorkerAlign` | **cố định 1** | Đồng bộ hình tiếng chạy đơn luồng |
+| `WorkerAssemb` | 1 ~ 4 | Nặng về GPU (mã hóa ffmpeg) |
+| `WorkerTaskDone` | **cố định 1** | Di chuyển và dọn tệp |
 
-`task_nums` 计算逻辑：优先使用 `settings.process_max_gpu` 手动指定值；否则根据 `multi_gpus` + `NVIDIA_GPU_NUMS` 自动检测（1 GPU = 1，2-3 GPU = 2，≥4 GPU = 4，无 GPU = 1）。
+Cách tính `task_nums`: ưu tiên giá trị người dùng đặt tay trong `settings.process_max_gpu`; nếu không thì tự dò theo `multi_gpus` + `NVIDIA_GPU_NUMS` (1 GPU = 1, 2-3 GPU = 2, từ 4 GPU trở lên = 4, không có GPU = 1).
 
-### 3.5 批量任务提交：MultVideo
+### 3.5 Gửi tác vụ hàng loạt: MultVideo
 
-`MultVideo(QThread)`（`phiendichvideo/task/mult_video.py`，54 行）负责将用户选择的多个视频文件逐个创建 `TransCreate` 对象并推入 `prepare_queue`。支持通过 `batch_nums` 参数控制每批并发数量：
+`MultVideo(QThread)` (`phiendichvideo/task/mult_video.py`, 54 dòng) chịu trách nhiệm tạo lần lượt đối tượng `TransCreate` cho từng tệp video người dùng chọn rồi đẩy vào `prepare_queue`. Số lượng chạy đồng thời mỗi đợt điều khiển bằng tham số `batch_nums`:
 
-- `batch_nums == 0`：全部任务一次性推入队列（最大并发）
-- `batch_nums == 1`：逐次推入，每个任务完成后再推下一个
-- `batch_nums > 1`：每批推入 N 个，等待该批全部完成后再推下一批
+- `batch_nums == 0`: đẩy toàn bộ tác vụ vào hàng đợi một lần (đồng thời tối đa)
+- `batch_nums == 1`: đẩy từng cái một, xong tác vụ này mới đẩy tác vụ kế
+- `batch_nums > 1`: mỗi đợt đẩy N cái, chờ cả đợt xong mới đẩy đợt tiếp
 
-### 3.6 软退出机制
+### 3.6 Cơ chế thoát mềm
 
-全局标志 `app_cfg.exit_soft` 设为 `True` 时，所有 Worker 在下一轮循环中检测并安全退出。`app_cfg.stoped_uuid_set` 用于标记被手动停止的特定任务 UUID，Worker 在取出任务后跳过这些任务。
+Khi cờ toàn cục `app_cfg.exit_soft` được đặt `True`, mọi Worker sẽ phát hiện ở vòng lặp kế tiếp và thoát an toàn. `app_cfg.stoped_uuid_set` đánh dấu UUID của những tác vụ bị dừng thủ công; Worker lấy tác vụ ra sẽ bỏ qua chúng.
 
 ---
 
-## 四、核心类的设计与继承关系
+## 4. Thiết kế và quan hệ kế thừa của các lớp cốt lõi
 
-### 4.1 类继承体系
+### 4.1 Hệ thống kế thừa
 
 ```
 @dataclass BaseCon                    ← phiendichvideo/configure/base.py
-    │                                  基础属性和工具方法
+    │                                  thuộc tính nền và phương thức tiện ích
     ├── @dataclass BaseTask           ← phiendichvideo/task/_base.py
-    │       │                          定义 8 个阶段空方法和 5 个标志位
-    │       ├── @dataclass TransCreate ← phiendichvideo/task/trans_create.py (~1678 行核心)
-    │       ├── @dataclass SpeechToText ← phiendichvideo/task/speech2text.py (批量语音识别)
-    │       ├── @dataclass DubbingSrt  ← phiendichvideo/task/dubbing.py (批量字幕配音)
-    │       └── @dataclass TranslateSrt ← phiendichvideo/task/translate_srt.py (批量字幕翻译)
+    │       │                          định nghĩa 8 phương thức giai đoạn rỗng và 5 cờ
+    │       ├── @dataclass TransCreate ← phiendichvideo/task/trans_create.py (~1678 dòng, phần lõi)
+    │       ├── @dataclass SpeechToText ← phiendichvideo/task/speech2text.py (nhận dạng hàng loạt)
+    │       ├── @dataclass DubbingSrt  ← phiendichvideo/task/dubbing.py (lồng tiếng phụ đề hàng loạt)
+    │       └── @dataclass TranslateSrt ← phiendichvideo/task/translate_srt.py (dịch phụ đề hàng loạt)
     │
     ├── @dataclass BaseRecogn         ← phiendichvideo/recognition/_base.py
-    │       │                          VAD 音频切分、字幕合并、CJK 处理
-    │       └── 22 个子类（懒加载）    各 ASR 渠道具体实现
+    │       │                          cắt âm thanh bằng VAD, gộp phụ đề, xử lý CJK
+    │       └── 26 lớp con (nạp lười)  cài đặt cụ thể của từng kênh ASR
     │
     ├── @dataclass BaseTrans          ← phiendichvideo/translator/_base.py
-    │       │                          MD5 缓存、逐行/全文翻译调度
-    │       └── 24 个子类（懒加载）    各翻译渠道具体实现
+    │       │                          đệm MD5, điều phối dịch theo dòng/toàn văn
+    │       └── 24 lớp con (nạp lười)  cài đặt cụ thể của từng kênh dịch
     │
     └── @dataclass BaseTTS            ← phiendichvideo/tts/_base.py
-            │                          异步/多线程并发调度
-            └── 34 个子类（懒加载）    各 TTS 渠道具体实现
+            │                          điều phối bất đồng bộ/đa luồng
+            └── 34 lớp con (nạp lười)  cài đặt cụ thể của từng kênh TTS
 ```
 
-所有通道类均为 `@dataclass`，使用 `__post_init__` 初始化而非传统构造函数 `__init__`。
+Mọi lớp kênh đều là `@dataclass`, khởi tạo bằng `__post_init__` thay vì hàm dựng `__init__` truyền thống.
 
-### 4.2 BaseCon——顶层基类
+### 4.2 BaseCon — lớp cơ sở cao nhất
 
-`phiendichvideo/configure/base.py`（296 行）定义了所有类共用的核心能力：
+`phiendichvideo/configure/base.py` (296 dòng) định nghĩa các năng lực cốt lõi mà mọi lớp đều dùng chung:
 
-| 方法 | 职责 |
+| Phương thức | Nhiệm vụ |
 |------|------|
-| `_exit()` | 检查是否应停止（`exit_soft` 或 UUID 在 `stoped_uuid_set` 中） |
-| `signal(**kwargs)` | 向 UI 发送消息（通过 `push_queue()` → `SignalHub`。CLI 模式下直接 print） |
-| `_set_proxy(type)` | 设置/清除 HTTP 代理（操作 `app_cfg.proxy` 和环境变量） |
-| `_new_process(callback, title, is_cuda, kwargs)` | **在子进程中执行耗时任务**（返回 `(data, error)` 元组） |
-| `_signal_of_process(logs_file)` | 通过轮询 JSON 日志文件的 mtime 实时读取子进程进度 |
-| `convert_to_wav()` | 音频统一转为 48kHz 立体声 WAV（可选去静音） |
-| `_base64_to_audio()` / `_audio_to_base64()` | Base64 音频编解码 |
-| `_process_callback(data)` | 下载进度回调（转发到 `signal()`） |
+| `_exit()` | Kiểm tra có nên dừng không (`exit_soft` hoặc UUID nằm trong `stoped_uuid_set`) |
+| `signal(**kwargs)` | Gửi thông điệp lên giao diện (qua `push_queue()` → `SignalHub`; ở chế độ CLI thì in thẳng) |
+| `_set_proxy(type)` | Đặt/xóa proxy HTTP (thao tác trên `app_cfg.proxy` và biến môi trường) |
+| `_new_process(callback, title, is_cuda, kwargs)` | **Chạy tác vụ nặng trong tiến trình con** (trả về bộ `(data, error)`) |
+| `_signal_of_process(logs_file)` | Đọc tiến độ tiến trình con theo thời gian thực bằng cách theo dõi mtime của tệp nhật ký JSON |
+| `convert_to_wav()` | Chuyển âm thanh về WAV 48kHz stereo (tùy chọn bỏ khoảng lặng) |
+| `_base64_to_audio()` / `_audio_to_base64()` | Mã hóa/giải mã âm thanh Base64 |
+| `_process_callback(data)` | Hàm gọi lại báo tiến độ tải (chuyển tiếp tới `signal()`) |
 
-`BaseCon.__post_init__()` 在初始化时自动调用 `_set_proxy(type='set')` 获取代理配置。
+`BaseCon.__post_init__()` tự gọi `_set_proxy(type='set')` khi khởi tạo để lấy cấu hình proxy.
 
-### 4.3 BaseTask——任务基类
+### 4.3 BaseTask — lớp cơ sở của tác vụ
 
-`phiendichvideo/task/_base.py:10-167` 定义了所有任务子类的阶段空方法和共享工具：
+`phiendichvideo/task/_base.py:10-167` định nghĩa các phương thức giai đoạn rỗng và công cụ dùng chung cho mọi lớp con:
 
-**阶段方法**（均为空实现，由子类重写）：
-`prepare()`、`recogn()`、`diariz()`、`trans()`、`dubbing()`、`align()`、`assembling()`、`task_done()`
+**Phương thức giai đoạn** (đều rỗng, lớp con ghi đè):
+`prepare()`, `recogn()`, `diariz()`, `trans()`, `dubbing()`, `align()`, `assembling()`, `task_done()`
 
-> 注意：`recogn2pass()` 方法定义在 `TransCreate` 中，不在 `BaseTask` 基类中。
+> Lưu ý: `recogn2pass()` được định nghĩa trong `TransCreate`, không nằm ở lớp cơ sở `BaseTask`.
 
-**共享方法**：
-| 方法 | 职责 |
+**Phương thức dùng chung**:
+| Phương thức | Nhiệm vụ |
 |------|------|
-| `_unlink_size0(file)` | 删除尺寸为 0 的无效文件 |
-| `_save_srt_target(srtstr, file)` | 将 SrtItem 列表格式化为 SRT 字符串并写入文件，发送 `replace_subtitle` 信号 |
-| `check_target_sub(source, target)` | 校验翻译前后字幕行数一致性；不一致时按时间轴匹配对齐 |
-| `set_end(succeed=False)` | 标记任务结束，成功时发送通知并清理临时文件夹 |
-| `_edgetts_single(target_audio, kwargs)` | Edge-TTS 一次性异步配音（带代理回退） |
+| `_unlink_size0(file)` | Xóa tệp rỗng (kích thước 0) không hợp lệ |
+| `_save_srt_target(srtstr, file)` | Định dạng danh sách SrtItem thành chuỗi SRT rồi ghi ra tệp, gửi tín hiệu `replace_subtitle` |
+| `check_target_sub(source, target)` | Kiểm tra số dòng phụ đề trước và sau khi dịch có khớp không; không khớp thì căn theo trục thời gian |
+| `set_end(succeed=False)` | Đánh dấu tác vụ kết thúc, nếu thành công thì gửi thông báo và dọn thư mục tạm |
+| `_edgetts_single(target_audio, kwargs)` | Lồng tiếng bất đồng bộ một lần bằng Edge-TTS (có dự phòng khi proxy lỗi) |
 
-### 4.4 TransCreate——视频翻译核心实现
+### 4.4 TransCreate — phần lõi dịch video
 
-`phiendichvideo/task/trans_create.py`（约 1678 行）是完整 9 阶段处理逻辑的实现类。关键内部方法：
+`phiendichvideo/task/trans_create.py` (khoảng 1678 dòng) là lớp cài đặt đầy đủ logic 9 giai đoạn. Các phương thức nội bộ quan trọng:
 
-| 方法 | 职责 |
+| Phương thức | Nhiệm vụ |
 |------|------|
-| `__post_init__()` | 初始化所有文件路径、计算标志位、启动进度计时线程 |
-| `_split_novoice_byraw()` | 从原始视频分离无声视频（优先硬件解码 h264_cuvid，回退 libx264） |
-| `_split_audio_byraw()` | 从原始视频提取 16kHz 单声道 PCM 音频 + 可选人声/背景分离 |
-| `_tts()` | 构建 `queue_tts` 列表（含 clone 参考音频片段），调用 `tts.run()` |
-| `_create_ref_from_vocal()` | 多线程（ThreadPoolExecutor）裁剪原始音频对应片段作为声音克隆参考 |
-| `_recogn_succeed()` | 识别完成后的处理（tiqu 模式下复制文件） |
-| `_back_music()` | 将用户上传的背景音乐与配音音频混合 |
-| `_separate()` | 将分离出的背景音乐重新嵌入配音音频 |
-| `_process_subtitles()` | 处理软/硬字幕嵌入逻辑（单/双字幕、样式设置） |
+| `__post_init__()` | Khởi tạo mọi đường dẫn tệp, tính các cờ, khởi động luồng đếm tiến độ |
+| `_split_novoice_byraw()` | Tách video câm khỏi video gốc (ưu tiên giải mã phần cứng h264_cuvid, dự phòng libx264) |
+| `_split_audio_byraw()` | Trích âm thanh PCM 16kHz đơn kênh từ video gốc + tùy chọn tách giọng nói/nhạc nền |
+| `_tts()` | Dựng danh sách `queue_tts` (gồm cả đoạn âm thanh tham chiếu để nhân bản giọng), gọi `tts.run()` |
+| `_create_ref_from_vocal()` | Cắt các đoạn âm thanh gốc tương ứng làm mẫu nhân bản giọng, chạy đa luồng (ThreadPoolExecutor) |
+| `_recogn_succeed()` | Xử lý sau khi nhận dạng xong (chế độ tiqu thì sao chép tệp) |
+| `_back_music()` | Trộn nhạc nền người dùng tải lên với âm thanh lồng tiếng |
+| `_separate()` | Nhúng lại nhạc nền đã tách vào âm thanh lồng tiếng |
+| `_process_subtitles()` | Xử lý logic nhúng phụ đề mềm/cứng (đơn ngữ/song ngữ, thiết lập kiểu dáng) |
 
-### 4.5 子进程通道
+### 4.5 Các kênh chạy trong tiến trình con
 
-为防止 `faster-whisper` 崩溃导致整个软件退出，`Faster-Whisper`、`Faster-Whisper-XXL` 和 `Whisper.cpp`（以及部分 TTS 引擎如 `QWEN3LOCAL_TTS`）通过 `BaseCon._new_process()` 委托给 `GlobalProcessManager` 在独立子进程中执行。
+Để tránh việc `faster-whisper` sập kéo theo cả phần mềm thoát, các kênh `Faster-Whisper`, `Faster-Whisper-XXL` và `Whisper.cpp` (cùng một vài công cụ TTS như `QWEN3LOCAL_TTS`) được ủy thác cho `GlobalProcessManager` chạy trong tiến trình con riêng, thông qua `BaseCon._new_process()`.
 
-子进程通过写入 JSON 日志文件来报告进度。`BaseCon._signal_of_process()` 在守护线程中轮询该日志文件，检测到 mtime 变化时解析 JSON 并通过 `signal()` 上报。
+Tiến trình con báo tiến độ bằng cách ghi vào tệp nhật ký JSON. `BaseCon._signal_of_process()` chạy trong luồng nền, theo dõi tệp nhật ký đó, phát hiện mtime thay đổi thì đọc JSON và báo lên qua `signal()`.
 
 ---
 
-## 五、配置系统
+## 5. Hệ thống cấu hình
 
-软件将配置分为三个层次（`phiendichvideo/configure/config.py`，902 行），均为 `@dataclass`：
+Phần mềm chia cấu hình thành ba tầng (`phiendichvideo/configure/config.py`, 902 dòng), tất cả đều là `@dataclass`:
 
-| 配置类 | 持久化 | 用途 | 示例字段 |
+| Lớp cấu hình | Lưu trữ | Công dụng | Trường ví dụ |
 |--------|--------|------|---------|
-| `AppCfg` | 纯内存 | 队列、状态、线程控制、运行时上下文 | `prepare_queue`, `exit_soft`, `stoped_uuid_set`, `current_status`, `line_roles`, `exec_mode`, `video_codec`, `onlyone_source_sub`, `onlyone_target_sub`, `proxy`, `SUPPORT_LANG` |
-| `AppSettings` | `phiendichvideo/cfg.json` | 全局默认设置、模型列表 | `homedir`, `model_list`, `vad_type`, `cuda_com_type` |
-| `AppParams` | `phiendichvideo/params.json` | 用户偏好、API 密钥 | `source_language`, `recogn_type`, `chatgpt_key`, `voice_role`, `app_mode` |
+| `AppCfg` | Chỉ trong bộ nhớ | Hàng đợi, trạng thái, điều khiển luồng, ngữ cảnh lúc chạy | `prepare_queue`, `exit_soft`, `stoped_uuid_set`, `current_status`, `line_roles`, `exec_mode`, `video_codec`, `onlyone_source_sub`, `onlyone_target_sub`, `proxy`, `SUPPORT_LANG` |
+| `AppSettings` | `phiendichvideo/cfg.json` | Thiết lập mặc định toàn cục, danh sách mô hình | `homedir`, `model_list`, `vad_type`, `cuda_com_type` |
+| `AppParams` | `phiendichvideo/params.json` | Tùy chọn người dùng, khóa API | `source_language`, `recogn_type`, `chatgpt_key`, `voice_role`, `app_mode` |
 
-关键单例变量在模块加载时自动初始化：
+Các biến singleton quan trọng được khởi tạo tự động khi nạp mô-đun:
 
 ```python
-app_cfg: AppCfg = AppCfg()        # 运行时状态（含 9 个 Queue 实例）
-settings: AppSettings = AppSettings()  # 从 cfg.json 加载
-params: AppParams = AppParams()    # 从 params.json 加载
+app_cfg: AppCfg = AppCfg()        # trạng thái lúc chạy (chứa 9 thực thể Queue)
+settings: AppSettings = AppSettings()  # nạp từ cfg.json
+params: AppParams = AppParams()    # nạp từ params.json
 ```
 
-### 5.1 AppSettings 特性
+### 5.1 Đặc điểm của AppSettings
 
-- 支持 `settings['key']` 字典式访问和 `settings.get('key', default)` 方法
-- `get()` 自动对数字类型字段进行类型强制转换（`int_type` 和 `float_type` 白名单）
-- `_get_defaults()` 定义了 ~100 个配置项的默认值
-- 支持连字符字段名映射（如 `"initial_prompt_zh-cn"` → `"initial_prompt_zh_cn"`）
+- Hỗ trợ truy cập kiểu từ điển `settings['key']` và phương thức `settings.get('key', default)`
+- `get()` tự ép kiểu cho các trường số (theo danh sách trắng `int_type` và `float_type`)
+- `_get_defaults()` định nghĩa giá trị mặc định cho khoảng 100 mục cấu hình
+- Hỗ trợ ánh xạ tên trường có dấu gạch nối (ví dụ `"initial_prompt_zh-cn"` → `"initial_prompt_zh_cn"`)
 
-### 5.2 AppParams 特性
+### 5.2 Đặc điểm của AppParams
 
-- `_get_defaults()` 定义了 ~100 个用户参数默认值
-- `getset_params(update_data)` 支持批量更新（如 `check_start()` 中收集所有 UI 控件值）
-- API key 类字段统一在此管理，供 `is_input_api()` 校验
+- `_get_defaults()` định nghĩa khoảng 100 tham số người dùng mặc định
+- `getset_params(update_data)` hỗ trợ cập nhật hàng loạt (như khi `check_start()` thu thập giá trị mọi widget)
+- Các trường khóa API được quản lý tập trung tại đây, phục vụ kiểm tra của `is_input_api()`
 
-### 5.3 AppCfg 运行时状态
+### 5.3 Trạng thái lúc chạy trong AppCfg
 
-- 9 个 `Queue(maxsize=0)`（无限容量）：`prepare_queue` ~ `taskdone_queue`
-- `queue_novice: Dict` — 跟踪无声视频分离进度（key=uuid, value='ing'|'end'）
-- `line_roles: Dict` — 存储单视频模式下用户逐行分配的字幕角色
-- `child_forms: Dict` — 缓存已打开的窗口实例，避免重复创建
-- `exec_mode` — 执行模式（'gui' 或 'cli'）
-- `video_codec` / `codec_cache` — 视频编解码器缓存
-- `onlyone_source_sub` / `onlyone_target_sub` / `onlyone_trans` — 单视频模式字幕状态
-- `SUPPORT_LANG` — 支持的语言列表
+- 9 hàng đợi `Queue(maxsize=0)` (không giới hạn dung lượng): từ `prepare_queue` đến `taskdone_queue`
+- `queue_novice: Dict` — theo dõi tiến độ tách video câm (khóa=uuid, giá trị='ing'|'end')
+- `line_roles: Dict` — lưu giọng đọc người dùng gán cho từng dòng ở chế độ một video
+- `child_forms: Dict` — đệm các cửa sổ đã mở, tránh tạo lại
+- `exec_mode` — chế độ chạy ('gui' hoặc 'cli')
+- `video_codec` / `codec_cache` — đệm bộ mã hóa/giải mã video
+- `onlyone_source_sub` / `onlyone_target_sub` / `onlyone_trans` — trạng thái phụ đề ở chế độ một video
+- `SUPPORT_LANG` — danh sách ngôn ngữ hỗ trợ
 
-### 5.4 环境变量初始化
+### 5.4 Khởi tạo biến môi trường
 
-`_set_env()` 在模块加载时自动执行（`phiendichvideo/configure/config.py:44-72`），设置：
+`_set_env()` chạy tự động khi nạp mô-đun (`phiendichvideo/configure/config.py:44-72`), thiết lập:
 - `MODELSCOPE_CACHE` / `HF_HOME` / `HF_HUB_CACHE` → `ROOT_DIR/models`
 - `QT_API = 'pyside6'`
-- `PATH` 追加 ffmpeg/sox 目录
+- Thêm thư mục ffmpeg/sox vào `PATH`
 - `OMP_NUM_THREADS = 1`
 - `HF_HUB_DOWNLOAD_TIMEOUT = 3600`
 - `HF_HUB_DISABLE_XET = 1`
 
 ---
 
-## 六、GlobalProcessManager——子进程池管理
+## 6. GlobalProcessManager — quản lý nhóm tiến trình con
 
-`phiendichvideo/process/signelobj.py`（167 行）实现了一个类级别单例的 `GlobalProcessManager`：
+`phiendichvideo/process/signelobj.py` (167 dòng) cài đặt `GlobalProcessManager` dạng singleton ở cấp lớp:
 
 ```
-GlobalProcessManager (类级别单例)
+GlobalProcessManager (singleton cấp lớp)
     ├── _executor_cpu: multiprocessing.Pool
-    │       workers = max(min(available_ram/4GB, 8, cpu_count), 1)  ← 基于剩余内存量计算
-    │       maxtasksperchild = 1  ← 每个子进程执行一个任务后重启，防内存泄漏
+    │       workers = max(min(RAM_khả_dụng/4GB, 8, cpu_count), 1)  ← tính theo bộ nhớ còn trống
+    │       maxtasksperchild = 1  ← mỗi tiến trình con chạy một tác vụ rồi khởi động lại, chống rò rỉ bộ nhớ
     │
     └── _executor_gpu: multiprocessing.Pool
-            workers = GPU 数量（优先 settings.process_max_gpu 手动设置）
+            workers = số GPU (ưu tiên giá trị đặt tay settings.process_max_gpu)
             maxtasksperchild = 1
 ```
 
-### 6.1 CPU 进程池规模
+### 6.1 Quy mô nhóm tiến trình CPU
 
-不再使用固定公式，而是通过 `psutil.virtual_memory().available` 获取当前系统剩余内存，按每 4GB 一个进程计算，限制在 **1~8** 之间，且不超过 `os.cpu_count()`。可通过 `settings.process_max` 手动覆盖。
+Không dùng công thức cố định nữa, mà lấy bộ nhớ còn trống của hệ thống qua `psutil.virtual_memory().available`, tính mỗi 4GB một tiến trình, giới hạn trong khoảng **1~8** và không vượt quá `os.cpu_count()`. Có thể ghi đè thủ công bằng `settings.process_max`.
 
-### 6.2 GPU 进程池规模
+### 6.2 Quy mô nhóm tiến trình GPU
 
-优先使用 `settings.process_max_gpu` 手动设置值；否则根据 `multi_gpus` 和 `NVIDIA_GPU_NUMS` 自动确定（无显卡 = 1，有显卡但未启用多显卡 = 1，启用多显卡 = min(GPU 数量, 8, cpu_count)）。
+Ưu tiên giá trị đặt tay `settings.process_max_gpu`; nếu không thì xác định theo `multi_gpus` và `NVIDIA_GPU_NUMS` (không có card = 1, có card nhưng chưa bật nhiều card = 1, bật nhiều card = min(số GPU, 8, cpu_count)).
 
-### 6.3 任务提交接口
+### 6.3 Giao diện gửi tác vụ
 
 ```python
 GlobalProcessManager.submit_task_cpu(func, **kwargs)   → AsyncResultFutureWrapper
 GlobalProcessManager.submit_task_gpu(func, **kwargs)   → AsyncResultFutureWrapper
 ```
 
-`AsyncResultFutureWrapper` 将 `Pool.apply_async` 的 `AsyncResult` 包装为 `Future` 兼容接口（`.result()`, `.done()`）。
+`AsyncResultFutureWrapper` bọc `AsyncResult` của `Pool.apply_async` thành giao diện tương thích `Future` (`.result()`, `.done()`).
 
-### 6.4 使用场景
+### 6.4 Tình huống sử dụng
 
-通过 `BaseCon._new_process()` 统一调用，用于执行：ASR 推理、TTS 合成、噪声去除、人声分离、说话人分离、标点恢复（均在独立子进程中运行，崩溃不影响主进程）。
+Được gọi thống nhất qua `BaseCon._new_process()`, dùng để chạy: suy luận ASR, tổng hợp TTS, khử nhiễu, tách giọng nói, phân tách người nói, khôi phục dấu câu — tất cả đều chạy trong tiến trình con riêng, sập cũng không ảnh hưởng tiến trình chính.
 
 ---
 
-## 七、SignalHub——跨线程消息中心
+## 7. SignalHub — trung tâm thông điệp giữa các luồng
 
-`phiendichvideo/configure/signal_hub.py`（33 行）实现了基于 Qt 信号的单例消息传递：
+`phiendichvideo/configure/signal_hub.py` (33 dòng) cài đặt cơ chế truyền thông điệp singleton dựa trên tín hiệu của Qt:
 
 ```python
 class SignalHub(QObject):
@@ -429,58 +425,58 @@ class SignalHub(QObject):
 
     @Slot(str, object)
     def post(self, uuid=None, data=None):
-        self.new_message.emit(uuid, data)  # 跨线程自动使用 QueuedConnection
+        self.new_message.emit(uuid, data)  # tự dùng QueuedConnection khi qua luồng khác
 ```
 
-### 消息流
+### Luồng thông điệp
 
 ```
 BaseCon.signal(**kwargs)
     → push_queue(uuid, SignMsg(**kwargs))     [configure/config.py]
         → SignalHub.instance().post(uuid, data)
-            → new_message Signal (QueuedConnection)
+            → tín hiệu new_message (QueuedConnection)
                 → WinAction.update_data(uuid, data)   [mainwin/_actions.py]
-                    → 按 type 分发:
+                    → phân nhánh theo type:
                         'logs'|'error'|'succeed'|'set_precent' → set_process_btn_text()
-                        'edit_subtitle_source' → 弹出 EditRecognResultDialog
-                        'edit_subtitle_target' → 弹出 SpeakerAssignmentDialog
-                        'edit_dubbing' → 弹出 EditDubbingResultDialog
-                        'replace_subtitle' → 更新字幕编辑区
+                        'edit_subtitle_source' → mở EditRecognResultDialog
+                        'edit_subtitle_target' → mở SpeakerAssignmentDialog
+                        'edit_dubbing' → mở EditDubbingResultDialog
+                        'replace_subtitle' → cập nhật vùng soạn phụ đề
                         'end' → update_status('end')
 ```
 
-### 消息类型枚举
+### Các loại thông điệp
 
-| type | 含义 | 处理逻辑 |
+| type | Ý nghĩa | Xử lý |
 |------|------|---------|
-| `logs` | 普通日志 | 更新进度条文本 |
-| `error` | 错误 | 进度条变红，加入重试队列 |
-| `succeed` | 成功 | 进度条变绿，标记完成 |
-| `set_precent` | 进度百分比 | `text="耗时???百分比"` 格式 |
-| `edit_subtitle_source` | 弹出原始字幕编辑框 | 单视频模式暂停点① |
-| `edit_subtitle_target` | 弹出翻译字幕编辑框 | 单视频模式暂停点② |
-| `edit_dubbing` | 弹出配音结果编辑框 | 单视频模式暂停点③ |
-| `replace_subtitle` | 替换字幕区域内容 | 批量/单视频共用 |
-| `subtitle` | 追加字幕行 | 逐行输出到编辑器 |
-| `end` | 任务完成 | 触发 update_status('end') |
-| `disabled_edit` | 禁止编辑字幕 | 批量模式下锁定编辑器 |
-| `refreshtts` | 刷新 TTS 选择 | 重新设置 TTS 下拉框 |
-| `shitingerror` | 试听错误 | 弹出错误提示 |
-| `ffmpeg` | ffmpeg 状态 | 更新开始按钮文本 |
+| `logs` | Nhật ký thường | Cập nhật chữ trên thanh tiến độ |
+| `error` | Lỗi | Thanh tiến độ chuyển đỏ, đưa vào hàng đợi thử lại |
+| `succeed` | Thành công | Thanh tiến độ chuyển xanh, đánh dấu hoàn tất |
+| `set_precent` | Phần trăm tiến độ | Định dạng `text="thời gian???phần trăm"` |
+| `edit_subtitle_source` | Mở hộp thoại sửa phụ đề gốc | Điểm dừng ① của chế độ một video |
+| `edit_subtitle_target` | Mở hộp thoại sửa phụ đề đã dịch | Điểm dừng ② của chế độ một video |
+| `edit_dubbing` | Mở hộp thoại sửa kết quả lồng tiếng | Điểm dừng ③ của chế độ một video |
+| `replace_subtitle` | Thay nội dung vùng phụ đề | Dùng chung cho cả hàng loạt và một video |
+| `subtitle` | Thêm dòng phụ đề | Xuất từng dòng ra trình soạn |
+| `end` | Tác vụ hoàn tất | Kích hoạt update_status('end') |
+| `disabled_edit` | Cấm sửa phụ đề | Khóa trình soạn ở chế độ hàng loạt |
+| `refreshtts` | Làm mới lựa chọn TTS | Đặt lại ô chọn TTS |
+| `shitingerror` | Lỗi nghe thử | Hiện thông báo lỗi |
+| `ffmpeg` | Trạng thái ffmpeg | Cập nhật chữ trên nút bắt đầu |
 
 ---
 
-## 八、动态通道加载
+## 8. Nạp kênh động
 
-`phiendichvideo/__init__.py`（35 行）提供了通用的懒加载机制：
+`phiendichvideo/__init__.py` (35 dòng) cung cấp cơ chế nạp lười dùng chung:
 
 ```python
 @dataclass
 class ChannelProvider:
-    name: str           # 界面显示名称
-    imp: str            # 模块导入后缀（如 "._whisper" → "phiendichvideo.recognition._whisper"）
-    key_name: str|None  # 对应 params.json 中的 API key 字段（用于 is_input_api 校验）
-    win: str|None       # 对应 winform 中的设置窗口名称
+    name: str           # tên hiển thị trên giao diện
+    imp: str            # hậu tố tên mô-đun (ví dụ "._whisper" → "phiendichvideo.recognition._whisper")
+    key_name: str|None  # tên trường khóa API tương ứng trong params.json (để is_input_api kiểm tra)
+    win: str|None       # tên cửa sổ cài đặt tương ứng trong winform
 
 def get_class(channel_id=0, provider_type=None, _ID_NAME_DICT=None):
     _key = f'{provider_type}-{channel_id}'
@@ -493,17 +489,17 @@ def get_class(channel_id=0, provider_type=None, _ID_NAME_DICT=None):
             return obj
 ```
 
-三大模块各自的 `_ID_NAME_DICT`：
+`_ID_NAME_DICT` của ba mô-đun chính:
 
-| 模块 | 渠道数 | 定义位置 |
+| Mô-đun | Số kênh | Nơi định nghĩa |
 |------|--------|---------|
-| 识别 (recognition) | 22 | `phiendichvideo/recognition/__init__.py:48-79` |
-| 翻译 (translator) | 24 | `phiendichvideo/translator/__init__.py:60-90` |
-| 配音 (tts) | **34** | `phiendichvideo/tts/__init__.py:75-116` |
+| Nhận dạng (recognition) | 26 | `phiendichvideo/recognition/__init__.py` |
+| Dịch (translator) | 24 | `phiendichvideo/translator/__init__.py` |
+| Lồng tiếng (tts) | **34** | `phiendichvideo/tts/__init__.py` |
 
-### 8.1 统一入口函数
+### 8.1 Hàm vào thống nhất
 
-每个模块提供 `run()` 统一入口，内部通过 `get_class()` 获取对应渠道类并实例化调用：
+Mỗi mô-đun đều có hàm `run()` làm điểm vào chung, bên trong gọi `get_class()` để lấy lớp kênh tương ứng rồi khởi tạo và chạy:
 
 ```python
 # recognition/__init__.py
@@ -522,53 +518,53 @@ def run(*, queue_tts, language, tts_type, ...) -> None:
     return _cls(**kwargs).run()
 ```
 
-### 8.2 API Key 校验
+### 8.2 Kiểm tra khóa API
 
-每个模块提供 `is_input_api(recogn_type/translate_type/tts_type)` 函数，检查对应渠道的 `key_name` 在 `params` 中是否已填写。未填写时自动弹出对应的 winform 设置窗口。
+Mỗi mô-đun có hàm `is_input_api(recogn_type/translate_type/tts_type)` để kiểm tra trường `key_name` của kênh tương ứng đã được điền trong `params` chưa. Chưa điền thì tự mở cửa sổ cài đặt winform tương ứng.
 
-### 8.3 翻译缓存
+### 8.3 Đệm bản dịch
 
-`BaseTrans`（`phiendichvideo/translator/_base.py`）实现了基于 MD5 的翻译缓存：
-- 缓存 key = `md5(channel_name + api_url + model + source_lang + target_lang + text)`
-- 缓存文件存储在 `{TEMP_ROOT}/translate_cache/`
-- 写入接口 `_set_cache()`，读取接口 `_get_cache()`
+`BaseTrans` (`phiendichvideo/translator/_base.py`) cài đặt cơ chế đệm bản dịch dựa trên MD5:
+- Khóa đệm = `md5(tên_kênh + api_url + model + ngôn_ngữ_nguồn + ngôn_ngữ_đích + văn_bản)`
+- Tệp đệm lưu tại `{TEMP_ROOT}/translate_cache/`
+- Ghi qua `_set_cache()`, đọc qua `_get_cache()`
 
-### 8.4 CJK 特殊处理
+### 8.4 Xử lý riêng cho CJK
 
-`BaseRecogn`（`phiendichvideo/recognition/_base.py:58-80`）在 `__post_init__` 中对中日韩等语言进行特殊处理：
-- `join_word_flag`：CJK 语言（zh, ja, ko, yu, th, km, yue）字幕词间不加空格（其他语言加空格）
-- `maxlen`：CJK 语言每行最大字符数为 `settings.cjk_len`（默认 15），其他语言为 `settings.other_len`（默认 40）
-- `jianfan`：中文语言且 `settings.zh_hant_s=True` 时启用繁简转换
+`BaseRecogn` (`phiendichvideo/recognition/_base.py:58-80`) xử lý riêng cho các ngôn ngữ Trung, Nhật, Hàn... trong `__post_init__`:
+- `join_word_flag`: với ngôn ngữ CJK (zh, ja, ko, yu, th, km, yue) thì không chèn khoảng trắng giữa các từ trong phụ đề (ngôn ngữ khác thì có)
+- `maxlen`: ngôn ngữ CJK dùng `settings.cjk_len` ký tự mỗi dòng (mặc định 15), ngôn ngữ khác dùng `settings.other_len` (mặc định 40)
+- `jianfan`: bật chuyển phồn thể sang giản thể khi là tiếng Trung và `settings.zh_hant_s=True`
 
-### 8.5 翻译调度策略
+### 8.5 Chiến lược điều phối dịch
 
-`BaseTrans.run()` 根据 `aisendsrt` 标志选择不同策略：
+`BaseTrans.run()` chọn chiến lược theo cờ `aisendsrt`:
 
-| 模式 | 条件 | 方法 | 并发数 |
+| Chế độ | Điều kiện | Phương thức | Số luồng đồng thời |
 |------|------|------|--------|
-| 逐行翻译 | 非 AI 渠道 | `_run_text()` → `_item_task()` | `settings.trans_thread`（默认 10） |
-| 全文翻译 | AI 渠道 + `aisendsrt=True` | `_run_srt()` | `settings.aitrans_thread`（默认 50） |
+| Dịch theo dòng | Kênh không phải AI | `_run_text()` → `_item_task()` | `settings.trans_thread` (mặc định 10) |
+| Dịch toàn văn | Kênh AI + `aisendsrt=True` | `_run_srt()` | `settings.aitrans_thread` (mặc định 50) |
 
-### 8.6 TTS 调度策略
+### 8.6 Chiến lược điều phối TTS
 
-`BaseTTS.run()` 根据渠道类型选择执行方式：
+`BaseTTS.run()` chọn cách chạy theo loại kênh:
 
-| 渠道类型 | 调度方式 | 说明 |
+| Loại kênh | Cách điều phối | Ghi chú |
 |---------|---------|------|
-| Edge-TTS | `asyncio` 异步 | 单线程内 async 并发 |
-| 其他渠道 | `ThreadPoolExecutor` | 由 `dubbing_thread` 控制并发数（默认 1） |
+| Edge-TTS | Bất đồng bộ `asyncio` | Chạy async đồng thời trong một luồng |
+| Kênh khác | `ThreadPoolExecutor` | Số luồng đồng thời do `dubbing_thread` quyết định (mặc định 1) |
 
-渠道子类可重写 `_exec()` 方法实现自定义调度。`BaseTTS` 默认调用 `__local_mul_thread()` → `_item_task()`。
+Lớp con của kênh có thể ghi đè `_exec()` để tự điều phối. Mặc định `BaseTTS` gọi `__local_mul_thread()` → `_item_task()`.
 
 ---
 
-## 九、交互式单视频处理模式
+## 9. Chế độ xử lý một video có tương tác
 
-当用户选择 **1 个视频** 且在**标准模式（biaozhun）**下时，程序采用不同于批量流水线的处理模型。
+Khi người dùng chọn **1 video** và đang ở **chế độ chuẩn (biaozhun)**, chương trình dùng mô hình xử lý khác với dây chuyền hàng loạt.
 
-### 9.1 实现：Worker(QThread)
+### 9.1 Cài đặt: Worker(QThread)
 
-`phiendichvideo/task/only_one.py`（148 行）中的 `Worker` 类在**单个 QThread 内串行执行**全部 9 个阶段，通过 `uito = Signal(str, SignMsg)` 与主线程通信：
+Lớp `Worker` trong `phiendichvideo/task/only_one.py` (148 dòng) chạy **tuần tự cả 9 giai đoạn trong một QThread duy nhất**, giao tiếp với luồng chính qua `uito = Signal(str, SignMsg)`:
 
 ```
 Worker.run()
@@ -576,357 +572,355 @@ Worker.run()
     ├── trk.prepare()
     ├── trk.recogn()
     ├── trk.diariz()
-    ├── [暂停点 ①] → _post(type='edit_subtitle_source')
-    │    用户校对原始字幕 → 点击"确定"或等待倒计时
-    ├── trk.trans() (if should_trans)
-    ├── [暂停点 ②] → _post(type='edit_subtitle_target')
-    │    用户校对翻译字幕 + 分配说话人角色 → 点击"确定"
-    ├── trk.dubbing() (if should_dubbing)
-    ├── [暂停点 ③] → _post(type='edit_dubbing')
-    │    用户修改配音结果 → 点击"确定"
+    ├── [Điểm dừng ①] → _post(type='edit_subtitle_source')
+    │    người dùng soát phụ đề gốc → bấm "Đồng ý" hoặc đợi hết đếm ngược
+    ├── trk.trans() (nếu should_trans)
+    ├── [Điểm dừng ②] → _post(type='edit_subtitle_target')
+    │    người dùng soát phụ đề đã dịch + gán giọng cho người nói → bấm "Đồng ý"
+    ├── trk.dubbing() (nếu should_dubbing)
+    ├── [Điểm dừng ③] → _post(type='edit_dubbing')
+    │    người dùng sửa kết quả lồng tiếng → bấm "Đồng ý"
     ├── trk.align()
     ├── trk.recogn2pass()
     ├── trk.assembling()
     └── trk.task_done()
 ```
 
-### 9.2 与批量模式的关键差异
+### 9.2 Khác biệt chính so với chế độ hàng loạt
 
-| 维度 | 单视频模式 | 批量模式 |
+| Khía cạnh | Chế độ một video | Chế độ hàng loạt |
 |------|-----------|---------|
-| 执行线程 | `Worker(QThread)` 直接执行，不使用队列管道 | `TransCreate` 推入 `prepare_queue`，经 9 个 Worker 队列流动 |
-| 消息通道 | `uito` 信号直接连接到 `WinAction.update_data()` | `BaseCon.signal()` → `push_queue()` → `SignalHub` |
-| 暂停机制 | 三段暂停点，用户可中间编辑 | 不支持暂停编辑 |
-| 进度显示 | 字幕编辑区实时显示 | 进度条 + 按钮文本 |
+| Luồng thực thi | `Worker(QThread)` chạy trực tiếp, không dùng đường ống hàng đợi | `TransCreate` đẩy vào `prepare_queue`, chảy qua 9 hàng đợi Worker |
+| Kênh thông điệp | Tín hiệu `uito` nối thẳng tới `WinAction.update_data()` | `BaseCon.signal()` → `push_queue()` → `SignalHub` |
+| Cơ chế tạm dừng | Ba điểm dừng, người dùng sửa được ở giữa chừng | Không hỗ trợ dừng để sửa |
+| Hiển thị tiến độ | Hiện trực tiếp trong vùng soạn phụ đề | Thanh tiến độ + chữ trên nút |
 
-### 9.3 倒计时与暂停机制
+### 9.3 Cơ chế đếm ngược và tạm dừng
 
-1. **自动倒计时**：`app_cfg.set_countdown(86400)` 设置初始值。Worker 线程每 `sleep(1)` 递减一次。默认倒计时由 `settings.countdown_sec` 控制。
-2. **无限期暂停**：用户点击"停止"按钮将 `app_cfg.current_status` 设为 `'stop'`，Worker 的 `_exit()` 检测后退出；或 `set_countdown(-1)` 让倒计时消失。
-3. **手动继续**：用户在校对对话框中点击"确定"后，`WinAction.set_djs_timeout()` 调用 `app_cfg.set_countdown(-1)` 使倒计时立即归零。
+1. **Đếm ngược tự động**: `app_cfg.set_countdown(86400)` đặt giá trị ban đầu. Luồng Worker giảm dần mỗi `sleep(1)`. Giá trị đếm ngược mặc định do `settings.countdown_sec` quyết định.
+2. **Dừng vô thời hạn**: người dùng bấm nút "Dừng" sẽ đặt `app_cfg.current_status` thành `'stop'`, `_exit()` của Worker phát hiện và thoát; hoặc `set_countdown(-1)` để bỏ đếm ngược.
+3. **Tiếp tục thủ công**: khi người dùng bấm "Đồng ý" trong hộp thoại soát lỗi, `WinAction.set_djs_timeout()` gọi `app_cfg.set_countdown(-1)` cho đếm ngược về 0 ngay lập tức.
 
-### 9.4 校对对话框
+### 9.4 Các hộp thoại soát lỗi
 
-| 对话框 | 文件 | 功能 |
+| Hộp thoại | Tệp | Chức năng |
 |--------|------|------|
-| `EditRecognResultDialog` | `component/onlyone_set_recogn.py` | 原始字幕编辑（文本 + 时间轴） |
-| `SpeakerAssignmentDialog` | `component/onlyone_set_role.py` | 翻译字幕编辑 + 逐行分配配音角色 |
-| `EditDubbingResultDialog` | `component/onlyone_set_editdubb.py` | 配音结果试听 + 单独重新配音 |
-
-![](https://pvtr2.pyvideotrans.com/1760192881455_image.png)
-![](https://pvtr2.pyvideotrans.com/1760192930833_image.png)
-
+| `EditRecognResultDialog` | `component/onlyone_set_recogn.py` | Sửa phụ đề gốc (nội dung + trục thời gian) |
+| `SpeakerAssignmentDialog` | `component/onlyone_set_role.py` | Sửa phụ đề đã dịch + gán giọng lồng tiếng cho từng dòng |
+| `EditDubbingResultDialog` | `component/onlyone_set_editdubb.py` | Nghe thử kết quả lồng tiếng + lồng tiếng lại từng dòng |
 
 ---
 
-## 十、音画对齐引擎（SpeedRate）
+## 10. Bộ máy đồng bộ hình tiếng (SpeedRate)
 
-`phiendichvideo/task/_rate.py`（877 行）实现了 `SpeedRate` 和 `TtsSpeedRate` 两个对齐引擎：
+`phiendichvideo/task/_rate.py` (877 dòng) cài đặt hai bộ máy đồng bộ là `SpeedRate` và `TtsSpeedRate`:
 
-### 10.1 SpeedRate（视频翻译场景）
+### 10.1 SpeedRate (dùng khi dịch video)
 
-处理策略（按优先级）：
+Chiến lược xử lý (theo thứ tự ưu tiên):
 
-| 条件 | 策略 |
+| Điều kiện | Chiến lược |
 |------|------|
-| 启用音频加速 + 视频慢速 | 各负担一半时间差（忽略倍率限制） |
-| 仅启用音频加速 | 加速配音到匹配字幕时长（最高不超过 `max_audio_speed_rate`） |
-| 仅启用视频慢速 | 慢放视频片段到匹配配音时长（最高不超过 `max_video_pts_rate`） |
-| 两者均未启用 | 按字幕时间轴拼接音频片段，填充静音/定格处理时长差异 |
+| Bật cả tăng tốc âm thanh và làm chậm video | Mỗi bên gánh một nửa chênh lệch (bỏ qua giới hạn tỉ lệ) |
+| Chỉ bật tăng tốc âm thanh | Tăng tốc lồng tiếng cho khớp thời lượng phụ đề (không vượt `max_audio_speed_rate`) |
+| Chỉ bật làm chậm video | Làm chậm đoạn video cho khớp thời lượng lồng tiếng (không vượt `max_video_pts_rate`) |
+| Không bật cả hai | Ghép các đoạn âm thanh theo trục thời gian phụ đề, bù khoảng lặng cho phần chênh lệch |
 
-额外处理：
-- `remove_silent_mid`：去除字幕之间的静音区间
-- `align_sub_audio`：强制对齐字幕时间轴到实际配音位置
-- 末尾静音移除
+Xử lý thêm:
+- `remove_silent_mid`: xóa khoảng lặng giữa các dòng phụ đề
+- `align_sub_audio`: ép trục thời gian phụ đề khớp vị trí lồng tiếng thực tế
+- Xóa khoảng lặng ở cuối
 
-### 10.2 TtsSpeedRate（纯配音场景）
+> Nguyên lý chi tiết xem [Nguyên lý đồng bộ dấu thời gian hình và tiếng](Synchronize.md)
 
-简化版对齐引擎，仅负责音频拼接与加速，无视频慢放逻辑。
+### 10.2 TtsSpeedRate (chỉ lồng tiếng)
+
+Bản rút gọn, chỉ lo ghép và tăng tốc âm thanh, không có logic làm chậm video.
 
 ---
 
-## 十一、软件启动与 UI 实现
+## 11. Khởi động phần mềm và cài đặt giao diện
 
-### 11.1 启动流程
+### 11.1 Luồng khởi động
 
-`sp.py` 是唯一入口（221 行），启动过程如下：
+`sp.py` là điểm vào duy nhất (221 dòng), quá trình khởi động như sau:
 
 ```
 sp.py (if __name__ == "__main__")
   │
   ├── 1. multiprocessing.freeze_support() / set_start_method('spawn')
-  ├── 2. qInstallMessageHandler() 抑制 Qt 警告
-  ├── 3. atexit.register(cleanup) 注册退出清理
+  ├── 2. qInstallMessageHandler() chặn cảnh báo của Qt
+  ├── 3. atexit.register(cleanup) đăng ký dọn dẹp khi thoát
   ├── 4. QApplication.setHighDpiScaleFactorRoundingPolicy(PassThrough)
-  ├── 5. 创建 QApplication
-  ├── 6. 检测是否在压缩包内运行（PyInstaller 打包版）
-  ├── 7. 创建 StartWindow (splash screen, 无边框半透明)
+  ├── 5. Tạo QApplication
+  ├── 6. Kiểm tra có đang chạy từ trong tệp nén không (bản đóng gói PyInstaller)
+  ├── 7. Tạo StartWindow (màn hình khởi động, không viền, nền trong suốt)
   │       └── QTimer.singleShot(100ms) → initialize_full_app()
-  │           ├── 重定向 sys.stdout/stderr 到日志文件
-  │           ├── 设置全局异常钩子 show_global_error_dialog
-  │           ├── 解析 --lang CLI 参数
-  │           ├── 导入 darkstyle_rc（编译后的 QRC 资源）
-  │           ├── 加载 QSS 样式表 (phiendichvideo/styles/style.qss)
-  │           ├── 恢复上次窗口大小 (QSettings)
-  │           └── 实例化 MainWindow → uito 连接 splash.update_lable
+  │           ├── Chuyển hướng sys.stdout/stderr sang tệp nhật ký
+  │           ├── Đặt bẫy ngoại lệ toàn cục show_global_error_dialog
+  │           ├── Đọc tham số dòng lệnh --lang
+  │           ├── Nạp darkstyle_rc (tài nguyên QRC đã biên dịch)
+  │           ├── Nạp bảng kiểu QSS (phiendichvideo/styles/style.qss)
+  │           ├── Khôi phục kích thước cửa sổ lần trước (QSettings)
+  │           └── Khởi tạo MainWindow → nối uito với splash.update_lable
   │               └── MainWindow.__init__()
-  │                   ├── setupUi() → 填充下拉列表（翻译/识别/TTS 渠道、语言列表）
-  │                   ├── AiLoaderThread 启动 → 检测 GPU → 回调 _start_workers()
-  │                   ├── _start_workers() → start_thread() 启动 9 种 Worker 线程
-  │                   ├── _set_default() → 恢复上次用户选择
-  │                   ├── _bind_signal() → 绑定 ~60 个控件事件
+  │                   ├── setupUi() → đổ dữ liệu vào các ô chọn (kênh dịch/nhận dạng/TTS, danh sách ngôn ngữ)
+  │                   ├── Khởi động AiLoaderThread → dò GPU → gọi lại _start_workers()
+  │                   ├── _start_workers() → start_thread() khởi động 9 loại luồng Worker
+  │                   ├── _set_default() → khôi phục lựa chọn lần trước của người dùng
+  │                   ├── _bind_signal() → nối khoảng 60 sự kiện của các widget
   │                   ├── SignalHub.new_message.connect(win_action.update_data)
-  │                   └── uito.emit('end') → splash 关闭
-  └── 8. app.exec() → Qt 事件循环
+  │                   └── uito.emit('end') → đóng màn hình khởi động
+  └── 8. app.exec() → vòng lặp sự kiện Qt
 ```
 
-### 11.2 退出机制
+### 11.2 Cơ chế thoát
 
-用户点击关闭按钮时：
-1. 设置 `app_cfg.exit_soft = True`, `app_cfg.current_status = 'stop'`
-2. 主窗口立即隐藏（`hide()`）
-3. 保存窗口尺寸到 `QSettings`
-4. 隐藏/关闭所有子窗口
-5. 等待 ~4 秒让所有 Worker 完成当前工作并安全退出
-6. 清理临时目录 `TEMP_ROOT`
-7. `atexit` cleanup 回调执行 → 程序终止
-8. 若为重启模式，启动新进程后 `os._exit(0)`
+Khi người dùng bấm nút đóng:
+1. Đặt `app_cfg.exit_soft = True`, `app_cfg.current_status = 'stop'`
+2. Ẩn cửa sổ chính ngay (`hide()`)
+3. Lưu kích thước cửa sổ vào `QSettings`
+4. Ẩn/đóng mọi cửa sổ con
+5. Đợi khoảng 4 giây để các Worker hoàn tất việc đang làm và thoát an toàn
+6. Dọn thư mục tạm `TEMP_ROOT`
+7. Hàm dọn dẹp `atexit` chạy → chương trình kết thúc
+8. Nếu là chế độ khởi động lại thì mở tiến trình mới rồi `os._exit(0)`
 
-### 11.3 UI 架构分层
+### 11.3 Phân tầng kiến trúc giao diện
 
 ```
-UI 定义层         phiendichvideo/ui/         ← PySide6 UI 布局文件（~75 个），dark/ 资源文件
+Tầng định nghĩa UI    phiendichvideo/ui/         ← tệp bố cục giao diện PySide6 (~75 tệp), tài nguyên dark/
     ↓
-UI 逻辑层         phiendichvideo/component/   ← 通用组件：进度条、设置表单、字幕编辑器、实时语音识别、视频裁剪、文本比对
+Tầng logic UI         phiendichvideo/component/  ← thành phần dùng chung: thanh tiến độ, biểu mẫu cài đặt, trình soạn phụ đề, nhận dạng thời gian thực, cắt video, so khớp văn bản
     ↓
-窗口管理层        phiendichvideo/winform/     ← 懒加载的 ~65 个设置/功能窗口模块
+Tầng quản lý cửa sổ   phiendichvideo/winform/    ← khoảng 65 mô-đun cửa sổ cài đặt/chức năng, nạp lười
     ↓
-主窗口层          phiendichvideo/mainwin/
-    ├── main_win.py                      ← MainWindow(QMainWindow): UI 初始化、信号绑定、Worker 启动、窗口生命周期（528 行）
-    ├── _actions.py                       ← WinAction: 核心业务逻辑 → 参数收集 → 任务启动 → 状态分发（798 行）
-    └── _actions_base.py                 ← WinActionBase: 代理管理、模式切换、文件选择、CUDA 检测、试听（590 行）
+Tầng cửa sổ chính     phiendichvideo/mainwin/
+    ├── main_win.py                      ← MainWindow(QMainWindow): khởi tạo UI, nối tín hiệu, khởi động Worker, vòng đời cửa sổ (528 dòng)
+    ├── _actions.py                       ← WinAction: logic nghiệp vụ cốt lõi → thu thập tham số → khởi động tác vụ → phân phối trạng thái (798 dòng)
+    └── _actions_base.py                 ← WinActionBase: quản lý proxy, chuyển chế độ, chọn tệp, dò CUDA, nghe thử (590 dòng)
     ↓
-任务层            phiendichvideo/task/        ← TransCreate、SpeechToText、DubbingSrt、TranslateSrt、Worker 线程、SpeedRate
+Tầng tác vụ           phiendichvideo/task/       ← TransCreate, SpeechToText, DubbingSrt, TranslateSrt, luồng Worker, SpeedRate
 ```
 
-### 11.4 MainWindow——主窗口
+### 11.4 MainWindow — cửa sổ chính
 
-`phiendichvideo/mainwin/main_win.py`（528 行）职责：
-- `setupUi()`：加载 UI 布局，填充下拉列表（翻译渠道、识别渠道、TTS 渠道、语言、字幕类型）
-- `_bind_signal()`：绑定约 60 个控件事件到 `WinAction` 方法
-- `_start_workers(status)`：GPU 检测完成后启动 9 种 Worker 后台线程
-- `open_winform(name)`：统一窗口打开入口（优先复用已缓存的 `app_cfg.child_forms`，否则调用 `winform.get_win(name).openwin()`）
-- `closeEvent()`：安全关闭流程（标记退出 → 隐藏窗口 → 停止线程 → 清理临时文件）
-- `restart_app()`：询问确认后触发 `closeEvent()` 并启动新进程
+Nhiệm vụ của `phiendichvideo/mainwin/main_win.py` (528 dòng):
+- `setupUi()`: nạp bố cục giao diện, đổ dữ liệu vào các ô chọn (kênh dịch, kênh nhận dạng, kênh TTS, ngôn ngữ, kiểu phụ đề)
+- `_bind_signal()`: nối khoảng 60 sự kiện widget tới các phương thức của `WinAction`
+- `_start_workers(status)`: sau khi dò GPU xong thì khởi động 9 loại luồng Worker chạy nền
+- `open_winform(name)`: điểm vào thống nhất để mở cửa sổ (ưu tiên dùng lại cửa sổ đã đệm trong `app_cfg.child_forms`, nếu chưa có thì gọi `winform.get_win(name).openwin()`)
+- `closeEvent()`: quy trình đóng an toàn (đánh dấu thoát → ẩn cửa sổ → dừng luồng → dọn tệp tạm)
+- `restart_app()`: hỏi xác nhận rồi kích hoạt `closeEvent()` và mở tiến trình mới
 
-### 11.5 WinAction——核心控制器
+### 11.5 WinAction — bộ điều khiển cốt lõi
 
-`WinAction` 继承自 `WinActionBase`（两者均为 `@dataclass`），是连接 UI 和后台任务的关键枢纽：
+`WinAction` kế thừa từ `WinActionBase` (cả hai đều là `@dataclass`), là đầu mối then chốt nối giao diện với tác vụ chạy nền:
 
-**WinActionBase**（`mainwin/_actions_base.py`，590 行）提供：
-- 文件选择（`get_mp4()`）—— 单文件/文件夹模式
-- 输出目录设置（`get_save_dir()`）
-- 代理配置（`change_proxy()`, `check_proxy()`, `proxy_alert()`）
-- 模式切换（`set_biaozhun()`, `set_tiquzimu()`）—— 控制 UI 元素显隐
-- CUDA 检测（`check_cuda()`, `cuda_isok()`）
-- 试听功能（`listen_voice_fun()`）—— 创建 `ListenVoice` 线程
-- 角色列表更新（`tts_type_change()`, `set_voice_role()`）
-- 高级选项折叠（`toggle_adv()`）
-- UI 启用/禁用控制（`disabled_widget()`, `_disabled_button()`）
+**WinActionBase** (`mainwin/_actions_base.py`, 590 dòng) cung cấp:
+- Chọn tệp (`get_mp4()`) — chế độ một tệp/thư mục
+- Đặt thư mục đầu ra (`get_save_dir()`)
+- Cấu hình proxy (`change_proxy()`, `check_proxy()`, `proxy_alert()`)
+- Chuyển chế độ (`set_biaozhun()`, `set_tiquzimu()`) — điều khiển ẩn/hiện các thành phần giao diện
+- Dò CUDA (`check_cuda()`, `cuda_isok()`)
+- Nghe thử (`listen_voice_fun()`) — tạo luồng `ListenVoice`
+- Cập nhật danh sách giọng (`tts_type_change()`, `set_voice_role()`)
+- Thu gọn tùy chọn nâng cao (`toggle_adv()`)
+- Bật/tắt các thành phần giao diện (`disabled_widget()`, `_disabled_button()`)
 
-**WinAction**（`mainwin/_actions.py`，798 行）提供：
-- `check_start()`：收集所有 UI 控件值 → 构建 `cfg` 字典 → 参数校验 → 调用 `create_btns()`
-- `create_btns()`：格式化输入文件路径 → 创建进度条 → 单视频启动 `Worker`，批量启动 `MultVideo`
-- `update_data(uuid, SignMsg)`：连接 `SignalHub.new_message` 信号 → 按消息类型分发
-- `update_status(type)`：切换 `ing`/`stop`/`end` 状态，控制按钮和进度条
-- `set_process_btn_text(d)`：更新进度条文本/百分比/颜色
-- `retry()`：重新处理失败的任务
-- `_check_all_done()`：检测是否所有任务完成
+**WinAction** (`mainwin/_actions.py`, 798 dòng) cung cấp:
+- `check_start()`: thu thập giá trị mọi widget → dựng từ điển `cfg` → kiểm tra tham số → gọi `create_btns()`
+- `create_btns()`: chuẩn hóa đường dẫn tệp đầu vào → tạo thanh tiến độ → một video thì khởi động `Worker`, hàng loạt thì khởi động `MultVideo`
+- `update_data(uuid, SignMsg)`: nối với tín hiệu `SignalHub.new_message` → phân nhánh theo loại thông điệp
+- `update_status(type)`: chuyển trạng thái `ing`/`stop`/`end`, điều khiển nút và thanh tiến độ
+- `set_process_btn_text(d)`: cập nhật chữ/phần trăm/màu của thanh tiến độ
+- `retry()`: xử lý lại các tác vụ thất bại
+- `_check_all_done()`: kiểm tra đã xong hết tác vụ chưa
 
 ---
 
-## 十二、异常体系
+## 12. Hệ thống ngoại lệ
 
-`phiendichvideo/configure/excepts.py`（376 行）定义了分层异常：
+`phiendichvideo/configure/excepts.py` (376 dòng) định nghĩa hệ thống ngoại lệ phân tầng:
 
 ```
-VideoTransError (基类)
-    ├── TranslateSrtError       # 翻译相关错误
-    ├── DubbingSrtError         # 配音相关错误
-    ├── SpeechToTextError       # 语音识别相关错误
-    ├── LLMSegmentError         # LLM 重新断句错误
-    ├── FFmpegError             # FFmpeg 操作错误
-    ├── DownloadModelsError     # 模型下载错误
-    ├── SttTimeoutError         # STT 子进程超时
-    ├── StopTask                # 需立即停止的任务异常
-    └── StopRetry               # 不可重试的错误
+VideoTransError (lớp cơ sở)
+    ├── TranslateSrtError       # lỗi liên quan dịch thuật
+    ├── DubbingSrtError         # lỗi liên quan lồng tiếng
+    ├── SpeechToTextError       # lỗi liên quan nhận dạng giọng nói
+    ├── LLMSegmentError         # lỗi tách câu bằng LLM
+    ├── FFmpegError             # lỗi thao tác FFmpeg
+    ├── DownloadModelsError     # lỗi tải mô hình
+    ├── SttTimeoutError         # tiến trình con STT quá hạn
+    ├── StopTask                # ngoại lệ cần dừng tác vụ ngay
+    └── StopRetry               # lỗi không thể thử lại
 ```
 
-`get_msg_from_except(e)` 函数映射数十种第三方库异常为用户可读的中/英文错误消息（覆盖 `httpx`、`openai`、`requests`、`deepgram`、`elevenlabs`、`tenacity` 等）。
+Hàm `get_msg_from_except(e)` ánh xạ hàng chục loại ngoại lệ của thư viện bên thứ ba thành thông báo lỗi dễ hiểu (bao phủ `httpx`, `openai`, `requests`, `deepgram`, `elevenlabs`, `tenacity`...).
 
-`NO_RETRY_EXCEPT` 元组定义了不可恢复的异常类型，翻译/配音模块在重试循环中遇到这些异常时直接放弃。
+Bộ `NO_RETRY_EXCEPT` định nghĩa các loại ngoại lệ không thể khắc phục; mô-đun dịch/lồng tiếng gặp những ngoại lệ này trong vòng lặp thử lại sẽ bỏ cuộc ngay.
 
 ---
 
-## 十三、代码结构概览
+## 13. Tổng quan cấu trúc mã nguồn
 
 ```
 /
-├── sp.py                       # ★ 主程序入口（221 行）
-├── cli.py                      # ★ CLI 命令行入口
-├── models/                     # 存放本地 AI 模型文件（ONNX 等）
-├── logs/                       # 日志文件目录（YYYYMMDD.log）
-├── ffmpeg/                     # ffmpeg 及 sox 二进制文件
-├── f5-tts/                     # 声音克隆参考音频存放目录
-├── docs/                       # 文档
-├── tmp/                        # 临时文件根目录
-│   ├── _temp/                  # 进程级临时目录
-│   └── translate_cache/        # 翻译 MD5 缓存目录
+├── sp.py                       # ★ điểm vào chương trình chính (221 dòng)
+├── cli.py                      # ★ điểm vào dòng lệnh
+├── models/                     # chứa các tệp mô hình AI cục bộ (ONNX...)
+├── logs/                       # thư mục tệp nhật ký (YYYYMMDD.log)
+├── ffmpeg/                     # tệp nhị phân ffmpeg và sox
+├── f5-tts/                     # thư mục chứa âm thanh mẫu để nhân bản giọng
+├── docs/                       # tài liệu
+├── tmp/                        # thư mục gốc chứa tệp tạm
+│   ├── _temp/                  # thư mục tạm cấp tiến trình
+│   └── translate_cache/        # thư mục đệm bản dịch theo MD5
 │
-└── phiendichvideo/                 # 核心业务逻辑代码
-    │   __init__.py             # ★ VERSION, ChannelProvider 定义, get_class() 懒加载
-    │   cfg.json                # settings 持久化文件
-    │   params.json             # params 持久化文件
-    │   codec.json              # 视频编解码器缓存
+└── phiendichvideo/             # mã nguồn nghiệp vụ cốt lõi
+    │   __init__.py             # ★ VERSION, định nghĩa ChannelProvider, get_class() nạp lười
+    │   cfg.json                # tệp lưu settings
+    │   params.json             # tệp lưu params
+    │   codec.json              # đệm bộ mã hóa/giải mã video
     │
     ├── codes/
-    │   └── model.py            # 模型相关定义
+    │   └── model.py            # định nghĩa liên quan mô hình
     │
-    ├── configure/              # 全局配置、队列定义、顶层基类
-    │   ├── config.py           # ★ AppCfg / AppSettings / AppParams / logger / 队列定义 / tr() / push_queue()（902 行）
-    │   ├── base.py             # ★ BaseCon 基类（_new_process, signal, _exit, convert_to_wav 等）（296 行）
-    │   ├── contants.py         # ★ 全局常量（模型列表、语言测试文本、标点符号、代理白名单等）
-    │   ├── excepts.py          # ★ 异常体系 + get_msg_from_except()（376 行）
-    │   ├── signal_hub.py       # ★ SignalHub 单例（跨线程 Qt 信号）（33 行）
-    │   └── whispernet_config.py # Whisper.NET 配置
+    ├── configure/              # cấu hình toàn cục, định nghĩa hàng đợi, lớp cơ sở cao nhất
+    │   ├── config.py           # ★ AppCfg / AppSettings / AppParams / logger / hàng đợi / tr() / push_queue() (902 dòng)
+    │   ├── base.py             # ★ lớp cơ sở BaseCon (_new_process, signal, _exit, convert_to_wav...) (296 dòng)
+    │   ├── contants.py         # ★ hằng số toàn cục (danh sách mô hình, văn bản thử ngôn ngữ, dấu câu, danh sách trắng proxy...)
+    │   ├── excepts.py          # ★ hệ thống ngoại lệ + get_msg_from_except() (376 dòng)
+    │   ├── signal_hub.py       # ★ singleton SignalHub (tín hiệu Qt giữa các luồng) (33 dòng)
+    │   └── whispernet_config.py # cấu hình Whisper.NET
     │
-    ├── task/                   # 任务处理逻辑与后台线程
-    │   ├── _base.py            # ★ BaseTask 基类（8 阶段空方法 + 5 标志位 + 共享工具方法）（167 行）
-    │   ├── taskcfg.py          # ★ TaskCfgBase/VTT/STT/TTS/STS + InputFile + SignMsg + SrtItem（261 行）
-    │   ├── trans_create.py     # ★ TransCreate 完整实现（~1678 行，视频翻译核心）
-    │   ├── speech2text.py      # ★ SpeechToText（批量语音转字幕）
-    │   ├── dubbing.py          # ★ DubbingSrt（批量字幕配音）
-    │   ├── translate_srt.py    # ★ TranslateSrt（批量翻译 SRT 字幕）
-    │   ├── job.py              # ★ 9 种 BaseWorker 子类 + start_thread() 入口（245 行）
-    │   ├── only_one.py         # ★ 单视频交互式 Worker(QThread) + uito 信号（148 行）
-    │   ├── mult_video.py       # ★ 多视频批量提交 MultVideo(QThread)（54 行）
-    │   ├── _rate.py            # SpeedRate / TtsSpeedRate 音画对齐引擎（877 行）
-    │   ├── separate_worker.py  # SeparateWorker 独立人声分离 QThread
-    │   ├── simple_runnable_qt.py # QRunnable 线程池工具
-    │   ├── child_win_sign.py   # 子窗口信号处理
-    │   └── update_ffmpeg.py    # ffmpeg 更新管理
+    ├── task/                   # logic xử lý tác vụ và luồng nền
+    │   ├── _base.py            # ★ lớp cơ sở BaseTask (8 phương thức giai đoạn rỗng + 5 cờ + tiện ích chung) (167 dòng)
+    │   ├── taskcfg.py          # ★ TaskCfgBase/VTT/STT/TTS/STS + InputFile + SignMsg + SrtItem (261 dòng)
+    │   ├── trans_create.py     # ★ cài đặt đầy đủ TransCreate (~1678 dòng, lõi dịch video)
+    │   ├── speech2text.py      # ★ SpeechToText (chuyển giọng nói thành phụ đề hàng loạt)
+    │   ├── dubbing.py          # ★ DubbingSrt (lồng tiếng phụ đề hàng loạt)
+    │   ├── translate_srt.py    # ★ TranslateSrt (dịch phụ đề SRT hàng loạt)
+    │   ├── job.py              # ★ 9 lớp con BaseWorker + điểm vào start_thread() (245 dòng)
+    │   ├── only_one.py         # ★ Worker(QThread) tương tác một video + tín hiệu uito (148 dòng)
+    │   ├── mult_video.py       # ★ MultVideo(QThread) gửi nhiều video hàng loạt (54 dòng)
+    │   ├── _rate.py            # bộ máy đồng bộ hình tiếng SpeedRate / TtsSpeedRate (877 dòng)
+    │   ├── separate_worker.py  # SeparateWorker, QThread tách giọng nói độc lập
+    │   ├── simple_runnable_qt.py # tiện ích nhóm luồng QRunnable
+    │   ├── child_win_sign.py   # xử lý tín hiệu cửa sổ con
+    │   └── update_ffmpeg.py    # quản lý cập nhật ffmpeg
     │
-    ├── recognition/            # 语音识别 (ASR) 模块（22 个渠道）
-    │   ├── __init__.py         # ★ 渠道常量 ID、_ID_NAME_DICT、run()、is_allow_lang()、is_input_api()
-    │   ├── _base.py            # ★ BaseRecogn（VAD 分割、CJK 处理、字幕合并，400 行）
-    │   └── _*.py               # 22 个渠道实现（_whisper, _whisperx, _whispernet, _qwenasrlocal, _qwen3asr, _funasr 等）
+    ├── recognition/            # mô-đun nhận dạng giọng nói (ASR) — 26 kênh
+    │   ├── __init__.py         # ★ hằng số ID kênh, _ID_NAME_DICT, run(), is_allow_lang(), is_input_api()
+    │   ├── _base.py            # ★ BaseRecogn (cắt bằng VAD, xử lý CJK, gộp phụ đề, 400 dòng)
+    │   └── _*.py               # cài đặt từng kênh (_whisper, _whisperx, _whispernet, _qwenasrlocal, _funasr...)
     │
-    ├── translator/             # 字幕翻译模块（24 个渠道）
-    │   ├── __init__.py         # ★ 渠道常量、_ID_NAME_DICT、LANG_CODE、run()、is_allow_translate()（860 行）
-    │   ├── _base.py            # ★ BaseTrans（MD5 缓存、逐行/全文翻译调度，176 行）
-    │   └── _*.py               # 24 个渠道实现（_google, _chatgpt, _deepseek, _gemini, _deepl, _baidu 等）
+    ├── translator/             # mô-đun dịch phụ đề — 24 kênh
+    │   ├── __init__.py         # ★ hằng số kênh, _ID_NAME_DICT, LANG_CODE, run(), is_allow_translate() (860 dòng)
+    │   ├── _base.py            # ★ BaseTrans (đệm MD5, điều phối dịch theo dòng/toàn văn, 176 dòng)
+    │   └── _*.py               # cài đặt từng kênh (_google, _chatgpt, _deepseek, _gemini, _deepl, _baidu...)
     │
-    ├── tts/                    # 文本转语音 (TTS) 模块（**34** 个渠道）
-    │   ├── __init__.py         # ★ 渠道常量 ID、_ID_NAME_DICT、SUPPORT_CLONE、CHANGE_BY_LANGUAGE、run()（192 行）
-    │   ├── _base.py            # ★ BaseTTS（异步/多线程并发调度，304 行）
-    │   └── _*.py               # 34 个渠道实现（_edgetts, _openaitts, _azuretts, _gptsovits, _cosyvoice 等）
+    ├── tts/                    # mô-đun chuyển văn bản thành giọng nói (TTS) — **34** kênh
+    │   ├── __init__.py         # ★ hằng số ID kênh, _ID_NAME_DICT, SUPPORT_CLONE, CHANGE_BY_LANGUAGE, run() (192 dòng)
+    │   ├── _base.py            # ★ BaseTTS (điều phối bất đồng bộ/đa luồng, 304 dòng)
+    │   └── _*.py               # cài đặt từng kênh (_edgetts, _openaitts, _azuretts, _gptsovits, _cosyvoice...)
     │
-    ├── process/                # 独立子进程实现
-    │   ├── __init__.py         # 子进程函数导出
-    │   ├── signelobj.py        # ★ GlobalProcessManager（CPU/GPU 双进程池，167 行）
-    │   ├── prepare_audio.py    # 人声分离、降噪、标点恢复、说话人分离（4 种后端）
-    │   ├── stt_fun.py          # ASR 子进程入口（openai_whisper, faster_whisper, paraformer, funasr_mlt, qwen3asr_fun 等）
-    │   ├── tts_fun.py          # TTS 子进程入口（qwen3tts_fun）
-    │   └── vad.py              # VAD 语音活动检测（Silero VAD）
+    ├── process/                # cài đặt chạy trong tiến trình con
+    │   ├── __init__.py         # xuất các hàm chạy tiến trình con
+    │   ├── signelobj.py        # ★ GlobalProcessManager (hai nhóm tiến trình CPU/GPU, 167 dòng)
+    │   ├── prepare_audio.py    # tách giọng nói, khử nhiễu, khôi phục dấu câu, phân tách người nói (4 nền)
+    │   ├── stt_fun.py          # điểm vào ASR trong tiến trình con (openai_whisper, faster_whisper, paraformer, funasr_mlt, qwen3asr_fun...)
+    │   ├── tts_fun.py          # điểm vào TTS trong tiến trình con (qwen3tts_fun)
+    │   └── vad.py              # dò hoạt động giọng nói VAD (Silero VAD)
     │
-    ├── mainwin/                # 主窗口界面与业务逻辑
-    │   ├── main_win.py         # ★ MainWindow(QMainWindow) 初始化、信号绑定、线程启动（528 行）
-    │   ├── _actions.py         # ★ WinAction 核心控制器（检查、启动、状态更新，798 行）
-    │   └── _actions_base.py    # ★ WinActionBase 基类（代理、模式切换、CUDA、文件选择，590 行）
+    ├── mainwin/                # giao diện cửa sổ chính và logic nghiệp vụ
+    │   ├── main_win.py         # ★ MainWindow(QMainWindow) khởi tạo, nối tín hiệu, khởi động luồng (528 dòng)
+    │   ├── _actions.py         # ★ bộ điều khiển cốt lõi WinAction (kiểm tra, khởi động, cập nhật trạng thái, 798 dòng)
+    │   └── _actions_base.py    # ★ lớp cơ sở WinActionBase (proxy, chuyển chế độ, CUDA, chọn tệp, 590 dòng)
     │
-    ├── component/              # UI 通用组件
-    │   ├── progressbar.py      # 可点击进度条
-    │   ├── set_form.py         # 通用设置表单 / 关于页面
-    │   ├── onlyone_set_recogn.py    # 单视频模式：原始字幕编辑对话框
-    │   ├── onlyone_set_role.py      # 单视频模式：说话人角色分配对话框
-    │   ├── onlyone_set_editdubb.py  # 单视频模式：配音结果编辑对话框
-    │   ├── clip_video.py       # 视频裁剪组件
-    │   ├── realtime_stt.py     # 实时语音识别窗口
-    │   ├── textmatching.py     # 文本比对窗口
-    │   ├── set_proxy.py        # 代理设置弹窗
-    │   ├── set_ass.py          # ASS 字幕样式设置
-    │   ├── set_cpp.py          # Whisper.cpp 路径设置
-    │   ├── set_xxl.py          # Faster-Whisper-XXL 路径设置
-    │   ├── set_subtitles_length.py # 字幕长度设置
-    │   ├── set_threads.py      # 线程数设置
-    │   └── controlobj.py       # 控件对象管理
+    ├── component/              # thành phần giao diện dùng chung
+    │   ├── progressbar.py      # thanh tiến độ bấm được
+    │   ├── set_form.py         # biểu mẫu cài đặt chung / trang giới thiệu
+    │   ├── onlyone_set_recogn.py    # chế độ một video: hộp thoại sửa phụ đề gốc
+    │   ├── onlyone_set_role.py      # chế độ một video: hộp thoại gán giọng cho người nói
+    │   ├── onlyone_set_editdubb.py  # chế độ một video: hộp thoại sửa kết quả lồng tiếng
+    │   ├── clip_video.py       # thành phần cắt video
+    │   ├── realtime_stt.py     # cửa sổ nhận dạng giọng nói thời gian thực
+    │   ├── textmatching.py     # cửa sổ so khớp văn bản
+    │   ├── set_proxy.py        # hộp thoại cài đặt proxy
+    │   ├── set_ass.py          # cài đặt kiểu phụ đề ASS
+    │   ├── set_cpp.py          # cài đặt đường dẫn Whisper.cpp
+    │   ├── set_xxl.py          # cài đặt đường dẫn Faster-Whisper-XXL
+    │   ├── set_subtitles_length.py # cài đặt độ dài phụ đề
+    │   ├── set_threads.py      # cài đặt số luồng
+    │   └── controlobj.py       # quản lý đối tượng widget
     │
-    ├── ui/                     # PySide6 UI 定义文件（~75 个.py 文件）
-    │   ├── en.py               # ★ 主窗口 UI 布局定义
-    │   ├── chatgpt.py, deepseek.py, gemini.py, ...    # 各渠道设置对话框布局
-    │   ├── videoandaudio.py, separate.py, peiyin.py, ... # 功能窗口布局
-    │   └── dark/               # 暗色主题资源（darkstyle_rc.py, palette.py）
+    ├── ui/                     # tệp định nghĩa giao diện PySide6 (~75 tệp .py)
+    │   ├── en.py               # ★ định nghĩa bố cục cửa sổ chính
+    │   ├── chatgpt.py, deepseek.py, gemini.py, ...    # bố cục hộp thoại cài đặt từng kênh
+    │   ├── videoandaudio.py, separate.py, peiyin.py, ... # bố cục các cửa sổ chức năng
+    │   └── dark/               # tài nguyên giao diện tối (darkstyle_rc.py, palette.py)
     │
-    ├── winform/                # 各渠道设置窗口懒加载管理（~65 个模块）
-    │   ├── __init__.py         # ★ get_win() 懒加载入口 + _module_map（91 行）
-    │   ├── chatgpt.py, azure.py, baidu.py, ...  # ~50 个渠道设置窗口（openwin()）
-    │   └── fn_*.py             # ~10 个独立功能窗口（批量语音转字幕、批量为字幕配音、批量翻译srt字幕等）
+    ├── winform/                # quản lý nạp lười cửa sổ cài đặt từng kênh (~65 mô-đun)
+    │   ├── __init__.py         # ★ điểm vào nạp lười get_win() + _module_map (91 dòng)
+    │   ├── chatgpt.py, azure.py, baidu.py, ...  # ~50 cửa sổ cài đặt kênh (openwin())
+    │   └── fn_*.py             # ~10 cửa sổ chức năng độc lập (bóc phụ đề hàng loạt, lồng tiếng hàng loạt, dịch SRT hàng loạt...)
     │
-    ├── styles/                 # UI 样式与媒体资源
-    │   ├── style.qss           # Qt 样式表
-    │   ├── logo.png            # 启动画面 logo
-    │   ├── icon.ico            # 应用图标
-    │   ├── simhei.ttf          # 黑体中文字体
-    │   ├── preview.png         # 预览图
-    │   ├── no-remove.mp4       # 防清理的占位视频
-    │   └── no-remove.wav       # 防清理的占位音频
+    ├── styles/                 # kiểu giao diện và tài nguyên đa phương tiện
+    │   ├── style.qss           # bảng kiểu Qt
+    │   ├── logo.png            # logo màn hình khởi động
+    │   ├── icon.ico            # biểu tượng ứng dụng
+    │   ├── simhei.ttf          # phông chữ Hán SimHei
+    │   ├── preview.png         # ảnh xem trước
+    │   ├── no-remove.mp4       # video giữ chỗ, không được xóa
+    │   └── no-remove.wav       # âm thanh giữ chỗ, không được xóa
     │
-    ├── util/                   # 通用工具函数（18 个文件）
-    │   ├── tools.py            # ★ 核心工具函数（ffmpeg 封装、字幕解析/格式化、文件操作、系统通知、模型下载）
-    │   ├── gpus.py             # GPU 检测与分配（get_cudaX 获取可用 GPU 索引）
-    │   ├── checkgpu.py         # GPU 检测线程（AiLoaderThread）
-    │   ├── ListenVoice.py      # 声音试听功能（ListenVioce QThread）
-    │   ├── req_fac.py          # HuggingFace 自定义 session 工厂
-    │   ├── cn_tn.py            # 中文文本规范化
-    │   ├── en_tn.py            # 英文文本规范化
-    │   ├── help_down.py        # 下载工具函数
-    │   ├── help_ffmpeg.py      # ffmpeg 视频编解码器检测
-    │   ├── help_misc.py        # 杂项工具
-    │   ├── help_role.py        # 配音角色工具
-    │   ├── help_srt.py         # 字幕文件工具
-    │   ├── helper_supertonic.py # Supertonic TTS 辅助
-    │   ├── TestSrtTrans.py     # 翻译测试工具
-    │   └── TestSTT.py          # STT 测试工具
+    ├── util/                   # hàm tiện ích dùng chung (18 tệp)
+    │   ├── tools.py            # ★ hàm tiện ích cốt lõi (bọc ffmpeg, đọc/định dạng phụ đề, thao tác tệp, thông báo hệ thống, tải mô hình)
+    │   ├── gpus.py             # dò và phân bổ GPU (get_cudaX lấy chỉ số GPU khả dụng)
+    │   ├── checkgpu.py         # luồng dò GPU (AiLoaderThread)
+    │   ├── ListenVoice.py      # chức năng nghe thử giọng (ListenVioce QThread)
+    │   ├── req_fac.py          # nhà máy tạo session tùy chỉnh cho HuggingFace
+    │   ├── cn_tn.py            # chuẩn hóa văn bản tiếng Trung
+    │   ├── en_tn.py            # chuẩn hóa văn bản tiếng Anh
+    │   ├── help_down.py        # hàm tiện ích tải về
+    │   ├── help_ffmpeg.py      # dò bộ mã hóa/giải mã video của ffmpeg
+    │   ├── help_misc.py        # tiện ích linh tinh
+    │   ├── help_role.py        # tiện ích về giọng lồng tiếng
+    │   ├── help_srt.py         # tiện ích về tệp phụ đề
+    │   ├── helper_supertonic.py # hỗ trợ Supertonic TTS
+    │   ├── TestSrtTrans.py     # công cụ thử dịch
+    │   └── TestSTT.py          # công cụ thử nhận dạng
     │
-    ├── language/               # 界面多语言 JSON 文件
-    │   ├── en.json
-    │   ├── zh.json
-    │   └── ...                 # 30+ 语言
+    ├── language/               # tệp JSON đa ngôn ngữ cho giao diện
+    │   ├── vi.json             # Tiếng Việt
+    │   ├── en.json             # Tiếng Anh
+    │   └── zh.json             # Tiếng Trung
     │
-    ├── prompts/                # AI 翻译提示词模板（31 个文件）
-    │   ├── srt/                # SRT 格式翻译 prompt（chatgpt.txt, deepseek.txt 等 13 个）
-    │   ├── text/               # 纯文本翻译 prompt（同 13 个）
-    │   ├── recogn/             # 语音识别 prompt（gemini_recogn.txt）
-    │   └── recharge/           # LLM重新断句 prompt（recharge-llm.txt）
+    ├── prompts/                # mẫu prompt cho dịch bằng AI
+    │   ├── srt/                # prompt dịch định dạng SRT (chatgpt.txt, deepseek.txt...)
+    │   ├── text/               # prompt dịch văn bản thuần (tương ứng)
+    │   ├── recogn/             # prompt nhận dạng giọng nói (gemini_recogn.txt)
+    │   └── resegment/          # prompt tách câu bằng LLM (llm.txt, llm2.txt)
     │
-    └── voicejson/              # TTS 音色配置文件（14 个 JSON）
-        ├── edge_tts.json       # Edge-TTS 各语言音色列表
-        ├── azure_voice_list.json # Azure TTS 音色列表
-        ├── qwen3tts.json       # Qwen3-TTS 音色
-        └── ...                 # 其他渠道音色配置
+    └── voicejson/              # tệp cấu hình giọng đọc của TTS
+        ├── edge_tts.json       # danh sách giọng Edge-TTS theo từng ngôn ngữ
+        ├── azure_voice_list.json # danh sách giọng Azure TTS
+        ├── qwen3tts.json       # giọng Qwen3-TTS
+        └── ...                 # cấu hình giọng của các kênh khác
 ```
 
 ---
 
-## 十四、扩展开发指南
+## 14. Hướng dẫn mở rộng
 
-### 14.1 新增一个翻译通道
+### 14.1 Thêm một kênh dịch mới
 
-假设要新增翻译通道 `MyTranslator`：
+Giả sử muốn thêm kênh dịch `MyTranslator`:
 
-#### Step 1: 创建通道实现文件
+#### Bước 1: Tạo tệp cài đặt kênh
 
-在 `phiendichvideo/translator/` 下创建 `_mytranslator.py`：
+Tạo `_mytranslator.py` trong `phiendichvideo/translator/`:
 
 ```python
 from dataclasses import dataclass
@@ -946,14 +940,14 @@ class MyTranslator(BaseTrans):
         return result
 ```
 
-#### Step 2: 分配渠道 ID 并注册
+#### Bước 2: Cấp ID kênh và đăng ký
 
-在 `phiendichvideo/translator/__init__.py` 中：
+Trong `phiendichvideo/translator/__init__.py`:
 
 ```python
-MYTRANSLATOR_INDEX = 24   # 分配不重复的整数 ID
+MYTRANSLATOR_INDEX = 24   # cấp một ID số nguyên chưa trùng
 
-# 在 _ID_NAME_DICT 末尾添加：
+# Thêm vào cuối _ID_NAME_DICT:
 _ID_NAME_DICT[MYTRANSLATOR_INDEX] = ChannelProvider(
     "My Translator",
     imp="._mytranslator",
@@ -962,56 +956,56 @@ _ID_NAME_DICT[MYTRANSLATOR_INDEX] = ChannelProvider(
 )
 ```
 
-#### Step 3: 添加用户配置字段
+#### Bước 3: Thêm trường cấu hình người dùng
 
-在 `phiendichvideo/configure/config.py` 的 `AppParams._get_defaults()` 中添加：
+Thêm vào `AppParams._get_defaults()` trong `phiendichvideo/configure/config.py`:
 
 ```python
 "mytranslator_key": "",
 "mytranslator_model": "model-v1",
 ```
 
-#### Step 4: 创建设置窗口
+#### Bước 4: Tạo cửa sổ cài đặt
 
-在 `phiendichvideo/winform/` 下创建 `mytranslator.py`，实现 `openwin()` 函数。在 `phiendichvideo/winform/__init__.py` 的 `_module_map` 中注册：
+Tạo `mytranslator.py` trong `phiendichvideo/winform/`, cài đặt hàm `openwin()`. Đăng ký vào `_module_map` trong `phiendichvideo/winform/__init__.py`:
 
 ```python
 "mytranslator": ".mytranslator",
 ```
 
-#### Step 5: 可选扩展
+#### Bước 5: Mở rộng tùy chọn
 
-- 在 `is_allow_translate()` 中添加语言兼容性检测
-- 在 `ui/` 目录下新增界面文件
-- 在菜单 `ui/en.py` 中添加对应 Action
-
----
-
-### 14.2 新增一个 TTS 通道
-
-步骤与翻译通道类似：
-
-1. 创建 `phiendichvideo/tts/_mytts.py`，继承 `BaseTTS`
-2. 在 `phiendichvideo/tts/__init__.py` 中分配 ID 并注册 `_ID_NAME_DICT`
-3. 如需声音克隆支持，将 ID 加入 `SUPPORT_CLONE` 列表
-4. 如需语言跟随角色变化，将 ID 加入 `CHANGE_BY_LANGUAGE` 列表
-5. 在 `AppParams._get_defaults()` 中添加对应的 API Key / URL 配置字段
-6. 在 `phiendichvideo/winform/` 和 `_module_map` 中注册设置窗口
-
-### 14.3 新增一个识别通道
-
-步骤同翻译/TTS，渠道实现类继承 `BaseRecogn`，必须实现 `.run()` 方法返回 `List[SrtItem]`。
-
-### 14.4 常规约定
-
-- 所有渠道类使用 `@dataclass` + `__post_init__`
-- 通过 `get_class(channel_id, "recognition/translator/tts", _ID_NAME_DICT)` 懒加载
-- API key 校验依赖 `is_input_api()` 函数 + `_ID_NAME_DICT` 中的 `key_name` / `win` 字段
-- 翻译/配音引擎内部并发数由 `settings` 中的对应字段控制
+- Thêm kiểm tra tương thích ngôn ngữ trong `is_allow_translate()`
+- Thêm tệp giao diện trong thư mục `ui/`
+- Thêm Action tương ứng vào menu trong `ui/en.py`
 
 ---
 
-> **版本**: v4.03 (VERSION_NUM=403)
-> **主页**: https://github.com/jianchang512/pyvideotrans
-> **文档**: https://pyvideotrans.com
-> **BBS**: https://bbs.pyvideotrans.com
+### 14.2 Thêm một kênh TTS mới
+
+Các bước tương tự kênh dịch:
+
+1. Tạo `phiendichvideo/tts/_mytts.py`, kế thừa `BaseTTS`
+2. Cấp ID và đăng ký vào `_ID_NAME_DICT` trong `phiendichvideo/tts/__init__.py`
+3. Nếu cần hỗ trợ nhân bản giọng, thêm ID vào danh sách `SUPPORT_CLONE`
+4. Nếu cần giọng thay đổi theo ngôn ngữ, thêm ID vào danh sách `CHANGE_BY_LANGUAGE`
+5. Thêm trường cấu hình khóa API / URL tương ứng vào `AppParams._get_defaults()`
+6. Đăng ký cửa sổ cài đặt trong `phiendichvideo/winform/` và `_module_map`
+
+### 14.3 Thêm một kênh nhận dạng mới
+
+Các bước giống kênh dịch/TTS. Lớp cài đặt kênh kế thừa `BaseRecogn` và bắt buộc phải cài đặt phương thức `.run()` trả về `List[SrtItem]`.
+
+### 14.4 Quy ước chung
+
+- Mọi lớp kênh dùng `@dataclass` + `__post_init__`
+- Nạp lười qua `get_class(channel_id, "recognition/translator/tts", _ID_NAME_DICT)`
+- Việc kiểm tra khóa API dựa vào hàm `is_input_api()` cùng hai trường `key_name` / `win` trong `_ID_NAME_DICT`
+- Số luồng đồng thời bên trong bộ máy dịch/lồng tiếng do các trường tương ứng trong `settings` quyết định
+
+---
+
+> **Phiên bản**: v4.04 (VERSION_NUM=404)
+> **Kho mã nguồn bản Việt hóa**: https://github.com/haianh02034/VideoTrans
+> **Dự án gốc**: https://github.com/jianchang512/pyvideotrans
+> **Tài liệu dự án gốc**: https://pyvideotrans.com

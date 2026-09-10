@@ -7,11 +7,13 @@
 
 # Phiên Dịch Video
 
+> 本页为中文版说明。本仓库是 pyVideoTrans 的越南语本地化版本，主 README 为越南语：[README.md](../README.md)。原项目：[jianchang512/pyvideotrans](https://github.com/jianchang512/pyvideotrans)
+
 <div align="center">
 
 **一款强大的开源视频翻译 / 语音转录 / AI配音 / 字幕翻译工具**
 
-[English](../README.md) | [**文档**](https://pyvideotrans.com) | [**在线问答**](https://bbs.pyvideotrans.com) 
+[Tiếng Việt](../README.md) | [**文档**](https://pyvideotrans.com) | [**在线问答**](https://bbs.pyvideotrans.com) 
 
 [![License](https://img.shields.io/badge/License-GPL_v3-blue.svg)](../LICENSE) [![Python](https://img.shields.io/badge/Python-3.10%2B-green.svg)](https://www.python.org/) [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
 
