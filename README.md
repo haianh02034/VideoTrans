@@ -1,75 +1,46 @@
-﻿> Sponsors: **[Recall.ai](https://www.recall.ai/product/meeting-transcription-api?utm_source=github&utm_medium=sponsorship&utm_campaign=jianchang512-pyvideotrans) - Meeting Transcription API**
->
-> If you’re looking for a transcription API for meetings, consider checking out **[Recall.ai](https://www.recall.ai/product/meeting-transcription-api?utm_source=github&utm_medium=sponsorship&utm_campaign=jianchang512-pyvideotrans)** , an API that works with Zoom, Google Meet, Microsoft Teams, and more
-
-
----
-
-# pyVideoTrans
+# Phiên Dịch Video
 
 <div align="center">
 
-**A Powerful Open Source Video Translation / Audio Transcription / AI Dubbing / Subtitle Translation Tool**
+**Công cụ mã nguồn mở dịch video, nhận dạng giọng nói, lồng tiếng AI và dịch phụ đề**
 
-[中文](docs/README_CN.md) | [**Documentation**](https://pyvideotrans.com) | [**Online Q&A**](https://bbs.pyvideotrans.com)
-
-[![License](https://img.shields.io/badge/License-GPL_v3-blue.svg)](LICENSE) [![Python](https://img.shields.io/badge/Python-3.10%2B-green.svg)](https://www.python.org/) [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
+[![License](https://img.shields.io/badge/License-GPL_v3-blue.svg)](LICENSE) [![Python](https://img.shields.io/badge/Python-3.10-green.svg)](https://www.python.org/) [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
 
 </div>
 
-**pyVideoTrans** is dedicated to seamlessly converting videos from one language to another, offering a complete workflow that includes speech recognition, subtitle translation, multi-role dubbing, and audio-video synchronization. It supports both local offline deployment and a wide variety of mainstream online APIs.
+**Phiên Dịch Video** chuyển video từ ngôn ngữ này sang ngôn ngữ khác qua một quy trình khép kín: nhận dạng giọng nói, dịch phụ đề, lồng tiếng nhiều giọng và đồng bộ hình tiếng. Phần mềm chạy được hoàn toàn ngoại tuyến trên máy, hoặc kết nối tới hàng chục dịch vụ API trực tuyến tùy bạn chọn.
 
-<img width="1566" height="912" alt="image" src="https://github.com/user-attachments/assets/7410b17d-9903-4919-954a-31764e246c15" />
-
----
-
-## ✨ Core Features
-
-> [Technical Architecture and Principles](docs/architecture.md)
-
-- **🎥 Fully Automatic Video Translation**: One-click workflow: Speech Recognition (ASR) → Subtitle Translation → Speech Synthesis (TTS) → Video Synthesis.
-- **🎙️ Audio Transcription / Subtitle Generation**: Batch convert audio/video to SRT subtitles, supporting **Speaker Diarization** to distinguish between different roles.
-- **🗣️ Multi-Role AI Dubbing**: Assign different AI dubbing voices to different speakers.
-- **🧬 Voice Cloning**: Integrates models like **F5-TTS, CosyVoice, GPT-SoVITS** for zero-shot voice cloning.
-- **🧠 Powerful Model Support**:
-  - **ASR**: Faster-Whisper (Local), OpenAI Whisper, Alibaba Qwen, ByteDance Volcano, Azure, Google, etc.
-  - **LLM Translation**: DeepSeek, ChatGPT, Claude, Gemini, MiniMax, Ollama (Local), Alibaba Bailian, etc.
-  - **TTS**: Edge-TTS (Free), OpenAI, Azure, Minimaxi, ChatTTS, ChatterBox, etc.
-- **🖥️ Interactive Editing**: Supports pausing and manual proofreading at each stage (recognition, translation, dubbing) to ensure accuracy.
-- **🛠️ Utility Toolkit**: Includes auxiliary tools such as vocal separation, video/subtitle merging, audio-video alignment, and transcript matching.
-- **💻 Command Line Interface (CLI)**: Supports headless operation, convenient for server deployment or batch processing.
-- **🌐 Web Interface (WebUI)**: Browser-based interface for remote access or internal network deployment.
-
+> Đây là bản Việt hóa của [pyVideoTrans](https://github.com/jianchang512/pyvideotrans) do [jianchang512](https://github.com/jianchang512) phát triển, phát hành lại theo giấy phép GPL-v3. Xem mục [Giấy phép và ghi nhận](#-giấy-phép-và-ghi-nhận).
 
 ---
 
-## 🚀 Quick Start (Windows Users)
+## ✨ Tính năng chính
 
-We provide a pre-packaged `.exe` version for Windows 10/11 users, requiring no Python environment configuration.
-
-1. **Download**: [Click to download the latest pre-packaged version](https://github.com/jianchang512/pyvideotrans/releases)
-2. **Unzip**: Extract the compressed file to a path without Chinese characters or spaces (e.g., `D:\pyVideoTrans`).
-3. **Run**: Double-click `sp.exe` inside the folder to launch.
-
-> **Note**:
-> * Do not run directly from within the compressed archive.
-> * To use GPU acceleration, ensure **CUDA 12.8** and **cuDNN 9.11** are installed.
+- **🎥 Dịch video tự động** — một lần bấm: nhận dạng giọng nói (ASR) → dịch phụ đề → tổng hợp giọng nói (TTS) → dựng video.
+- **🎙️ Bóc phụ đề hàng loạt** — chuyển audio/video thành tệp SRT, có **phân tách người nói**.
+- **🗣️ Lồng tiếng nhiều giọng** — gán giọng AI riêng cho từng người nói.
+- **🧬 Nhân bản giọng nói** — tích hợp **F5-TTS, CosyVoice, GPT-SoVITS**.
+- **🖥️ Chỉnh sửa xen giữa** — tạm dừng để soát lại ở từng bước: nhận dạng, dịch, lồng tiếng.
+- **🛠️ Bộ công cụ phụ trợ** — tách giọng/nhạc nền, ghép video và phụ đề, đồng bộ hình tiếng, cắt video theo phụ đề.
+- **💻 Dòng lệnh (CLI)** — chạy không cần giao diện, tiện cho máy chủ và xử lý hàng loạt.
+- **🌐 Giao diện web (WebUI)** — truy cập qua trình duyệt.
+- **🌏 Ba ngôn ngữ giao diện** — Tiếng Việt, Tiếng Anh, Tiếng Trung.
 
 ---
 
-## 🛠️ Source Deployment (macOS / Linux / Windows Developers)
+## 🚀 Cài đặt từ mã nguồn
 
-We recommend using **[`uv`](https://docs.astral.sh/uv/)** for package management for faster speed and better environment isolation.
+Khuyến nghị dùng **[`uv`](https://docs.astral.sh/uv/)** để quản lý gói.
 
-### 1. Prerequisites
+### 1. Yêu cầu
 
-* **Python**: Recommended version 3.10
-* **FFmpeg**: Must be installed and configured in the environment variables.
-  * **macOS**: `brew install ffmpeg libsndfile git`
-  * **Linux (Ubuntu/Debian)**: `sudo apt-get install ffmpeg libsndfile1-dev`
-  * **Windows**: [Download FFmpeg](https://ffmpeg.org/download.html) and configure Path, or place `ffmpeg.exe` and `ffprobe.exe` directly in the project directory.
+- **Python 3.10** (dự án yêu cầu `>=3.10, <3.11`)
+- **FFmpeg** đã cài và có trong biến môi trường PATH:
+  - macOS: `brew install ffmpeg libsndfile git`
+  - Linux (Ubuntu/Debian): `sudo apt-get install ffmpeg libsndfile1-dev`
+  - Windows: [tải FFmpeg](https://ffmpeg.org/download.html) rồi thêm vào PATH, hoặc đặt `ffmpeg.exe` và `ffprobe.exe` ngay trong thư mục dự án.
 
-### 2. Install uv (If not installed)
+### 2. Cài uv (nếu chưa có)
 
 ```bash
 # macOS/Linux
@@ -79,126 +50,154 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-### 3. Clone and Install
+### 3. Tải mã nguồn và cài thư viện
 
 ```bash
-git clone https://github.com/jianchang512/pyvideotrans.git
-cd pyvideotrans
+git clone https://github.com/haianh02034/VideoTrans.git
+cd VideoTrans
 uv sync
 ```
 
-> By default, `qwen-tts`, `qwen-asr`, `moss-tts`, and `chatterbox` are not installed locally.
-> - To install all optional channels: `uv sync --all-extra`
-> - To install individually: `uv sync --extra qwentts` / `uv sync --extra qwenasr` / `uv sync --extra mosstts` / `uv sync --extra chatterbox`
+Các nhóm thư viện tùy chọn hiện có: `webui`, `mosstts`, `dotnet`.
 
-### 4. Launch Software
-
-**GUI**:
 ```bash
-uv run sp.py
+uv sync --extra webui      # giao diện web
+uv sync --extra mosstts    # kênh MOSS-TTS
+uv sync --all-extras       # cài tất cả
 ```
 
-**CLI**:
-```bash
-# Video Translation
-uv run cli.py --task vtv --name "./video.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural"
+---
 
-# Audio to Subtitle
+## ▶️ Chạy phần mềm
+
+### Giao diện đồ họa
+
+```bash
+uv run sp.py               # theo ngôn ngữ hệ thống
+uv run sp.py --lang vi     # ép dùng tiếng Việt
+```
+
+Đổi ngôn ngữ trong phần mềm: **Công cụ → Tùy chọn nâng cao → Ngôn ngữ giao diện**, chọn `vi` rồi khởi động lại.
+
+### Dòng lệnh
+
+```bash
+# Dịch video
+uv run cli.py --task vtv --name "./video.mp4" \
+  --source_language_code zh-cn --target_language_code vi \
+  --voice_role "vi-VN-NamMinhNeural"
+
+# Bóc phụ đề từ audio
 uv run cli.py --task stt --name "./audio.wav" --model_name large-v3
 
-# Subtitle Translation
-uv run cli.py --task sts --name "./subs.srt" --target_language_code en
+# Dịch tệp phụ đề
+uv run cli.py --task sts --name "./subs.srt" --target_language_code vi
 
-# Text to Speech
-uv run cli.py --task tts --name "./subs.srt" --voice_role "zh-CN-YunyangNeural"
+# Lồng tiếng từ phụ đề
+uv run cli.py --task tts --name "./subs.srt" --voice_role "vi-VN-HoaiMyNeural"
+
+# Xem danh sách kênh / ngôn ngữ / mô hình
+uv run cli.py --list providers
 ```
 
-> [CLI documentation with all parameters](docs/cli.md)
+Xem [tài liệu CLI đầy đủ](docs/cli.md).
 
-**WebUI** (for remote/internal network access):
+### Giao diện web
+
 ```bash
 uv sync --extra webui
 uv run webui.py
 ```
 
+> ⚠️ WebUI mặc định lắng nghe trên `0.0.0.0`, nghĩa là **mọi máy trong mạng LAN đều truy cập được** và không có xác thực. Nếu chỉ dùng trên máy mình, hãy chạy `uv run webui.py --host 127.0.0.1`. Cờ `--share` sẽ tạo liên kết công khai ra Internet — chỉ bật khi bạn thực sự cần.
 
-**Docker** (containerized deployment):
+Xem [tài liệu WebUI](docs/webui.md).
+
+### Docker
+
 ```bash
-# Build
-docker build -t pyvideotrans-webui .
+# Bản CPU
+docker build -t phiendichvideo-webui .
 
-# Run
-docker run -d -p 7860:7860 --name pyvideotrans pyvideotrans-webui
+# Bản GPU
+docker build --build-arg USE_CUDA=true -t phiendichvideo-webui:gpu .
 
-# With persistent config and output
+# Chạy
+docker run -d -p 7860:7860 --name phiendichvideo phiendichvideo-webui
+
+# Giữ lại kết quả và mô hình đã tải
 docker run -d -p 7860:7860 \
   -v ./data/output:/app/output \
-  -v ./data/config:/app/phiendichvideo \
-  --name pyvideotrans pyvideotrans-webui
+  -v ./data/models:/app/models \
+  --name phiendichvideo phiendichvideo-webui
 ```
 
-> [WebUI documentation](docs/webui.md)
+Image được dựng từ mã nguồn trong thư mục hiện tại (`COPY`), không tải từ GitHub, nên mọi thay đổi cục bộ đều có hiệu lực ngay. Tệp `.dockerignore` loại `.venv/`, `models/`, `ffmpeg/` cùng các tệp cấu hình cá nhân ra khỏi image.
 
-### 5. (Optional) GPU Acceleration Configuration
+> ⚠️ Đừng gắn volume vào `/app/phiendichvideo` — thư mục đó là mã nguồn của phần mềm, gắn đè lên sẽ che mất và phần mềm không chạy được. Tệp `cfg.json` và `params.json` cố ý không được đưa vào image (chúng chứa khóa API); phần mềm tự sinh lại với giá trị mặc định khi khởi động.
 
-If you have an NVIDIA graphics card, execute the following commands to install the CUDA-supported PyTorch version:
+---
+
+## ⚡ Tăng tốc bằng GPU
+
+Nếu có card NVIDIA, cài bản PyTorch hỗ trợ CUDA:
 
 ```bash
-# Uninstall CPU version
 uv remove torch torchaudio
-
-# Install CUDA version (Example for CUDA 12.x)
 uv add torch==2.7 torchaudio==2.7 --index-url https://download.pytorch.org/whl/cu128
 uv add nvidia-cublas-cu12 nvidia-cudnn-cu12
 ```
 
-> [AMD GPU acceleration via Whisper.NET](docs/whisper_net_setup.md)
+Cần **CUDA 12.8** và **cuDNN 9.11**. Với card AMD, xem [hướng dẫn Whisper.NET](docs/whisper_net_setup.md).
 
 ---
 
-## 🧩 Supported Channels & Models (Partial)
+## 🧩 Các kênh hỗ trợ (một phần)
 
-| Category | Channel/Model | Description |
+| Nhóm | Kênh / Mô hình | Ghi chú |
 | :--- | :--- | :--- |
-| **ASR (Speech Recognition)** | **Faster-Whisper** (Local) | Recommended, fast speed, high accuracy |
-| | WhisperX / Parakeet | Supports timestamp alignment & speaker diarization |
-| | Alibaba Qwen3-ASR / ByteDance Volcano | Online API, excellent for Chinese |
-| **Translation (LLM/MT)** | **DeepSeek** / ChatGPT | Supports context understanding, more natural translation |
-| | MiniMax AI | MiniMax M3 LLM, latest flagship model, OpenAI-compatible |
-| | Google / Microsoft | Traditional machine translation, fast speed |
-| | Ollama / M2M100 | Fully local offline translation |
-| **TTS (Speech Synthesis)** | **Edge-TTS** | Microsoft free interface, natural effect |
-| | **F5-TTS / CosyVoice** | Supports **Voice Cloning**, requires local deployment |
-| | GPT-SoVITS / ChatTTS | High-quality open-source TTS |
-| | 302.AI / OpenAI / Azure | High-quality commercial API |
+| **Nhận dạng giọng nói** | **Faster-Whisper** (cục bộ) | Khuyến nghị, nhanh và chính xác |
+| | WhisperX / Parakeet | Căn chỉnh dấu thời gian, phân tách người nói |
+| | Qwen3-ASR, ByteDance, Deepgram | API trực tuyến |
+| **Dịch thuật** | **DeepSeek** / ChatGPT / Gemini | Hiểu ngữ cảnh, bản dịch tự nhiên hơn |
+| | Google / Microsoft | Dịch máy truyền thống, miễn phí, nhanh |
+| | Ollama / M2M100 | Dịch hoàn toàn ngoại tuyến |
+| **Lồng tiếng** | **Edge-TTS** | Miễn phí, có giọng tiếng Việt, chất lượng tốt |
+| | **F5-TTS / CosyVoice** | Nhân bản giọng, cần tự triển khai |
+| | GPT-SoVITS / ChatTTS | TTS mã nguồn mở chất lượng cao |
+| | OpenAI / Azure / Minimaxi | API thương mại |
+
+Xem danh sách đầy đủ bằng `uv run cli.py --list providers`.
 
 ---
 
-## 📚 Documentation & Support
+## 🔒 Về dữ liệu và quyền riêng tư
 
-* **Official Documentation**: [https://pyvideotrans.com](https://pyvideotrans.com) (Includes detailed tutorials, API configuration guides, FAQ)
-* **Online Q&A Community**: [https://bbs.pyvideotrans.com](https://bbs.pyvideotrans.com) (Submit error logs for automated AI analysis and answers)
-* **GitHub Wiki**: [architecture.md](docs/architecture.md) | [cli.md](docs/cli.md) | [webui.md](docs/webui.md) | [Synchronize.md](docs/Synchronize.md) | [faq.md](docs/faq.md)
+Phần mềm chỉ tự động kết nối ra ngoài ở hai chỗ: kiểm tra phiên bản mới và dò xem có vào được `huggingface.co` không (nếu không thì chuyển sang máy chủ gương).
 
-## ⚠️ Disclaimer
-
-This software is an open-source, free, non-commercial project. Users are solely responsible for any legal consequences arising from the use of this software (including but not limited to calling third-party APIs or processing copyrighted video content). Please comply with local laws and regulations and the terms of use of relevant service providers.
-
-## 🙏 Acknowledgements
-
-This project mainly relies on the following open-source projects (partial):
-
-* [FFmpeg](https://github.com/FFmpeg/FFmpeg)
-* [PySide6](https://pypi.org/project/PySide6/)
-* [faster-whisper](https://github.com/SYSTRAN/faster-whisper)
-* [openai-whisper](https://github.com/openai/whisper)
-* [edge-tts](https://github.com/rany2/edge-tts)
-* [F5-TTS](https://github.com/SWivid/F5-TTS)
-* [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)
-* [Gradio](https://www.gradio.app/) (WebUI)
+Ngoài ra, **dữ liệu chỉ được gửi đi khi bạn chọn một kênh trực tuyến**. Ví dụ chọn Google Dịch thì phụ đề được gửi tới Google, chọn Edge-TTS thì văn bản được gửi tới Microsoft. Muốn hoàn toàn ngoại tuyến, hãy chọn các kênh có nhãn *Cục bộ*: faster-whisper cho nhận dạng, M2M100 hoặc Ollama cho dịch, và một TTS chạy trên máy.
 
 ---
 
-*Created by [jianchang512](https://github.com/jianchang512)*
+## 📚 Tài liệu
 
+- [Kiến trúc kỹ thuật](docs/architecture.md) · [Dòng lệnh](docs/cli.md) · [WebUI](docs/webui.md) · [Đồng bộ hình tiếng](docs/Synchronize.md) · [Câu hỏi thường gặp](docs/faq.md)
+- Tài liệu của dự án gốc: [pyvideotrans.com](https://pyvideotrans.com) · [Diễn đàn hỏi đáp](https://bbs.pyvideotrans.com)
 
+---
+
+## ⚠️ Miễn trừ trách nhiệm
+
+Đây là phần mềm mã nguồn mở, miễn phí, phi thương mại. Người dùng tự chịu trách nhiệm về mọi hậu quả pháp lý phát sinh khi sử dụng, bao gồm nhưng không giới hạn ở việc gọi API của bên thứ ba hay xử lý video có bản quyền. Vui lòng tuân thủ pháp luật sở tại và điều khoản sử dụng của các nhà cung cấp dịch vụ.
+
+---
+
+## 📜 Giấy phép và ghi nhận
+
+Dự án phát hành theo giấy phép [GPL-v3](LICENSE).
+
+Toàn bộ phần lõi do **[jianchang512](https://github.com/jianchang512)** phát triển trong dự án [pyVideoTrans](https://github.com/jianchang512/pyvideotrans). Kho này là bản phái sinh, phần đóng góp thêm là Việt hóa giao diện và đổi tên sản phẩm. Xin cảm ơn tác giả gốc.
+
+Phần mềm dựa trên các dự án mã nguồn mở sau (một phần):
+
+[FFmpeg](https://github.com/FFmpeg/FFmpeg) · [PySide6](https://pypi.org/project/PySide6/) · [faster-whisper](https://github.com/SYSTRAN/faster-whisper) · [openai-whisper](https://github.com/openai/whisper) · [edge-tts](https://github.com/rany2/edge-tts) · [F5-TTS](https://github.com/SWivid/F5-TTS) · [CosyVoice](https://github.com/FunAudioLLM/CosyVoice) · [Gradio](https://www.gradio.app/)
