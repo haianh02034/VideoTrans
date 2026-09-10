@@ -4,9 +4,9 @@ date: 2024-01-22 14:33:00
 description: 菜单栏--帮助/关于 中有很多链接，比如模型下载地址、CUDA配置等，遇到问题时可尝试点开使用
 ---
 
-# pyVideoTrans 常见问题与解决方案
+# Phiên Dịch Video 常见问题与解决方案
 
-为了帮助您更好地使用 `pyVideoTrans`，我们整理了以下常见问题及其解决方案。
+为了帮助您更好地使用 `Phiên Dịch Video`，我们整理了以下常见问题及其解决方案。
 
 在 `菜单栏--帮助/关于` 中有很多链接，比如模型下载地址、CUDA配置等，遇到问题时可尝试点开使用。
 
@@ -28,7 +28,7 @@ description: 菜单栏--帮助/关于 中有很多链接，比如模型下载地
 *   **解决方案**：
     1.  **耐心等待**：双击后请耐心等待一段时间。
     2.  **检查安全软件**：部分杀毒软件或安全卫士可能会阻止程序启动，请尝试暂时关闭它们，或将本软件添加到信任/白名单中。
-    3.  **检查文件路径**：确保软件存放的路径**只包含英文和数字**，不应有中文、空格或特殊符号。例如，`D:\pyVideoTrans` 是一个好的路径，而 `D:\program file\视频 工具` 则可能导致问题。
+    3.  **检查文件路径**：确保软件存放的路径**只包含英文和数字**，不应有中文、空格或特殊符号。例如，`D:\PhienDichVideo` 是一个好的路径，而 `D:\program file\视频 工具` 则可能导致问题。
     4.  **升级包问题**：如果您是覆盖了升级包后无法启动，说明操作有误。请重新下载完整的软件包，解压后再覆盖新版升级包。
 
 ### 2. 启动时提示缺少 `python310.dll` 文件怎么办？
@@ -64,12 +64,12 @@ description: 菜单栏--帮助/关于 中有很多链接，比如模型下载地
     *   libsndfile
 *   **部署步骤**：
     ```bash
-    git clone https://github.com/jianchang512/pyvideotrans
-    cd pyvideotrans
+    git clone https://github.com/haianh02034/VideoTrans.git
+    cd VideoTrans
     uv sync
     uv run sp.py
     ```
-*   **可选依赖**：`uv sync --all-extra` 安装所有可选渠道（qwen-tts, qwen-asr, moss-tts, chatterbox）
+*   **可选依赖**：`uv sync --all-extras` 安装所有可选渠道（webui, mosstts, dotnet）
 
 ### 7. 源码部署后启动报错怎么办？
 
@@ -214,7 +214,7 @@ description: 菜单栏--帮助/关于 中有很多链接，比如模型下载地
     1.  本地小模型（如 7B）智能不足，建议改用 DeepSeek/GPT-4 等在线模型
     2.  取消"发送完整字幕"选项，改为按行翻译
     3.  设置 `trans_thread=1` 降低并发
-    4.  [具体原理和解决方法点击查看](/faq17)
+    4.  [具体原理和解决方法点击查看](https://pyvideotrans.com/faq17)
 
 ### 21. AI 翻译触发安全限制被过滤
 

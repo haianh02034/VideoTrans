@@ -9,7 +9,7 @@
 
 当然了，如果觉得该项目对你有价值，希望该项目能一直稳定持续维护和优化，也欢迎各位小额捐助。
 
-如果不愿捐助或者没有能力捐助，也无妨欢迎继续使用，点个star、提交个pr或关注下公众号(内容均是本项目教程，搜一搜公众号`pyvideotrans` )，也是对开发者的一种帮助。
+如果不愿捐助或者没有能力捐助，也无妨欢迎继续使用，点个star、提交个pr或关注下公众号(内容均是本项目教程，搜一搜公众号`Phiên Dịch Video` )，也是对开发者的一种帮助。
 
 ----
 
@@ -27,7 +27,7 @@
 <img src="https://pyvideotrans.com/images/biancn.jpg" width="200">
 
 
-# [pyVideoTrans项目](https://github.com/jianchang512/pyvideotrans)捐助者列表
+# [Phiên Dịch Video项目](https://github.com/jianchang512/pyvideotrans)捐助者列表
 
 **感谢所有捐助者，您的支持是我坚持维护的动力**
 

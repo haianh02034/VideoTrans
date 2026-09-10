@@ -1,4 +1,4 @@
-# Xây dựng ứng dụng (App) từ pyVideoTrans
+# Xây dựng ứng dụng (App) từ Phiên Dịch Video
 
 ## Câu hỏi: Project này có thể build thành app không?
 
@@ -37,13 +37,13 @@ Sử dụng PyInstaller để đóng gói `sp.py`:
 
 ```bash
 # Cơ bản
-pyinstaller --onefile --windowed --name "pyVideoTrans" sp.py
+pyinstaller --onefile --windowed --name "PhienDichVideo" sp.py
 
 # Với icon
-pyinstaller --onefile --windowed --name "pyVideoTrans" --icon "./phiendichvideo/styles/icon.ico" sp.py
+pyinstaller --onefile --windowed --name "PhienDichVideo" --icon "./phiendichvideo/styles/icon.ico" sp.py
 
 # Thêm dữ liệu kèm theo
-pyinstaller --onefile --windowed --name "pyVideoTrans" --icon "./phiendichvideo/styles/icon.ico" --add-data "phiendichvideo:phiendichvideo" sp.py
+pyinstaller --onefile --windowed --name "PhienDichVideo" --icon "./phiendichvideo/styles/icon.ico" --add-data "phiendichvideo:phiendichvideo" sp.py
 ```
 
 ### b. Build WebUI App
@@ -51,23 +51,23 @@ pyinstaller --onefile --windowed --name "pyVideoTrans" --icon "./phiendichvideo/
 Build thành web server độc lập:
 
 ```bash
-pyinstaller --onefile --name "pyVideoTrans-WebUI" webui.py
+pyinstaller --onefile --name "PhienDichVideo-WebUI" webui.py
 ```
 
 ### c. Build CLI App
 
 ```bash
-pyinstaller --onefile --name "pyVideoTrans-CLI" cli.py
+pyinstaller --onefile --name "PhienDichVideo-CLI" cli.py
 ```
 
 ---
 
 ## 4. Cấu trúc Spec file (khuyến nghị)
 
-Tạo file `pyVideoTrans.spec` để build chuẩn hơn:
+Tạo file `PhienDichVideo.spec` để build chuẩn hơn:
 
 ```python
-# pyVideoTrans.spec
+# PhienDichVideo.spec
 # -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
@@ -117,7 +117,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='pyVideoTrans',
+    name='PhienDichVideo',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -137,7 +137,7 @@ exe = EXE(
 Build bằng lệnh:
 
 ```bash
-pyinstaller pyVideoTrans.spec
+pyinstaller PhienDichVideo.spec
 ```
 
 ---
@@ -175,7 +175,7 @@ Cách build đơn giản nhất:
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed --name "VideoTrans" sp.py
+pyinstaller --onefile --windowed --name "PhienDichVideo" sp.py
 ```
 
 File `.exe` sẽ nằm trong thư mục `dist/`.

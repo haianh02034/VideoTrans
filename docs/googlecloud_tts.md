@@ -1,7 +1,7 @@
 # Google Cloud Text-to-Speech Integration
 
 ## Overview
-This integration adds Google Cloud Text-to-Speech as a new TTS provider in VideoTrans. It offers high-quality voice synthesis with support for multiple languages and voices.
+This integration adds Google Cloud Text-to-Speech as a new TTS provider in Phiên Dịch Video. It offers high-quality voice synthesis with support for multiple languages and voices.
 
 ## Features
 - Support for 16+ languages including:
@@ -38,7 +38,7 @@ This integration adds Google Cloud Text-to-Speech as a new TTS provider in Video
    - Create a service account and download the credentials JSON file
 
 ## Configuration
-1. In VideoTrans, go to Settings > Google Cloud TTS
+1. In Phiên Dịch Video, go to Settings > Google Cloud TTS
 2. Configure the following settings:
    - **Credential JSON**: Path to your Google Cloud service account credentials file
    - **Language**: Select the target language (e.g., "pt-BR" for Brazilian Portuguese)
@@ -80,9 +80,9 @@ Feel free to:
 - Enhance the configuration interface
 
 ## License
-This integration follows the same license as the main VideoTrans project.
+This integration follows the same license as the main Phiên Dịch Video project.
 
 ## Credits
 - Google Cloud Text-to-Speech API
-- VideoTrans team for the base project
+- The upstream pyVideoTrans project by jianchang512 for the base project
 - Contributors who helped with this integration 

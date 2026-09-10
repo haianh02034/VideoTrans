@@ -1,6 +1,6 @@
-# pyVideoTrans 命令行（CLI）使用指南
+# Phiên Dịch Video 命令行（CLI）使用指南
 
-pyVideoTrans 支持通过命令行进行无界面操作，适合服务器部署、批量处理、自动化流水线等场景。
+Phiên Dịch Video 支持通过命令行进行无界面操作，适合服务器部署、批量处理、自动化流水线等场景。
 
 ---
 

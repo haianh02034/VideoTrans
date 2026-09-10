@@ -1,6 +1,6 @@
 # 音频视频时间轴对齐原理说明
 
-本文档详细说明 pyVideoTrans 中「配音、字幕、视频对齐」模块（`phiendichvideo/task/_rate.py`）的实现原理。该模块负责将翻译后的配音音频与原始无声视频在时间轴上精确对齐，最终合并为流畅的新视频。
+本文档详细说明 Phiên Dịch Video 中「配音、字幕、视频对齐」模块（`phiendichvideo/task/_rate.py`）的实现原理。该模块负责将翻译后的配音音频与原始无声视频在时间轴上精确对齐，最终合并为流畅的新视频。
 
 ---
 
@@ -26,7 +26,7 @@
 
 ## 一、问题背景
 
-pyVideoTrans 将视频从 A 语言翻译为 B 语言的完整流程：
+Phiên Dịch Video 将视频从 A 语言翻译为 B 语言的完整流程：
 
 ```text
 原始视频(A语言)
@@ -75,7 +75,7 @@ FFmpeg 处理视频无法精确到毫秒级。使用 PTS（Presentation Time Sta
 
 ## 三、对齐策略总览
 
-pyVideoTrans 提供四种对齐模式，由两个布尔标志位控制：
+Phiên Dịch Video 提供四种对齐模式，由两个布尔标志位控制：
 
 | 模式 | `should_audiorate` | `should_videorate` | 说明 |
 |------|:---:|:---:|------|
@@ -396,7 +396,7 @@ def _run_no_rate_change_mode(self):
 
 ### 9.1 两种变速引擎
 
-pyVideoTrans 支持两种音频变速方式，按优先级自动选择：
+Phiên Dịch Video 支持两种音频变速方式，按优先级自动选择：
 
 | 引擎 | 优先级 | 依赖 | 特点 |
 |------|:---:|------|------|

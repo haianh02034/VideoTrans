@@ -1,11 +1,11 @@
-﻿> Sponsors: **[Recall.ai](https://www.recall.ai/product/meeting-transcription-api?utm_source=github&utm_medium=sponsorship&utm_campaign=jianchang512-pyvideotrans) - Meeting Transcription API**
+﻿> Sponsors: **[Recall.ai](https://www.recall.ai/product/meeting-transcription-api?utm_source=github&utm_medium=sponsorship&utm_campaign=jianchang512-Phiên Dịch Video) - Meeting Transcription API**
 >
-> If you’re looking for a transcription API for meetings, consider checking out **[Recall.ai](https://www.recall.ai/product/meeting-transcription-api?utm_source=github&utm_medium=sponsorship&utm_campaign=jianchang512-pyvideotrans)** , an API that works with Zoom, Google Meet, Microsoft Teams, and more
+> If you’re looking for a transcription API for meetings, consider checking out **[Recall.ai](https://www.recall.ai/product/meeting-transcription-api?utm_source=github&utm_medium=sponsorship&utm_campaign=jianchang512-Phiên Dịch Video)** , an API that works with Zoom, Google Meet, Microsoft Teams, and more
 
 
 ---
 
-# pyVideoTrans
+# Phiên Dịch Video
 
 <div align="center">
 
@@ -17,7 +17,7 @@
 
 </div>
 
-**pyVideoTrans** 致力于无缝地将视频从一种语言转换为另一种语言，包含语音识别、字幕翻译、多角色配音及音画同步等全套流程。支持本地离线部署与多种主流在线 API。
+**Phiên Dịch Video** 致力于无缝地将视频从一种语言转换为另一种语言，包含语音识别、字幕翻译、多角色配音及音画同步等全套流程。支持本地离线部署与多种主流在线 API。
 
 <img width="1566" height="912" alt="image" src="https://github.com/user-attachments/assets/2d5bd178-3dc0-45ee-bc1c-dbb5f6705cf4" />
 
@@ -48,7 +48,7 @@
 我们为 Windows 10/11 用户提供了预打包的 `.exe` 版本，无需配置 Python 环境。
 
 1. **下载**: [点击下载最新预打包版本](https://github.com/jianchang512/pyvideotrans/releases)
-2. **解压**: 将压缩包解压到一个**不包含中文、空格**的路径下 (例如 `D:\pyVideoTrans`)。
+2. **解压**: 将压缩包解压到一个**不包含中文、空格**的路径下 (例如 `D:\PhienDichVideo`)。
 3. **运行**: 双击文件夹内的 `sp.exe` 启动。
 
 > **注意**:
@@ -82,16 +82,15 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ### 3. 克隆与安装
 
 ```bash
-git clone https://github.com/jianchang512/pyvideotrans.git
-cd pyvideotrans
+git clone https://github.com/haianh02034/VideoTrans.git
+cd VideoTrans
 uv sync
 ```
 
-> 默认不安装 `qwen-tts`、`qwen-asr`、`moss-tts`、`chatterbox` 本地渠道，若需要全部安装请执行 `uv sync --all-extra`
-> - 单独安装 `qwen-tts`：`uv sync --extra qwentts`
-> - 单独安装 `qwen-asr`：`uv sync --extra qwenasr`
-> - 单独安装 `moss-tts`：`uv sync --extra mosstts`
-> - 单独安装 `chatterbox`：`uv sync --extra chatterbox`
+> 可选依赖组：`webui`、`mosstts`、`dotnet`。全部安装：`uv sync --all-extras`
+> - WebUI 界面：`uv sync --extra webui`
+> - MOSS-TTS 渠道：`uv sync --extra mosstts`
+> - Whisper.NET：`uv sync --extra dotnet`
 
 ### 4. 启动软件
 
@@ -128,16 +127,16 @@ uv run webui.py
 **Docker 部署** (容器化部署):
 ```bash
 # 构建镜像
-docker build -t pyvideotrans-webui .
+docker build -t phiendichvideo-webui .
 
 # 运行
-docker run -d -p 7860:7860 --name pyvideotrans pyvideotrans-webui
+docker run -d -p 7860:7860 --name phiendichvideo phiendichvideo-webui
 
 # 持久化配置和输出
 docker run -d -p 7860:7860 \
   -v ./data/output:/app/output \
-  -v ./data/config:/app/phiendichvideo \
-  --name pyvideotrans pyvideotrans-webui
+  -v ./data/models:/app/models \
+  --name phiendichvideo phiendichvideo-webui
 ```
 
 > [WebUI 使用说明](webui.md)

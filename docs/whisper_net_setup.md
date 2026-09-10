@@ -73,7 +73,7 @@ NuGet 包里包含这些文件（全部需要）：
 确保你的目录结构是这样的：
 
 ```
-pyvideotrans/
+VideoTrans/
 ├─ models/
 │  └─ ggml-large-v3-turbo.bin    ← 语音模型
 └─ deps/
@@ -211,7 +211,7 @@ Recommended: `ggml-large-v3-turbo.bin` (good quality, fast)
 Make sure your directory structure looks like this:
 
 ```
-pyvideotrans/
+VideoTrans/
 ├─ models/
 │  └─ ggml-large-v3-turbo.bin    ← Speech model
 └─ deps/
@@ -239,7 +239,7 @@ pyvideotrans/
 
 ## Step 4: Start Using
 
-1. Open pyVideoTrans
+1. Open Phiên Dịch Video
 2. Select **"Whisper.NET"** from the speech recognition dropdown
 3. Choose your downloaded model file
 4. Click Start

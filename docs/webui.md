@@ -1,4 +1,4 @@
-﻿# pyVideoTrans WebUI 使用指南
+﻿# Phiên Dịch Video WebUI 使用指南
 
 ## ⚠️ 重要提示
 
@@ -17,8 +17,8 @@
 ### 1.1 源码部署（推荐）
 
 ```bash
-git clone https://github.com/jianchang512/pyvideotrans.git
-cd pyvideotrans
+git clone https://github.com/haianh02034/VideoTrans.git
+cd VideoTrans
 uv sync --extra webui
 ```
 
@@ -37,24 +37,24 @@ uv run webui.py --share            # 创建 Gradio 公网链接
 
 ```bash
 # 构建镜像
-git clone https://github.com/jianchang512/pyvideotrans.git
-cd pyvideotrans
-docker build -t pyvideotrans-webui .
+git clone https://github.com/haianh02034/VideoTrans.git
+cd VideoTrans
+docker build -t phiendichvideo-webui .
 
 # 运行
-docker run -d -p 7860:7860 --name pyvideotrans pyvideotrans-webui
+docker run -d -p 7860:7860 --name phiendichvideo phiendichvideo-webui
 
 # 持久化配置和输出
 docker run -d -p 7860:7860 \
   -v ./data/output:/app/output \
-  -v ./data/config:/app/phiendichvideo \
-  --name pyvideotrans pyvideotrans-webui
+  -v ./data/models:/app/models \
+  --name phiendichvideo phiendichvideo-webui
 
 # GPU 加速
 docker run -d -p 7860:7860 --gpus all \
   -v ./data/output:/app/output \
-  -v ./data/config:/app/phiendichvideo \
-  --name pyvideotrans pyvideotrans-webui
+  -v ./data/models:/app/models \
+  --name phiendichvideo phiendichvideo-webui
 ```
 
 ### 1.3 Google Colab
@@ -136,7 +136,7 @@ WebUI 分为三个标签页：
 `uv sync --extra webui`
 
 **Q: Docker 如何持久化配置**
-`-v ./data/output:/app/output -v ./data/config:/app/phiendichvideo`
+`-v ./data/output:/app/output -v ./data/models:/app/models`
 
 **Q: Docker 如何使用 GPU**
 安装 nvidia-container-toolkit 后：`docker run --gpus all ...`
