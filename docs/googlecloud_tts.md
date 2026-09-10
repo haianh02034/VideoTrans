@@ -1,88 +1,88 @@
-# Google Cloud Text-to-Speech Integration
+# Tích hợp Google Cloud Text-to-Speech
 
-## Overview
-This integration adds Google Cloud Text-to-Speech as a new TTS provider in Phiên Dịch Video. It offers high-quality voice synthesis with support for multiple languages and voices.
+## Tổng quan
+Phần tích hợp này thêm Google Cloud Text-to-Speech làm một kênh lồng tiếng mới trong Phiên Dịch Video, cho chất lượng tổng hợp giọng nói cao với nhiều ngôn ngữ và giọng đọc.
 
-## Features
-- Support for 16+ languages including:
-  - Portuguese (Brazil)
-  - English (US/GB)
-  - Spanish
-  - French
-  - German
-  - Italian
-  - Japanese
-  - Korean
-  - Chinese
-  - Russian
-  - Hindi
-  - Arabic
-  - Turkish
-  - Thai
-  - Vietnamese
-  - Indonesian
-- Multiple voice options per language
-- Adjustable speaking rate and pitch
-- Support for multiple audio formats (MP3, LINEAR16, OGG_OPUS)
-- User-friendly configuration interface
+## Tính năng
+- Hỗ trợ hơn 16 ngôn ngữ, gồm:
+  - Tiếng Bồ Đào Nha (Brazil)
+  - Tiếng Anh (Mỹ/Anh)
+  - Tiếng Tây Ban Nha
+  - Tiếng Pháp
+  - Tiếng Đức
+  - Tiếng Ý
+  - Tiếng Nhật
+  - Tiếng Hàn
+  - Tiếng Trung
+  - Tiếng Nga
+  - Tiếng Hindi
+  - Tiếng Ả Rập
+  - Tiếng Thổ Nhĩ Kỳ
+  - Tiếng Thái
+  - Tiếng Việt
+  - Tiếng Indonesia
+- Nhiều lựa chọn giọng đọc cho mỗi ngôn ngữ
+- Điều chỉnh được tốc độ đọc và cao độ
+- Hỗ trợ nhiều định dạng âm thanh (MP3, LINEAR16, OGG_OPUS)
+- Giao diện cấu hình dễ dùng
 
-## Requirements
-1. Python package:
+## Yêu cầu
+1. Thư viện Python:
    ```bash
    pip install google-cloud-texttospeech>=2.14.0
    ```
 
-2. Google Cloud Project:
-   - Create a project in [Google Cloud Console](https://console.cloud.google.com)
-   - Enable the Cloud Text-to-Speech API
-   - Create a service account and download the credentials JSON file
+2. Dự án Google Cloud:
+   - Tạo một dự án trong [Google Cloud Console](https://console.cloud.google.com)
+   - Bật Cloud Text-to-Speech API
+   - Tạo tài khoản dịch vụ (service account) và tải tệp JSON chứng thực về
 
-## Configuration
-1. In Phiên Dịch Video, go to Settings > Google Cloud TTS
-2. Configure the following settings:
-   - **Credential JSON**: Path to your Google Cloud service account credentials file
-   - **Language**: Select the target language (e.g., "pt-BR" for Brazilian Portuguese)
-   - **Voice**: Choose from available voices for the selected language
-   - **Audio Encoding**: Select output format (MP3, LINEAR16, or OGG_OPUS)
+## Cấu hình
+1. Trong Phiên Dịch Video, vào **Cài đặt → Google Cloud TTS**
+2. Thiết lập các mục sau:
+   - **Tệp JSON chứng thực**: đường dẫn tới tệp chứng thực tài khoản dịch vụ Google Cloud
+   - **Ngôn ngữ**: chọn ngôn ngữ đích (ví dụ `vi-VN` cho tiếng Việt, `pt-BR` cho tiếng Bồ Đào Nha Brazil)
+   - **Giọng đọc**: chọn trong danh sách giọng có sẵn của ngôn ngữ đã chọn
+   - **Mã hóa âm thanh**: chọn định dạng đầu ra (MP3, LINEAR16 hoặc OGG_OPUS)
 
-## Usage
-1. Select "Google Cloud TTS" as your TTS provider
-2. Choose your target language
-3. Select a voice from the available options
-4. Adjust speaking rate and pitch if needed
-5. Proceed with your video translation as usual
+## Cách dùng
+1. Chọn "Google Cloud TTS" làm kênh lồng tiếng
+2. Chọn ngôn ngữ đích
+3. Chọn một giọng đọc trong danh sách
+4. Chỉnh tốc độ đọc và cao độ nếu cần
+5. Tiến hành dịch video như bình thường
 
-## Troubleshooting
-Common issues and solutions:
+## Khắc phục sự cố
+Các lỗi thường gặp và cách xử lý:
 
-1. **"Credentials not found"**
-   - Verify the path to your credentials JSON file
-   - Ensure the file has proper read permissions
+1. **"Credentials not found" (không tìm thấy chứng thực)**
+   - Kiểm tra lại đường dẫn tới tệp JSON chứng thực
+   - Đảm bảo tệp có quyền đọc
 
-2. **"No voices available"**
-   - Check if your credentials have Text-to-Speech API access
-   - Verify if the selected language is supported
-   - Check the logs for detailed error messages
+2. **"No voices available" (không có giọng đọc)**
+   - Kiểm tra chứng thực của bạn đã được cấp quyền dùng Text-to-Speech API chưa
+   - Kiểm tra ngôn ngữ đã chọn có được hỗ trợ không
+   - Xem nhật ký để biết thông báo lỗi chi tiết
 
-3. **"Invalid speaking rate"**
-   - Speaking rate should be a percentage (e.g., "+10%", "-5%")
-   - Default is "+0%"
+3. **"Invalid speaking rate" (tốc độ đọc không hợp lệ)**
+   - Tốc độ đọc phải ở dạng phần trăm (ví dụ `+10%`, `-5%`)
+   - Mặc định là `+0%`
 
-4. **"Invalid pitch"**
-   - Pitch should be in Hz (e.g., "+2Hz", "-1Hz")
-   - Default is "+0Hz"
+4. **"Invalid pitch" (cao độ không hợp lệ)**
+   - Cao độ phải tính bằng Hz (ví dụ `+2Hz`, `-1Hz`)
+   - Mặc định là `+0Hz`
 
-## Contributing
-Feel free to:
-- Report bugs
-- Suggest improvements
-- Add support for more languages
-- Enhance the configuration interface
+## Đóng góp
+Bạn có thể tự nhiên:
+- Báo lỗi
+- Đề xuất cải tiến
+- Thêm hỗ trợ cho ngôn ngữ khác
+- Cải thiện giao diện cấu hình
 
-## License
-This integration follows the same license as the main Phiên Dịch Video project.
+## Giấy phép
+Phần tích hợp này theo cùng giấy phép với dự án Phiên Dịch Video.
 
-## Credits
+## Ghi nhận
 - Google Cloud Text-to-Speech API
-- The upstream pyVideoTrans project by jianchang512 for the base project
-- Contributors who helped with this integration 
+- Dự án gốc [pyVideoTrans](https://github.com/jianchang512/pyvideotrans) của jianchang512
+- Những người đã đóng góp cho phần tích hợp này
