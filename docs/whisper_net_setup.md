@@ -1,90 +1,90 @@
-# Whisper.NET 安装指南
+# Hướng dẫn cài đặt Whisper.NET
 
-## 这是什么？
+## Đây là gì?
 
-Whisper.NET 是一个语音识别引擎，可以让你的 AMD 显卡通过 Vulkan 加速来识别语音（不用 NVIDIA 的 CUDA）。
+Whisper.NET là một công cụ nhận dạng giọng nói, cho phép card đồ họa AMD của bạn tăng tốc nhận dạng qua Vulkan (không cần CUDA của NVIDIA).
 
-## 适用场景
+## Dùng cho ai
 
-适合 **Windows + AMD 显卡** 用户使用。
+Phù hợp với người dùng **Windows + card AMD**.
 
-**背景说明**：我在使用 Whisper.cpp 时发现，最新版本已经不再提供 Windows 环境下 AMD 显卡的 GPU 支持，导致 Windows + AMD 显卡只能使用 CPU 进行语音识别，速度很慢。经过与 AI 的咨询和讨论，最终选择了 Whisper.NET 这条技术路线，并借助 AI 的编程能力得以实现。
+**Bối cảnh**: khi dùng Whisper.cpp, tác giả phát hiện bản mới nhất đã bỏ hỗ trợ GPU AMD trên Windows, khiến người dùng Windows + card AMD chỉ nhận dạng được bằng CPU, rất chậm. Sau khi tham khảo và trao đổi với AI, hướng kỹ thuật Whisper.NET được chọn và triển khai với sự hỗ trợ lập trình của AI.
 
-**测试环境**：目前仅在 **Windows 11 23H2 + RX 6650 XT** 环境下测试通过。其他环境可能需要用户自行测试，欢迎反馈结果。
+**Môi trường đã thử nghiệm**: hiện mới chỉ chạy thử thành công trên **Windows 11 23H2 + RX 6650 XT**. Các môi trường khác có thể cần bạn tự kiểm tra, rất mong nhận được phản hồi.
 
 ---
 
-## 第一步：下载 DLL 文件
+## Bước 1: Tải các tệp DLL
 
-### 需要下载的文件列表
+### Danh sách tệp cần tải
 
-**托管 DLL**（下载后放到 `deps/` 文件夹）：
+**DLL quản lý** (tải xong đặt vào thư mục `deps/`):
 
-| 文件名 | 版本 | 下载链接 |
+| Tên tệp | Phiên bản | Liên kết tải |
 |--------|------|----------|
-| Whisper.net.dll | 1.9.0 | [点击下载](https://www.nuget.org/packages/Whisper.net/1.9.0) |
-| Microsoft.Extensions.AI.Abstractions.dll | 10.0.0 | [点击下载](https://www.nuget.org/packages/Microsoft.Extensions.AI.Abstractions/10.0.0) |
-| Microsoft.Bcl.AsyncInterfaces.dll | 10.0.0 | [点击下载](https://www.nuget.org/packages/Microsoft.Bcl.AsyncInterfaces/10.0.0) |
-| System.Memory.dll | 4.6.3 | [点击下载](https://www.nuget.org/packages/System.Memory/4.6.3) |
-| System.Buffers.dll | 4.6.1 | [点击下载](https://www.nuget.org/packages/System.Buffers/4.6.1) |
-| System.Runtime.CompilerServices.Unsafe.dll | 6.1.2 | [点击下载](https://www.nuget.org/packages/System.Runtime.CompilerServices.Unsafe/6.1.2) |
-| System.Numerics.Vectors.dll | 4.6.1 | [点击下载](https://www.nuget.org/packages/System.Numerics.Vectors/4.6.1) |
+| Whisper.net.dll | 1.9.0 | [Tải về](https://www.nuget.org/packages/Whisper.net/1.9.0) |
+| Microsoft.Extensions.AI.Abstractions.dll | 10.0.0 | [Tải về](https://www.nuget.org/packages/Microsoft.Extensions.AI.Abstractions/10.0.0) |
+| Microsoft.Bcl.AsyncInterfaces.dll | 10.0.0 | [Tải về](https://www.nuget.org/packages/Microsoft.Bcl.AsyncInterfaces/10.0.0) |
+| System.Memory.dll | 4.6.3 | [Tải về](https://www.nuget.org/packages/System.Memory/4.6.3) |
+| System.Buffers.dll | 4.6.1 | [Tải về](https://www.nuget.org/packages/System.Buffers/4.6.1) |
+| System.Runtime.CompilerServices.Unsafe.dll | 6.1.2 | [Tải về](https://www.nuget.org/packages/System.Runtime.CompilerServices.Unsafe/6.1.2) |
+| System.Numerics.Vectors.dll | 4.6.1 | [Tải về](https://www.nuget.org/packages/System.Numerics.Vectors/4.6.1) |
 
-**Native DLL**（下载后放到 `deps/native/` 文件夹）：
+**DLL gốc (native)** (tải xong đặt vào thư mục `deps/native/`):
 
-从 [Whisper.net.Runtime.Vulkan 1.9.0](https://www.nuget.org/packages/Whisper.net.Runtime.Vulkan/1.9.0) 下载，解压后把 `build/win-x64/` 文件夹里的**所有 DLL 文件**都复制到 `deps/native/`。
+Tải từ [Whisper.net.Runtime.Vulkan 1.9.0](https://www.nuget.org/packages/Whisper.net.Runtime.Vulkan/1.9.0), giải nén rồi chép **toàn bộ tệp DLL** trong thư mục `build/win-x64/` vào `deps/native/`.
 
-NuGet 包里包含这些文件（全部需要）：
+Gói NuGet chứa các tệp sau (cần đủ tất cả):
 
-| 文件名 | 大小 | 用途 |
+| Tên tệp | Kích thước | Công dụng |
 |--------|------|------|
-| whisper.dll | 473KB | 语音识别核心 |
-| libwhisper.dll | 473KB | whisper.dll 的别名（必需） |
-| ggml-whisper.dll | 66KB | 计算库 |
-| libggml-whisper.dll | 66KB | ggml-whisper.dll 的别名 |
-| ggml-base-whisper.dll | 528KB | 基础库（必需依赖） |
-| libggml-base-whisper.dll | 528KB | ggml-base-whisper.dll 的别名 |
-| ggml-cpu-whisper.dll | 590KB | CPU 后备 |
-| libggml-cpu-whisper.dll | 590KB | ggml-cpu-whisper.dll 的别名 |
-| ggml-vulkan-whisper.dll | 45MB | GPU 加速（Vulkan） |
-| libggml-vulkan-whisper.dll | 45MB | ggml-vulkan-whisper.dll 的别名 |
+| whisper.dll | 473KB | Lõi nhận dạng giọng nói |
+| libwhisper.dll | 473KB | Bí danh của whisper.dll (bắt buộc) |
+| ggml-whisper.dll | 66KB | Thư viện tính toán |
+| libggml-whisper.dll | 66KB | Bí danh của ggml-whisper.dll |
+| ggml-base-whisper.dll | 528KB | Thư viện nền (phụ thuộc bắt buộc) |
+| libggml-base-whisper.dll | 528KB | Bí danh của ggml-base-whisper.dll |
+| ggml-cpu-whisper.dll | 590KB | Chạy dự phòng bằng CPU |
+| libggml-cpu-whisper.dll | 590KB | Bí danh của ggml-cpu-whisper.dll |
+| ggml-vulkan-whisper.dll | 45MB | Tăng tốc GPU (Vulkan) |
+| libggml-vulkan-whisper.dll | 45MB | Bí danh của ggml-vulkan-whisper.dll |
 
-### 如何从 NuGet 下载？
+### Tải từ NuGet thế nào?
 
-1. 点击上面的链接打开 NuGet 页面
-2. 点击 **"Download package"** 下载 `.nupkg` 文件
-3. 把 `.nupkg` 文件后缀改成 `.zip`，用解压软件打开
-4. 找到里面的 DLL 文件：
-   - 托管 DLL 在 `lib/netstandard2.0/` 文件夹里
-   - Native DLL 在 `build/win-x64/` 文件夹里
-
----
-
-## 第二步：下载语音模型
-
-从 [ggerganov/whisper.cpp models](https://github.com/ggerganov/whisper.cpp/tree/master/models) 下载 `.bin` 格式的模型文件，放到 `models/` 文件夹。
-
-比如下载：`ggml-large-v3-turbo.bin`（效果好、速度快）
+1. Bấm liên kết ở trên để mở trang NuGet
+2. Bấm **"Download package"** để tải tệp `.nupkg`
+3. Đổi phần mở rộng `.nupkg` thành `.zip` rồi mở bằng phần mềm giải nén
+4. Tìm các tệp DLL bên trong:
+   - DLL quản lý nằm trong thư mục `lib/netstandard2.0/`
+   - DLL gốc nằm trong thư mục `build/win-x64/`
 
 ---
 
-## 第三步：检查文件结构
+## Bước 2: Tải mô hình nhận dạng
 
-确保你的目录结构是这样的：
+Tải tệp mô hình định dạng `.bin` từ [ggerganov/whisper.cpp models](https://github.com/ggerganov/whisper.cpp/tree/master/models) rồi đặt vào thư mục `models/`.
+
+Ví dụ tải: `ggml-large-v3-turbo.bin` (chất lượng tốt, tốc độ nhanh)
+
+---
+
+## Bước 3: Kiểm tra cấu trúc thư mục
+
+Đảm bảo cấu trúc thư mục của bạn như sau:
 
 ```
 VideoTrans/
 ├─ models/
-│  └─ ggml-large-v3-turbo.bin    ← 语音模型
+│  └─ ggml-large-v3-turbo.bin    ← mô hình nhận dạng
 └─ deps/
-   ├─ Whisper.net.dll            ← 下面 7 个是托管 DLL
+   ├─ Whisper.net.dll            ← 7 tệp dưới đây là DLL quản lý
    ├─ Microsoft.Extensions.AI.Abstractions.dll
    ├─ Microsoft.Bcl.AsyncInterfaces.dll
    ├─ System.Memory.dll
    ├─ System.Buffers.dll
    ├─ System.Runtime.CompilerServices.Unsafe.dll
    ├─ System.Numerics.Vectors.dll
-   └─ native/                     ← 把 NuGet 包里 build/win-x64/ 的所有 DLL 复制到这里
+   └─ native/                     ← chép toàn bộ DLL trong build/win-x64/ của gói NuGet vào đây
       ├─ whisper.dll
       ├─ libwhisper.dll
       ├─ ggml-whisper.dll
@@ -99,40 +99,40 @@ VideoTrans/
 
 ---
 
-## 第四步：开始使用
+## Bước 4: Bắt đầu dùng
 
-0. 源码部署本项目，运行`uv sync --all-extras`，如果已安装，请单独执行`uv sync --extra dotnet` 安装 `pythonnet` 模块
-1. 执行`uv run sp.py` 打开软件
-2. 在"语音识别"下拉框选择 **"Whisper.NET"**
-3. 选择你下载的模型文件
-4. 点击开始
+0. Triển khai dự án từ mã nguồn, chạy `uv sync --all-extras`. Nếu đã cài rồi thì chạy riêng `uv sync --extra dotnet` để cài mô-đun `pythonnet`
+1. Chạy `uv run sp.py` để mở phần mềm
+2. Ở ô "Kênh nhận dạng", chọn **"Whisper.NET"**
+3. Chọn tệp mô hình bạn đã tải
+4. Bấm bắt đầu
 
 ---
 
-## 遇到问题？
+## Gặp vấn đề?
 
-### 提示 "Native Library not found" 或错误代码 `0x8007007E`
+### Báo "Native Library not found" hoặc mã lỗi `0x8007007E`
 
-- 检查 `deps/native/` 文件夹里是否有 10 个 DLL 文件
-- 检查文件名是否正确
+- Kiểm tra thư mục `deps/native/` có đủ 10 tệp DLL không
+- Kiểm tra tên tệp có đúng không
 
-### GPU 加速不工作
+### Tăng tốc GPU không hoạt động
 
-- 更新显卡驱动
-- AMD 显卡需要支持 Vulkan（RX 400 系列及以上）
-- NVIDIA 显卡需要 GTX 600 系列及以上
+- Cập nhật driver card đồ họa
+- Card AMD phải hỗ trợ Vulkan (dòng RX 400 trở lên)
+- Card NVIDIA phải từ dòng GTX 600 trở lên
 
-### 提示 pythonnet 初始化失败
+### Báo lỗi khởi tạo pythonnet
 
-- 安装 [.NET Runtime](https://dotnet.microsoft.com/download/dotnet)（选最新的 .NET 8 或 .NET 9）
+- Cài [.NET Runtime](https://dotnet.microsoft.com/download/dotnet) (chọn bản .NET 8 hoặc .NET 9 mới nhất)
 
-### 想确认显卡是否支持 Vulkan
+### Muốn kiểm tra card có hỗ trợ Vulkan không
 
-打开命令行，输入：
+Mở cửa sổ dòng lệnh và gõ:
 ```
 vulkaninfo
 ```
-如果显示显卡信息就说明支持。
+Nếu hiện thông tin card đồ họa nghĩa là có hỗ trợ.
 
 ---
 
