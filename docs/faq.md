@@ -1,563 +1,570 @@
 ---
-title: 常见错误与解决方法
+title: Lỗi thường gặp và cách khắc phục
 date: 2024-01-22 14:33:00
-description: 菜单栏--帮助/关于 中有很多链接，比如模型下载地址、CUDA配置等，遇到问题时可尝试点开使用
+description: Trong Menu → Trợ giúp/Giới thiệu có nhiều liên kết hữu ích như địa chỉ tải mô hình, cấu hình CUDA... Gặp vấn đề có thể mở ra dùng thử.
 ---
 
-# Phiên Dịch Video 常见问题与解决方案
+# Câu hỏi thường gặp về Phiên Dịch Video
 
-为了帮助您更好地使用 `Phiên Dịch Video`，我们整理了以下常见问题及其解决方案。
+Tài liệu này tổng hợp các vấn đề hay gặp và cách khắc phục.
 
-在 `菜单栏--帮助/关于` 中有很多链接，比如模型下载地址、CUDA配置等，遇到问题时可尝试点开使用。
+Trong **Menu → Trợ giúp/Giới thiệu** có nhiều liên kết hữu ích như địa chỉ tải mô hình, hướng dẫn cấu hình CUDA... Gặp vấn đề có thể mở ra xem.
 
-![image.png](https://pvtr2.pyvideotrans.com/images/c02de778f70546ba9a1eb2772ee9f18b~tplv-73owjymdk6-jj-mark_0_0_0_0_q75.webp)
-
-> **如何查看日志**：软件根目录下的 `logs/` 文件夹有按日期命名的 `.log` 日志文件。报错时可复制日志底部约 30 行内容寻求帮助。
+> **Xem nhật ký ở đâu**: thư mục `logs/` ở thư mục gốc phần mềm chứa các tệp `.log` đặt tên theo ngày. Khi báo lỗi, hãy chép khoảng 30 dòng cuối của nhật ký để nhờ hỗ trợ.
 >
-> **如何恢复出厂设置**：删除 `phiendichvideo/` 目录下的 `cfg.json`、`params.json`、`codec.json`、`ass.json` 四个文件，重启软件即可。
+> **Khôi phục cài đặt gốc**: xóa bốn tệp `cfg.json`, `params.json`, `codec.json`, `ass.json` trong thư mục `phiendichvideo/` rồi khởi động lại phần mềm.
 
 ---
 
-## 第一部分：安装与启动问题
+## Phần 1: Cài đặt và khởi động
 
-### 1. 双击 `sp.exe` 后，软件无法打开或长时间没有反应？
+### 1. Bấm đúp `sp.exe` mà phần mềm không mở hoặc rất lâu không phản hồi?
 
-这通常是正常现象，请不要着急。
+Đây thường là chuyện bình thường, đừng vội.
 
-*   **原因**：本软件基于 `PySide6` 开发，主界面包含较多组件，首次加载时需要初始化，这会消耗一些时间。根据您的电脑性能，启动时间可能在 **5秒到2分钟** 不等。
-*   **解决方案**：
-    1.  **耐心等待**：双击后请耐心等待一段时间。
-    2.  **检查安全软件**：部分杀毒软件或安全卫士可能会阻止程序启动，请尝试暂时关闭它们，或将本软件添加到信任/白名单中。
-    3.  **检查文件路径**：确保软件存放的路径**只包含英文和数字**，不应有中文、空格或特殊符号。例如，`D:\PhienDichVideo` 是一个好的路径，而 `D:\program file\视频 工具` 则可能导致问题。
-    4.  **升级包问题**：如果您是覆盖了升级包后无法启动，说明操作有误。请重新下载完整的软件包，解压后再覆盖新版升级包。
+*   **Nguyên nhân**: phần mềm viết bằng `PySide6`, giao diện chính có khá nhiều thành phần cần khởi tạo ở lần tải đầu tiên. Tùy cấu hình máy, thời gian khởi động có thể từ **5 giây đến 2 phút**.
+*   **Cách xử lý**:
+    1.  **Kiên nhẫn đợi**: sau khi bấm đúp, hãy đợi một lúc.
+    2.  **Kiểm tra phần mềm diệt virus**: một số phần mềm bảo mật có thể chặn chương trình khởi động. Hãy thử tắt tạm hoặc thêm phần mềm vào danh sách tin cậy.
+    3.  **Kiểm tra đường dẫn**: đảm bảo đường dẫn chứa phần mềm **chỉ gồm chữ cái tiếng Anh và số**, không có dấu tiếng Việt, khoảng trắng hay ký tự đặc biệt. Ví dụ `D:\PhienDichVideo` là đường dẫn tốt, còn `D:\program file\video của tôi` có thể gây lỗi.
+    4.  **Lỗi do gói nâng cấp**: nếu bạn ghi đè gói nâng cấp rồi không khởi động được, nghĩa là thao tác sai. Hãy tải lại gói đầy đủ, giải nén rồi mới ghi đè gói nâng cấp lên.
 
-### 2. 启动时提示缺少 `python310.dll` 文件怎么办？
+### 2. Khởi động báo thiếu tệp `python310.dll` thì làm sao?
 
-这个问题说明您只下载了升级补丁包，而没有下载主程序。
+Vấn đề này nghĩa là bạn mới tải gói vá nâng cấp mà chưa tải chương trình chính.
 
-*   **解决方案**：
-    1.  请先前往官网下载 **完整软件包**。
-    2.  解压完整包到指定目录。
-    3.  之后再下载最新的升级补丁包，覆盖到完整包的目录中即可。
+*   **Cách xử lý**:
+    1.  Tải **gói đầy đủ** trước.
+    2.  Giải nén gói đầy đủ vào thư mục mong muốn.
+    3.  Sau đó tải gói vá mới nhất rồi ghi đè lên thư mục gói đầy đủ.
 
-### 3. 软件需要安装吗？
+### 3. Phần mềm có cần cài đặt không?
 
-本软件是绿色版，**无需安装**。下载完整包后解压，双击 `sp.exe` 即可直接运行。
+Đây là bản chạy trực tiếp, **không cần cài đặt**. Tải gói đầy đủ, giải nén rồi bấm đúp `sp.exe` là chạy được.
 
-### 4. 为什么杀毒软件会报病毒或拦截？
+### 4. Vì sao phần mềm diệt virus báo có virus hoặc chặn lại?
 
-*   **原因**：本软件使用 `PyInstaller` 工具打包，并且没有进行商业数字签名认证。一些安全软件会基于此启动风险预警，这属于**常见误报**。
-*   **解决方案**：
-    1.  **添加信任**：将本软件添加到您杀毒软件的信任区或白名单中。
-    2.  **源码运行**：如果您是开发者，也可以选择从源代码直接部署运行，以完全避免此问题。
+*   **Nguyên nhân**: phần mềm được đóng gói bằng `PyInstaller` và không có chứng thực chữ ký số thương mại. Một số phần mềm bảo mật cảnh báo dựa trên đặc điểm này, đây là **báo nhầm phổ biến**.
+*   **Cách xử lý**:
+    1.  **Thêm vào danh sách tin cậy** của phần mềm diệt virus.
+    2.  **Chạy từ mã nguồn**: nếu bạn là lập trình viên, có thể triển khai và chạy trực tiếp từ mã nguồn để tránh hẳn vấn đề này.
 
-### 5. 软件支持 Windows 7 系统吗？
+### 5. Phần mềm có hỗ trợ Windows 7 không?
 
-**不支持**。软件依赖的许多核心组件（如 PyTorch、PySide6）已不再支持 Windows 7 系统。请使用 Windows 10 或 Windows 11。
+**Không**. Nhiều thành phần cốt lõi mà phần mềm phụ thuộc (PyTorch, PySide6) đã ngừng hỗ trợ Windows 7. Hãy dùng Windows 10 hoặc Windows 11.
 
-### 6. macOS / Linux 如何部署源码？
+### 6. macOS / Linux triển khai từ mã nguồn thế nào?
 
-*   **前置依赖**：
+*   **Yêu cầu trước**:
     *   Python 3.10
-    *   FFmpeg（`brew install ffmpeg` / `apt install ffmpeg`）
-    *   uv 包管理器
+    *   FFmpeg (`brew install ffmpeg` / `apt install ffmpeg`)
+    *   Trình quản lý gói uv
     *   libsndfile
-*   **部署步骤**：
+*   **Các bước**:
     ```bash
     git clone https://github.com/haianh02034/VideoTrans.git
     cd VideoTrans
     uv sync
     uv run sp.py
     ```
-*   **可选依赖**：`uv sync --all-extras` 安装所有可选渠道（webui, mosstts, dotnet）
+*   **Thư viện tùy chọn**: `uv sync --all-extras` cài tất cả các nhóm (webui, mosstts, dotnet)
 
-### 7. 源码部署后启动报错怎么办？
+### 7. Chạy từ mã nguồn nhưng khởi động báo lỗi thì làm sao?
 
-常见原因及解决方案：
-*   **FFmpeg 未安装**：确保系统已安装 FFmpeg 且配置了环境变量
-*   **依赖缺失**：运行 `uv sync` 重新安装依赖
-*   **Python 版本不对**：必须使用 Python 3.10（`.python-version` 文件已指定）
-
----
-
-## 第二部分：核心功能与设置
-
-### 8. 如何提升语音识别的准确率？
-
-识别准确率主要取决于您选择的模型大小和设置。
-
-*   **模型选择**：在 "faster" 或 "openai" 模式下，模型越大，准确率越高，但处理速度越慢、资源消耗也越大。
-    *   `tiny`: 体积最小，速度最快，但准确率较低。
-    *   `base` / `small` / `medium`: 效果与资源消耗居中，是常用的选项。
-    *   `large-v3`: 体积最大，效果最好，对硬件要求也最高（需要 8GB+ 显存）。
-*   **优化设置**：点击 `菜单--工具--高级选项`
-
-找到 `faster/openai语音识别调整` 部分，进行如下修改：
-
-- **语音阈值** 设为 `0.5`
-- **最短持续时间/毫秒** 设为 `3000`
-- **最大语音持续时间/秒** 设为 `6`
-- **静音分隔毫秒** 设为 `140`
-- **热词**：如果视频中有专有名词，可以在此填写，以逗号分隔
-
-*   **降噪处理**：如果视频有背景音乐或噪声，点击 `设置更多参数` 选中 `分离人声背景声`，可以显著提升识别效果。
-
-### 9. 为什么处理后的视频清晰度/质量降低了？
-
-任何涉及**重新编码**的操作都会不可避免地导致视频质量损失。如果您希望最大程度地保持原始画质，请确保满足以下所有条件：
-
-1.  **原始视频格式**：使用兼容性最好的 **H.264 (libx264) 编码的 MP4 文件**。
-2.  **禁用慢速处理**：在功能选项中，不要勾选"视频自动慢速"。
-3.  **不嵌入硬字幕**：可以选择不嵌入字幕，或只嵌入**软字幕**。硬字幕会强制重新编码整个视频。
-4.  **高级选项-视频输出质量控制**：数字默认23，可以降低到18或更低(最低0)，越低输出视频质量越高，但尺寸也越大
-5.  **高级选项-输出视频压缩率**：默认是`fast`,可用选择slow或slower，质量会更高，但输出耗时将增加
-6.  **高级选项-264/265编码**：默认是`264`,可选265，输出视频质量更高
-
-### 10. 为什么输出视频超级大？
-
-1. 修改**高级选项-视频输出质量控制** 为 25-51 越大输出视频尺寸越小，但质量也随之降低
-2. 高级选项-264/265编码：选择265，同质量下 265 尺寸更小
-
-### 11. 如何配置网络代理？
-
-部分翻译或配音服务（如 Google、OpenAI、Gemini）在国内无法直接访问，需要通过网络代理。
-
-*   **设置方法**：在主界面的"网络代理地址"文本框中，填入您的代理服务地址。
-*   **格式要求**：通常是 `http://127.0.0.1:10808` 这样的格式（端口号需根据您的代理客户端设置填写）。
-*   **重要提示**：如果您不了解代理或没有可用的代理服务，**请将此项留空**。错误的设置将导致报错。
-*   **国内 API 不需要代理**：百度翻译、腾讯翻译、阿里翻译、DeepSeek、智谱AI、字节火山等国内 API 默认不走代理。
-*   **本地服务不需要代理**：GPT-SoVITS、ChatTTS、F5-TTS 等本地服务自动绕过代理。
-
-### 12. 如何自定义字幕的字体、颜色和样式？
-
-点击主界面中 -> 设置更多参数 -> **修改硬字幕**
+Nguyên nhân thường gặp và cách xử lý:
+*   **Chưa cài FFmpeg**: đảm bảo hệ thống đã cài FFmpeg và thêm vào biến môi trường PATH
+*   **Thiếu thư viện**: chạy lại `uv sync`
+*   **Sai phiên bản Python**: bắt buộc dùng Python 3.10 (tệp `.python-version` đã chỉ định)
 
 ---
 
-## 第三部分：语音识别问题
+## Phần 2: Chức năng chính và cài đặt
 
-### 13. 识别结果为空或乱码
+### 8. Làm sao tăng độ chính xác khi nhận dạng giọng nói?
 
-*   **原因**：可能语言选择错误、视频无有效人声、或显存不足
-*   **解决方案**：
-    1.  检查"原始语言"是否选择正确（不要过度依赖 Auto）
-    2.  检查视频是否有背景音乐干扰（尝试开启降噪）
-    3.  显存不足：降低 `beam_size`，改用 `int8` 量化，或使用 `small` 模型
-    4.  尝试更换识别渠道（如从 faster-whisper 换成 openai-whisper）
+Độ chính xác chủ yếu phụ thuộc vào kích thước mô hình bạn chọn và các thiết lập đi kèm.
 
-### 14. 识别速度非常慢
+*   **Chọn mô hình**: ở chế độ "faster" hoặc "openai", mô hình càng lớn thì càng chính xác nhưng càng chậm và tốn tài nguyên.
+    *   `tiny`: nhỏ nhất, nhanh nhất, độ chính xác thấp.
+    *   `base` / `small` / `medium`: cân bằng giữa chất lượng và tài nguyên, hay dùng nhất.
+    *   `large-v3`: lớn nhất, tốt nhất, đòi hỏi phần cứng cao nhất (cần từ 8GB VRAM).
+*   **Tinh chỉnh**: vào **Menu → Công cụ → Tùy chọn nâng cao**
 
-*   **原因**：使用了大型模型但未启用 GPU 加速
-*   **解决方案**：
-    1.  **启用 CUDA 加速**：确保已安装 CUDA 12.8+ 和 cuDNN 9.x，勾选 `CUDA加速`
-    2.  **使用小模型**：将 `large-v3` 换成 `medium` 或 `small`
-    3.  **CPU 模式优化**：在高级选项中将 `计算数据类型` 改为 `int8`
+Tìm phần điều chỉnh nhận dạng faster/openai rồi sửa như sau:
 
-### 15. 提示显存或内存不足（`Unable to allocate`、`CUDA out of memory`）
+- **Ngưỡng giọng nói** đặt `0.5`
+- **Đoạn nói ngắn nhất (ms)** đặt `3000`
+- **Đoạn nói dài nhất (giây)** đặt `6`
+- **Khoảng lặng để tách (ms)** đặt `140`
+- **Từ khóa ưu tiên**: nếu video có thuật ngữ riêng, điền vào đây, cách nhau bằng dấu phẩy
 
-*   **原因**：模型太大或显存被其他程序占用
-*   **解决方案（按推荐顺序尝试）**：
-    1.  **使用更小的模型**：将识别模型从 `large-v3` 更换为 `medium`、`small` 或 `base`。`large-v3` 模型最低需要 8GB 显存。
-    2.  **调整高级设置**：在菜单栏 **`工具/选项` -> `高级选项`** 中进行如下修改：
-        *   `CUDA数据类型`: 将 `float32` 改为 `float16` 或 `int8`
-        *   `beam_size`: 将 `5` 改为 `1`
-        *   `best_of`: 将 `5` 改为 `1`
-        *   `上下文`: 将 `true` 改为 `false`
-    3.  **检查多显卡**：如果有多个可用显卡，检查第一块显卡可用显存是否过小。软件默认使用第一块显卡，升级到 v3.98-317 以上版本会自动选择显存最大的显卡。
+*   **Khử nhiễu**: nếu video có nhạc nền hoặc tạp âm, vào `Thêm cài đặt` chọn `Tách giọng nói/nhạc nền` sẽ cải thiện rõ rệt.
 
-### 16. 说话人识别不准确
+### 9. Vì sao video sau khi xử lý bị giảm chất lượng?
 
-*   **原因**：说话人分离模型对某些场景（如多人同时说话、背景噪声大）效果有限
-*   **解决方案**：
-    1.  在 `设置更多参数` 中勾选 `识别说话人` 并指定人数
-    2.  在高级选项中切换说话人模型（内置、阿里CAM++、pyannote）
-    3.  使用 pyannote 模型需要在 HuggingFace 上申请 token 并同意授权协议
+Mọi thao tác có **mã hóa lại** đều làm giảm chất lượng video. Muốn giữ chất lượng gốc tối đa, hãy đảm bảo đủ các điều kiện sau:
 
-### 17. LLM 重新断句后结果更差
+1.  **Định dạng video gốc**: dùng tệp MP4 mã hóa **H.264 (libx264)** — tương thích tốt nhất.
+2.  **Tắt làm chậm video**: không chọn "Tự động làm chậm video".
+3.  **Không nhúng phụ đề cứng**: chọn không nhúng phụ đề, hoặc chỉ nhúng **phụ đề mềm**. Phụ đề cứng buộc phải mã hóa lại toàn bộ video.
+4.  **Tùy chọn nâng cao → Kiểm soát chất lượng video đầu ra**: mặc định 23, có thể giảm xuống 18 hoặc thấp hơn (thấp nhất 0). Càng thấp chất lượng càng cao nhưng dung lượng càng lớn.
+5.  **Tùy chọn nâng cao → Mức nén video đầu ra**: mặc định `fast`, có thể chọn slow hoặc slower cho chất lượng cao hơn nhưng lâu hơn.
+6.  **Tùy chọn nâng cao → Mã hóa 264/265**: mặc định `264`, chọn 265 sẽ cho chất lượng cao hơn.
 
-*   **原因**：本地小模型（如 7B）智能不足，或提示词过于复杂
-*   **解决方案**：
-    1.  使用更强的在线模型（DeepSeek-V3、GPT-4o 等）
-    2.  精简提示词（在 `phiendichvideo/prompts/recharge/recharge-llm.txt` 中修改）
-    3.  使用 `clone` 角色克隆原音色时，**不建议**使用 LLM 重新断句
+### 10. Vì sao video xuất ra dung lượng quá lớn?
 
-### 18. 配音后字幕和声音不同步
+1. Đặt **Tùy chọn nâng cao → Kiểm soát chất lượng video đầu ra** thành 25-51. Số càng lớn dung lượng càng nhỏ nhưng chất lượng cũng giảm theo.
+2. **Tùy chọn nâng cao → Mã hóa 264/265**: chọn 265, cùng chất lượng thì 265 cho dung lượng nhỏ hơn.
 
-这是翻译配音中的常见现象，源于语言间的时长差异。
+### 11. Cấu hình proxy thế nào?
 
-*   **原因**：不同语言表达同一意思时，音节数和语法结构不同，导致配音时长与原始字幕时长不一致。例如，一句2秒的中文，翻译成英文后配音时长可能变为3-4秒。
-*   **解决方案**：
-    1.  **启用音频加速**：勾选 `音频加速`，自动将过长的配音加速到匹配字幕时长
-    2.  **启用视频慢速**：勾选 `视频慢速`，放慢视频画面以匹配配音时长
-    3.  **两者同时启用**：当倍率 > 1.2x 时，音频加速和视频慢速各负担一半时间差
-    4.  **调整语速**：设置 `配音语速` 值（如 `+10%`）加快整体配音速度
-    5.  **使用二次识别**：勾选 `二次识别`，在配音完成后再次识别生成更精准的字幕时间轴
+Một số dịch vụ dịch hoặc lồng tiếng (Google, OpenAI, Gemini) có thể không truy cập trực tiếp được, cần đi qua proxy.
 
-> 详细原理请参考 [音频视频时间轴对齐原理说明](Synchronize.md)
+*   **Cách đặt**: điền địa chỉ máy chủ proxy vào ô "Địa chỉ proxy" trên giao diện chính.
+*   **Định dạng**: thường là `http://127.0.0.1:10808` (số cổng tùy theo cấu hình phần mềm proxy của bạn).
+*   **Lưu ý quan trọng**: nếu bạn không hiểu về proxy hoặc không có proxy khả dụng, **hãy để trống ô này**. Điền sai sẽ gây lỗi.
+*   **Các API trong nước không cần proxy**: Baidu, Tencent, Ali, DeepSeek, Zhipu AI, ByteDance... mặc định không đi qua proxy.
+*   **Dịch vụ chạy trên máy không cần proxy**: GPT-SoVITS, ChatTTS, F5-TTS... tự động bỏ qua proxy.
 
-### 19. 二次识别是什么？什么时候需要？
+### 12. Tùy chỉnh phông chữ, màu sắc, kiểu phụ đề thế nào?
 
-二次识别是在配音完成后，对生成的配音音频再次进行语音识别，生成时间轴更精准、字数更简短的字幕。
-
-*   **适用场景**：选择了 `嵌入单字幕`（硬字幕或软字幕），且需要字幕和配音精确对齐
-*   **设置方法**：勾选 `二次识别`，在高级选项中设置二次识别的最长/最短语音持续时间
-*   **注意**：二次识别需要额外的处理时间
+Trên giao diện chính, vào **Thêm cài đặt → Chỉnh kiểu phụ đề cứng**.
 
 ---
 
-## 第四部分：翻译问题
+## Phần 3: Vấn đề nhận dạng giọng nói
 
-### 20. 翻译结果有空白行或包含提示词
+### 13. Kết quả nhận dạng rỗng hoặc bị lỗi ký tự
 
-*   **原因**：本地小模型智能不足，或 AI 合并了字幕行
-*   **解决方案**：
-    1.  本地小模型（如 7B）智能不足，建议改用 DeepSeek/GPT-4 等在线模型
-    2.  取消"发送完整字幕"选项，改为按行翻译
-    3.  设置 `trans_thread=1` 降低并发
-    4.  [具体原理和解决方法点击查看](https://pyvideotrans.com/faq17)
+*   **Nguyên nhân**: có thể chọn sai ngôn ngữ, video không có giọng người, hoặc thiếu VRAM
+*   **Cách xử lý**:
+    1.  Kiểm tra "Ngôn ngữ gốc" đã chọn đúng chưa (đừng phụ thuộc quá vào Auto)
+    2.  Kiểm tra video có bị nhạc nền lấn át không (thử bật khử nhiễu)
+    3.  Thiếu VRAM: giảm `beam_size`, đổi sang lượng tử `int8`, hoặc dùng mô hình `small`
+    4.  Thử đổi kênh nhận dạng (ví dụ từ faster-whisper sang openai-whisper)
 
-### 21. AI 翻译触发安全限制被过滤
+### 14. Nhận dạng rất chậm
 
-*   **错误信息**：`内容触发AI风控被过滤`
-*   **原因**：翻译内容被 AI 服务的安全系统拦截
-*   **解决方案**：
-    1.  手动编辑字幕，移除可能触发风控的内容
-    2.  更换翻译渠道（如从 OpenAI 换成 DeepSeek）
+*   **Nguyên nhân**: dùng mô hình lớn nhưng chưa bật tăng tốc GPU
+*   **Cách xử lý**:
+    1.  **Bật CUDA**: đảm bảo đã cài CUDA 12.8+ và cuDNN 9.x, rồi tick `Tăng tốc CUDA`
+    2.  **Dùng mô hình nhỏ hơn**: đổi `large-v3` thành `medium` hoặc `small`
+    3.  **Tối ưu chế độ CPU**: trong tùy chọn nâng cao, đổi `Kiểu dữ liệu tính toán` thành `int8`
 
-### 22. 翻译结果与原文不对应（字幕行错位）
+### 15. Báo thiếu VRAM hoặc bộ nhớ (`Unable to allocate`, `CUDA out of memory`)
 
-*   **原因**：AI 翻译时合并了字幕行，导致行号错位
-*   **解决方案**：
-    1.  在高级选项中取消勾选"发送完整字幕"
-    2.  将翻译并发数设为 1
-    3.  使用支持大上下文的在线 AI 模型
+*   **Nguyên nhân**: mô hình quá lớn hoặc VRAM đang bị chương trình khác chiếm
+*   **Cách xử lý (theo thứ tự khuyến nghị)**:
+    1.  **Dùng mô hình nhỏ hơn**: đổi từ `large-v3` sang `medium`, `small` hoặc `base`. Mô hình `large-v3` cần tối thiểu 8GB VRAM.
+    2.  **Chỉnh tùy chọn nâng cao** trong **Công cụ → Tùy chọn nâng cao**:
+        *   `Kiểu dữ liệu tính toán`: đổi `float32` thành `float16` hoặc `int8`
+        *   `beam_size`: đổi `5` thành `1`
+        *   `best_of`: đổi `5` thành `1`
+        *   `Nhận biết ngữ cảnh`: đổi `true` thành `false`
+    3.  **Kiểm tra nhiều card**: nếu máy có nhiều card đồ họa, kiểm tra xem card thứ nhất có quá ít VRAM không. Phần mềm mặc định dùng card đầu tiên.
 
-### 23. 翻译缓存导致结果异常
+### 16. Nhận dạng người nói không chính xác
 
-*   **原因**：翻译结果被缓存，修改提示词或翻译渠道后未生效
-*   **解决方案**：
-    1.  勾选主界面的 `清理已生成` 选项
-    2.  或手动删除 `tmp/translate_cache/` 目录下的缓存文件
+*   **Nguyên nhân**: mô hình phân tách người nói bị hạn chế ở một số tình huống (nhiều người nói cùng lúc, nhiễu nền lớn)
+*   **Cách xử lý**:
+    1.  Trong `Thêm cài đặt`, tick `Phân tách người nói` và chỉ định số người
+    2.  Trong tùy chọn nâng cao, đổi mô hình phân tách người nói (tích hợp sẵn, Ali CAM++, pyannote)
+    3.  Dùng mô hình pyannote thì cần đăng ký token trên HuggingFace và đồng ý thỏa thuận cấp phép
 
----
+### 17. Tách câu bằng LLM cho kết quả tệ hơn
 
-## 第五部分：配音问题
+*   **Nguyên nhân**: mô hình nhỏ chạy cục bộ (như 7B) chưa đủ thông minh, hoặc prompt quá phức tạp
+*   **Cách xử lý**:
+    1.  Dùng mô hình trực tuyến mạnh hơn (DeepSeek-V3, GPT-4o...)
+    2.  Rút gọn prompt (sửa trong `phiendichvideo/prompts/resegment/llm.txt`)
+    3.  Khi dùng giọng `clone` để nhân bản giọng gốc, **không nên** dùng tách câu bằng LLM
 
-### 24. Edge-TTS 报错 403 或生成静音
+### 18. Lồng tiếng xong thì phụ đề và tiếng bị lệch
 
-*   **原因**：微软限流，短时间内请求过多
-*   **解决方案**：
-    1.  在"高级选项"中将"同时配音线程数"设为 1
-    2.  将"配音后暂停秒数"设为 5-10 秒
-    3.  如果使用了代理，Edge-TTS 可能因代理问题失败。在软件根目录创建 `edgetts-noproxy.txt` 空文件可强制绕过代理
+Đây là hiện tượng thường gặp khi dịch và lồng tiếng, do khác biệt độ dài giữa các ngôn ngữ.
 
-### 25. F5-TTS / CosyVoice / GPT-SoVITS 无法连接
+*   **Nguyên nhân**: cùng một ý nhưng số âm tiết và cấu trúc ngữ pháp của mỗi ngôn ngữ khác nhau, nên thời lượng đọc khác nhau. Ví dụ một câu tiếng Trung 2 giây, dịch sang tiếng Anh có thể đọc mất 3-4 giây.
+*   **Cách xử lý**:
+    1.  **Bật tăng tốc âm thanh**: tick `Tăng tốc lồng tiếng`, phần lồng tiếng quá dài sẽ được tăng tốc cho khớp phụ đề
+    2.  **Bật làm chậm video**: tick `Làm chậm video` để hình khớp với thời lượng lồng tiếng
+    3.  **Bật cả hai**: khi tỉ lệ > 1.2x, tăng tốc âm thanh và làm chậm video mỗi bên gánh một nửa chênh lệch
+    4.  **Chỉnh tốc độ đọc**: đặt `Tốc độ lồng tiếng` (ví dụ `+10%`) để đọc nhanh hơn
+    5.  **Dùng nhận dạng lần 2**: tick `Nhận dạng lần 2` để tạo dấu thời gian phụ đề chuẩn hơn sau khi lồng tiếng
 
-*   **原因**：本地 TTS 服务未启动或地址配置错误
-*   **解决方案**：
-    1.  确保外部 TTS 服务的终端窗口未关闭
-    2.  检查 API 地址是否正确（注意端口号）
-    3.  GPT-SoVITS 需启动 `api.py` 或 `api_v2.py`，不能使用网页版 7860 端口
-    4.  如果填写了 `0.0.0.0` 作为地址，改为 `127.0.0.1`
+> Nguyên lý chi tiết xem [Nguyên lý đồng bộ dấu thời gian hình và tiếng](Synchronize.md)
 
-### 26. GPT-SoVITS 报错 `{"detail":"Not Found"}`
+### 19. "Nhận dạng lần 2" là gì? Khi nào cần?
 
-*   **原因**：API 版本不匹配或端口错误
-*   **解决方案**：
-    1.  检查启动的是 `api.py` 还是 `api_v2.py`，在软件中勾选对应的 `api_v2?` 选项
-    2.  确保填写的是 API 地址（默认 9880），而非网页版地址（7860）
+Nhận dạng lần 2 là việc nhận dạng lại chính tệp lồng tiếng vừa tạo, để sinh ra phụ đề có dấu thời gian chuẩn hơn và câu ngắn gọn hơn.
 
-### 27. Index-TTS 报错 `Value: 'Same as the voice reference' is not in the list`
-
-*   **原因**：Index-TTS 内部多语言翻译不一致的 Bug
-*   **解决方案**：打开 Index-TTS 项目根目录的 `webui.py`，将 `i18n("与音色参考音频相同")` 替换为 `Same as the voice reference`
-
-### 28. Azure-TTS 报错 `Could not find module Microsoft.CognitiveServices.Speech.core.dll`
-
-*   **原因**：缺少微软 VC++ 运行库
-*   **解决方案**：
-    1.  如果是下载的补丁包，请重新下载完整包
-    2.  如果已是完整包，安装 [微软 VC++ 运行时集合包](https://aka.ms/vs/17/release/vc_redist.x64.exe) 后重启电脑
-
-### 29. 配音后声音有机械感或杂音
-
-*   **原因**：音频加速倍率过高（> 3x），或参考音频质量差
-*   **解决方案**：
-    1.  启用视频慢速，与音频加速协同分担时间差
-    2.  提升参考音频质量：使用清晰的 5-10 秒单人声 WAV 文件
-    3.  勾选 `分离人声背景声`，去除背景噪声
+*   **Trường hợp dùng**: khi chọn nhúng phụ đề đơn ngữ (cứng hoặc mềm) và cần phụ đề khớp chính xác với lồng tiếng
+*   **Cách bật**: tick `Nhận dạng lần 2`, rồi đặt độ dài đoạn nói dài nhất/ngắn nhất cho lần 2 trong tùy chọn nâng cao
+*   **Lưu ý**: nhận dạng lần 2 tốn thêm thời gian xử lý
 
 ---
 
-## 第六部分：声音克隆问题
+## Phần 4: Vấn đề dịch thuật
 
-### 30. 使用 `clone` 角色配音失败或音质差
+### 20. Kết quả dịch có dòng trống hoặc lẫn cả prompt
 
-*   **原因**：参考音频时长不在 3-10 秒范围内，或字幕时间轴被 LLM 重新断句打乱
-*   **解决方案**：
-    1.  **禁止使用 LLM 重新断句**：LLM 重新断句会打乱时间轴，导致参考音频截取错位
-    2.  **强制控制字幕时长**：在 `高级选项 -> 语音识别参数` 中，将 `最长语音持续秒数` 设为 6-10，`最短语音持续毫秒` 设为 3000-4000
-    3.  勾选 `合并过短字幕到邻近` 和 `Whisper预分割音频`
-    4.  使用 `OmniVoice-TTS` 渠道，对短参考音频兼容性更好
-    5.  勾选 `分离人声背景声`，提升参考音频质量
+*   **Nguyên nhân**: mô hình nhỏ chạy cục bộ chưa đủ thông minh, hoặc AI gộp các dòng phụ đề lại
+*   **Cách xử lý**:
+    1.  Mô hình nhỏ (như 7B) chưa đủ thông minh, nên đổi sang mô hình trực tuyến như DeepSeek/GPT-4
+    2.  Bỏ chọn "Gửi toàn bộ phụ đề", chuyển sang dịch theo dòng
+    3.  Đặt `trans_thread=1` để giảm số luồng đồng thời
+    4.  [Xem nguyên lý và cách khắc phục chi tiết](https://pyvideotrans.com/faq17)
 
-### 31. 如何使用自定义参考音频？
+### 21. Dịch bằng AI bị chặn vì vi phạm chính sách nội dung
 
-1.  录制或截取一段 5-10 秒的 WAV 格式音频（单人声、无背景噪声）
-2.  将音频复制到软件目录下的 `f5-tts` 文件夹
-3.  打开 `菜单 -> TTS 设置 -> 设置参考音频`，填写 `文件名.wav#音频中的说话文本`
-4.  在主界面配音角色下拉框中选择该文件名
+*   **Thông báo lỗi**: `Nội dung bị AI lọc do vi phạm chính sách`
+*   **Nguyên nhân**: nội dung dịch bị hệ thống kiểm duyệt của dịch vụ AI chặn lại
+*   **Cách xử lý**:
+    1.  Sửa tay phụ đề, bỏ phần nội dung có thể bị chặn
+    2.  Đổi kênh dịch (ví dụ từ OpenAI sang DeepSeek)
 
-> **注意**：GPT-SoVITS 的参考音频需要放在 GPT-SoVITS 软件的根目录下，而非 `f5-tts` 文件夹。
+### 22. Bản dịch không khớp với bản gốc (lệch dòng phụ đề)
 
----
+*   **Nguyên nhân**: AI gộp các dòng phụ đề khi dịch nên số dòng bị lệch
+*   **Cách xử lý**:
+    1.  Bỏ chọn "Gửi toàn bộ phụ đề" trong tùy chọn nâng cao
+    2.  Đặt số luồng dịch đồng thời bằng 1
+    3.  Dùng mô hình AI trực tuyến hỗ trợ ngữ cảnh dài
 
-## 第七部分：视频合成与输出问题
+### 23. Bộ nhớ đệm dịch làm kết quả bất thường
 
-### 32. 执行过程中报错 `ffprobe exec error` 或 `ffmpeg` 相关异常
-
-*   **原因**：文件路径过长或含有特殊符号
-*   **解决方案**：
-    1.  将视频文件移动到更浅的目录（如 `D:\videos`）
-    2.  重命名为简短的英文或数字名称
-    3.  删除文件名中的特殊符号（`?*`、表情符号等）
-
-### 33. 软件提示视频"不含音轨"
-
-*   **可能原因 1**：视频确实没有声音（从某些网站下载时画面和声音分离）
-*   **可能原因 2**：视频编码格式不支持（如 AV1）
-*   **可能原因 3**：背景噪音过大，人声被掩盖
-*   **解决方案**：
-    1.  用播放器本地播放确认是否有声音
-    2.  尝试先将视频转换为标准 H.264/MP4 格式
-    3.  开启降噪或人声分离功能
-
-### 34. 如何输出无损视频？
-
-当满足以下所有条件时，视频将无损输出（不重新编码）：
-1.  原始视频编码为 `mp4/h.264/yuv420p`
-2.  高级选项中 `264/265编码` 选择 `264`
-3.  未启用 `视频慢速`
-4.  未嵌入 `硬字幕`（软字幕不影响）
-
-> 注意：若配音后时长大于视频原时长，超出部分会被截断。
-
-### 35. 处理后出现声音、字幕、画面不同步
-
-这是语言翻译中的正常现象。
-
-*   **原因**：不同语言表达同一个意思时，句子的长度和音节数均不同，发音时长必然发生变化。
-*   **解决方案**：
-    1.  启用 `音频加速` 和/或 `视频慢速`
-    2.  设置 `配音语速`（如 `+10%`）加快整体速度
-    3.  启用 `二次识别` 生成更精准的字幕时间轴
-    4.  详细原理请参考 [音频视频时间轴对齐原理说明](Synchronize.md)
-
-### 36. 总是提示显存不足 (例如 `Unable to allocate` 错误)
-
-这个错误意味着您的显卡没有足够的显存或内存来执行当前任务。
-
-*   **解决方案（按推荐顺序尝试）**：
-    1.  **使用更小的模型**：将识别模型从 `large-v3` 更换为 `medium`、`small` 或 `base`
-    2.  **调整高级设置**：
-        *   `CUDA数据类型`: 将 `float32` 改为 `float16` 或 `int8`
-        *   `beam_size`: 将 `5` 改为 `1`
-        *   `best_of`: 将 `5` 改为 `1`
-        *   `上下文`: 将 `true` 改为 `false`
-
-### 37. 已经安装了 CUDA，为什么软件还是无法使用 GPU 加速？
-
-请检查以下可能的原因：
-
-*   **CUDA 版本不兼容**：本软件要求 CUDA 12.8 及以上版本
-*   **显卡驱动过旧**：请更新您的 NVIDIA 显卡驱动到最新版本
-*   **缺少 cuDNN**：确保已安装 cuDNN 9.x 并配置了环境变量
-*   **硬件不兼容**：GPU 加速仅支持 NVIDIA 显卡（N卡）。AMD 或 Intel 显卡无法使用 CUDA
-*   **环境变量未配置**：检查系统环境变量中是否包含 CUDA 的 `bin` 和 `lib` 目录
-
-### 38. GPU 使用率很低，正常吗？
-
-**正常**。软件的工作流程是：`语音识别 -> 文字翻译 -> 文本配音 -> 视频合成`。
-
-只有在第一步 **"语音识别"** 阶段，才会大量使用 GPU 进行运算。其他阶段（如翻译、合成）主要依赖 CPU，因此 GPU 在大部分时间处于低负载状态是符合预期的。
-
-### 39. 处理几个视频后，发现硬盘空间被占满？
-
-这通常是由于启用了"视频慢速"功能并产生了大量临时文件。
-
-*   **原因**：该功能会将视频按字幕切割成许多小片段，并对每个片段进行处理，这会产生远超原视频体积的缓存文件。
-*   **解决方案**：
-    1.  **手动清理**：处理完成后，手动删除软件根目录下的 **`tmp/` 文件夹**内的所有内容
-    2.  **自动清理**：正常关闭软件时，程序会自动清理这些缓存
-
-### 40. 反复处理同一个视频，为什么识别结果和字幕总是不变？
-
-*   **原因**：软件默认启用了缓存机制，如果检测到某个视频已经生成过字幕文件，会直接使用缓存结果
-*   **解决方案**：在软件主界面的左上角，勾选 **`清理已生成`** 复选框
-
-![](https://pvtr2.pyvideotrans.com/1760281358634_image.png)
+*   **Nguyên nhân**: kết quả dịch đã được lưu đệm, nên sửa prompt hay đổi kênh dịch không có tác dụng
+*   **Cách xử lý**:
+    1.  Tick tùy chọn `Dọn kết quả đã tạo` trên giao diện chính
+    2.  Hoặc xóa tay các tệp đệm trong thư mục `tmp/translate_cache/`
 
 ---
 
-## 第八部分：批量处理问题
+## Phần 5: Vấn đề lồng tiếng
 
-### 41. 批量翻译视频时总是会卡住
+### 24. Edge-TTS báo lỗi 403 hoặc tạo ra tiếng câm
 
-默认批量任务时，会将每个任务分为多个阶段，同时交叉并行处理，太多任务时可能导致资源耗尽。
+*   **Nguyên nhân**: Microsoft giới hạn tần suất do gửi quá nhiều yêu cầu trong thời gian ngắn
+*   **Cách xử lý**:
+    1.  Trong tùy chọn nâng cao, đặt "Số luồng lồng tiếng đồng thời" bằng 1
+    2.  Đặt "Nghỉ sau mỗi yêu cầu lồng tiếng" thành 5-10 giây
+    3.  Nếu đang dùng proxy, Edge-TTS có thể lỗi vì proxy. Tạo tệp rỗng tên `edgetts-noproxy.txt` ở thư mục gốc phần mềm để ép bỏ qua proxy
 
-*   **解决方案**：选中 **高级选项--批量翻译时强制串行**，将执行方式改为串行处理
+### 25. F5-TTS / CosyVoice / GPT-SoVITS không kết nối được
 
-### 42. 批量处理时如何控制并发数量
+*   **Nguyên nhân**: dịch vụ TTS cục bộ chưa khởi động hoặc điền sai địa chỉ
+*   **Cách xử lý**:
+    1.  Đảm bảo cửa sổ dòng lệnh của dịch vụ TTS bên ngoài chưa bị đóng
+    2.  Kiểm tra địa chỉ API có đúng không (chú ý số cổng)
+    3.  GPT-SoVITS phải khởi động `api.py` hoặc `api_v2.py`, không dùng được cổng 7860 của bản web
+    4.  Nếu điền địa chỉ là `0.0.0.0`, hãy đổi thành `127.0.0.1`
 
-在 `高级选项 -> 通用设置` 中：
-*   `CPU同时任务数`：最大 CPU 同时任务数，不超过 CPU 核数
-*   `GPU同时任务数`：GPU 任务同时执行数量，除非多卡或单卡显存 > 24G，否则设为 1
-*   `批量翻译视频时每批数量`：设为 1 可逐个处理，设为 0 则全部同时处理
+### 26. GPT-SoVITS báo lỗi `{"detail":"Not Found"}`
+
+*   **Nguyên nhân**: sai phiên bản API hoặc sai cổng
+*   **Cách xử lý**:
+    1.  Kiểm tra bạn khởi động `api.py` hay `api_v2.py`, rồi tick đúng tùy chọn `api_v2?` trong phần mềm
+    2.  Đảm bảo điền địa chỉ API (mặc định 9880) chứ không phải địa chỉ bản web (7860)
+
+### 27. Index-TTS báo lỗi `Value: 'Same as the voice reference' is not in the list`
+
+*   **Nguyên nhân**: lỗi dịch đa ngôn ngữ không nhất quán bên trong Index-TTS
+*   **Cách xử lý**: mở tệp `webui.py` ở thư mục gốc dự án Index-TTS, thay `i18n("与音色参考音频相同")` thành `Same as the voice reference`
+
+### 28. Azure-TTS báo lỗi `Could not find module Microsoft.CognitiveServices.Speech.core.dll`
+
+*   **Nguyên nhân**: thiếu thư viện VC++ Runtime của Microsoft
+*   **Cách xử lý**:
+    1.  Nếu bạn tải gói vá, hãy tải lại gói đầy đủ
+    2.  Nếu đã là gói đầy đủ, cài [bộ VC++ Runtime của Microsoft](https://aka.ms/vs/17/release/vc_redist.x64.exe) rồi khởi động lại máy
+
+### 29. Lồng tiếng xong nghe máy móc hoặc có tạp âm
+
+*   **Nguyên nhân**: tỉ lệ tăng tốc âm thanh quá cao (> 3x), hoặc âm thanh mẫu chất lượng kém
+*   **Cách xử lý**:
+    1.  Bật làm chậm video để chia sẻ bớt chênh lệch thời lượng với tăng tốc âm thanh
+    2.  Nâng chất lượng âm thanh mẫu: dùng tệp WAV 5-10 giây, một giọng, rõ ràng
+    3.  Tick `Tách giọng nói/nhạc nền` để loại bỏ tạp âm nền
 
 ---
 
-## 第九部分：高级选项详解
+## Phần 6: Vấn đề nhân bản giọng nói
 
-### 43. 音频加速和视频慢速的区别？
+### 30. Lồng tiếng bằng giọng `clone` thất bại hoặc chất lượng kém
 
-| 选项 | 效果 | 适用场景 |
+*   **Nguyên nhân**: âm thanh mẫu không nằm trong khoảng 3-10 giây, hoặc dấu thời gian phụ đề bị tách câu bằng LLM làm xáo trộn
+*   **Cách xử lý**:
+    1.  **Không dùng tách câu bằng LLM**: việc này làm xáo trộn dấu thời gian, khiến đoạn âm thanh mẫu bị cắt lệch
+    2.  **Ép kiểm soát thời lượng phụ đề**: trong **Tùy chọn nâng cao → Tham số nhận dạng**, đặt `Đoạn nói dài nhất (giây)` thành 6-10, `Đoạn nói ngắn nhất (ms)` thành 3000-4000
+    3.  Tick `Gộp phụ đề ngắn` và `Cắt trước âm thanh cho Whisper`
+    4.  Dùng kênh `OmniVoice-TTS`, tương thích tốt hơn với âm thanh mẫu ngắn
+    5.  Tick `Tách giọng nói/nhạc nền` để nâng chất lượng âm thanh mẫu
+
+### 31. Dùng âm thanh mẫu của riêng mình thế nào?
+
+1.  Thu hoặc cắt một đoạn WAV dài 5-10 giây (một giọng, không tạp âm nền)
+2.  Chép tệp đó vào thư mục `f5-tts` trong thư mục phần mềm
+3.  Vào **Menu → Cài đặt TTS → Đặt âm thanh mẫu**, điền `tên_tệp.wav#nội dung lời nói trong tệp`
+4.  Chọn tên tệp đó trong ô giọng lồng tiếng trên giao diện chính
+
+> **Lưu ý**: âm thanh mẫu của GPT-SoVITS phải đặt ở thư mục gốc của phần mềm GPT-SoVITS, không phải thư mục `f5-tts`.
+
+---
+
+## Phần 7: Vấn đề dựng và xuất video
+
+### 32. Chạy giữa chừng báo lỗi `ffprobe exec error` hoặc lỗi liên quan `ffmpeg`
+
+*   **Nguyên nhân**: đường dẫn tệp quá dài hoặc chứa ký tự đặc biệt
+*   **Cách xử lý**:
+    1.  Chuyển tệp video sang thư mục nông hơn (ví dụ `D:\videos`)
+    2.  Đổi tên thành tên ngắn bằng chữ tiếng Anh hoặc số
+    3.  Bỏ ký tự đặc biệt trong tên tệp (`?*`, biểu tượng cảm xúc...)
+
+### 33. Phần mềm báo video "không có luồng âm thanh"
+
+*   **Nguyên nhân 1**: video thật sự không có tiếng (tải từ một số trang web thì hình và tiếng bị tách riêng)
+*   **Nguyên nhân 2**: định dạng mã hóa không được hỗ trợ (ví dụ AV1)
+*   **Nguyên nhân 3**: tạp âm nền quá lớn, giọng người bị lấn át
+*   **Cách xử lý**:
+    1.  Mở bằng trình phát để xác nhận có tiếng hay không
+    2.  Thử chuyển video sang định dạng chuẩn H.264/MP4 trước
+    3.  Bật khử nhiễu hoặc tách giọng nói
+
+### 34. Làm sao xuất video không mất chất lượng?
+
+Video sẽ được xuất không mã hóa lại khi thỏa mãn tất cả điều kiện sau:
+1.  Video gốc mã hóa `mp4/h.264/yuv420p`
+2.  Trong tùy chọn nâng cao, `Mã hóa 264/265` chọn `264`
+3.  Không bật `Làm chậm video`
+4.  Không nhúng `phụ đề cứng` (phụ đề mềm không ảnh hưởng)
+
+> Lưu ý: nếu lồng tiếng dài hơn video gốc, phần vượt quá sẽ bị cắt.
+
+### 35. Sau khi xử lý, tiếng, phụ đề và hình không khớp nhau
+
+Đây là hiện tượng bình thường khi dịch giữa các ngôn ngữ.
+
+*   **Nguyên nhân**: cùng một ý nhưng độ dài câu và số âm tiết của mỗi ngôn ngữ khác nhau, nên thời lượng phát âm chắc chắn thay đổi.
+*   **Cách xử lý**:
+    1.  Bật `Tăng tốc lồng tiếng` và/hoặc `Làm chậm video`
+    2.  Đặt `Tốc độ lồng tiếng` (ví dụ `+10%`) để đọc nhanh hơn
+    3.  Bật `Nhận dạng lần 2` để có dấu thời gian phụ đề chuẩn hơn
+    4.  Nguyên lý chi tiết xem [Nguyên lý đồng bộ dấu thời gian hình và tiếng](Synchronize.md)
+
+### 36. Liên tục báo thiếu VRAM (ví dụ lỗi `Unable to allocate`)
+
+Lỗi này nghĩa là card đồ họa không đủ VRAM hoặc bộ nhớ để chạy tác vụ hiện tại.
+
+*   **Cách xử lý (theo thứ tự khuyến nghị)**:
+    1.  **Dùng mô hình nhỏ hơn**: đổi từ `large-v3` sang `medium`, `small` hoặc `base`
+    2.  **Chỉnh tùy chọn nâng cao**:
+        *   `Kiểu dữ liệu tính toán`: đổi `float32` thành `float16` hoặc `int8`
+        *   `beam_size`: đổi `5` thành `1`
+        *   `best_of`: đổi `5` thành `1`
+        *   `Nhận biết ngữ cảnh`: đổi `true` thành `false`
+
+### 37. Đã cài CUDA rồi nhưng vì sao phần mềm vẫn không dùng được GPU?
+
+Hãy kiểm tra các khả năng sau:
+
+*   **Phiên bản CUDA không tương thích**: phần mềm yêu cầu CUDA từ 12.8 trở lên
+*   **Driver card quá cũ**: cập nhật driver NVIDIA lên bản mới nhất
+*   **Thiếu cuDNN**: đảm bảo đã cài cuDNN 9.x và cấu hình biến môi trường
+*   **Phần cứng không tương thích**: tăng tốc GPU chỉ hỗ trợ card NVIDIA. Card AMD hoặc Intel không dùng được CUDA
+*   **Chưa cấu hình biến môi trường**: kiểm tra biến môi trường hệ thống đã có thư mục `bin` và `lib` của CUDA chưa
+
+### 38. Mức sử dụng GPU rất thấp, có bình thường không?
+
+**Bình thường**. Quy trình của phần mềm là: `nhận dạng giọng nói → dịch → lồng tiếng → dựng video`.
+
+Chỉ ở bước đầu tiên — **nhận dạng giọng nói** — mới dùng nhiều GPU. Các bước còn lại (dịch, dựng video) chủ yếu dùng CPU, nên việc GPU nhàn rỗi phần lớn thời gian là đúng như thiết kế.
+
+### 39. Xử lý vài video xong thì ổ cứng đầy?
+
+Thường do bật chức năng "làm chậm video" và sinh ra rất nhiều tệp tạm.
+
+*   **Nguyên nhân**: chức năng này cắt video thành nhiều đoạn nhỏ theo phụ đề rồi xử lý từng đoạn, tạo ra lượng tệp đệm lớn hơn nhiều so với video gốc.
+*   **Cách xử lý**:
+    1.  **Dọn thủ công**: xử lý xong thì xóa toàn bộ nội dung trong thư mục **`tmp/`** ở thư mục gốc phần mềm
+    2.  **Dọn tự động**: khi đóng phần mềm đúng cách, chương trình sẽ tự dọn các tệp đệm này
+
+### 40. Xử lý lại cùng một video, vì sao kết quả nhận dạng và phụ đề luôn không đổi?
+
+*   **Nguyên nhân**: phần mềm mặc định bật cơ chế đệm, nếu phát hiện video đã từng sinh tệp phụ đề thì dùng luôn kết quả đệm
+*   **Cách xử lý**: tick ô **`Dọn kết quả đã tạo`** ở góc trên bên trái giao diện chính
+
+---
+
+## Phần 8: Vấn đề xử lý hàng loạt
+
+### 41. Dịch video hàng loạt hay bị treo
+
+Mặc định khi chạy hàng loạt, mỗi tác vụ được chia thành nhiều giai đoạn và chạy đan xen song song. Quá nhiều tác vụ có thể làm cạn tài nguyên.
+
+*   **Cách xử lý**: vào **Tùy chọn nâng cao → Cài đặt chung**, đặt `Số video mỗi đợt dịch` (`batch_nums`) bằng `1` để xử lý lần lượt từng video thay vì chạy song song.
+
+### 42. Kiểm soát số tác vụ chạy đồng thời thế nào?
+
+Trong **Tùy chọn nâng cao → Cài đặt chung**:
+*   `Số tác vụ CPU`: số tác vụ CPU chạy đồng thời tối đa, không nên vượt quá số nhân CPU
+*   `Số tác vụ GPU`: số tác vụ GPU chạy đồng thời, trừ khi có nhiều card hoặc VRAM > 24G thì hãy đặt 1
+*   `Số video mỗi đợt dịch`: đặt 1 để xử lý lần lượt, đặt 0 thì chạy tất cả cùng lúc
+
+---
+
+## Phần 9: Giải thích tùy chọn nâng cao
+
+### 43. Khác nhau giữa tăng tốc âm thanh và làm chậm video?
+
+| Tùy chọn | Tác dụng | Trường hợp dùng |
 |------|------|---------|
-| **音频加速** | 加速配音以匹配字幕时长，音质可能略有损失 | 配音比字幕长 1-2 倍 |
-| **视频慢速** | 慢放视频以匹配配音时长，画面可能略卡 | 配音比字幕长 2 倍以上 |
-| **两者同时** | 各负担一半时间差，效果最佳 | 配音远长于字幕 |
+| **Tăng tốc âm thanh** | Tăng tốc lồng tiếng cho khớp thời lượng phụ đề, chất lượng tiếng có thể giảm nhẹ | Lồng tiếng dài hơn phụ đề 1-2 lần |
+| **Làm chậm video** | Làm chậm hình cho khớp thời lượng lồng tiếng, hình có thể hơi giật | Lồng tiếng dài hơn phụ đề trên 2 lần |
+| **Bật cả hai** | Mỗi bên gánh một nửa chênh lệch, kết quả tốt nhất | Lồng tiếng dài hơn phụ đề rất nhiều |
 
-### 44. `发送完整字幕` 有什么作用？
+### 44. Tùy chọn `Gửi toàn bộ phụ đề` có tác dụng gì?
 
-选中后，AI 翻译时会附带行号和时间轴发给 AI，翻译质量更好但可能合并行。建议：
-*   使用在线大模型（DeepSeek、GPT-4o）时**选中**
-*   使用本地小模型时**取消选中**
+Khi bật, phần mềm gửi kèm số dòng và dấu thời gian cho AI, chất lượng dịch tốt hơn nhưng AI có thể gộp dòng. Khuyến nghị:
+*   **Bật** khi dùng mô hình trực tuyến lớn (DeepSeek, GPT-4o)
+*   **Tắt** khi dùng mô hình nhỏ chạy trên máy
 
-### 45. `二次识别` 与 `LLM重新断句` 的区别？
+### 45. Khác nhau giữa `Nhận dạng lần 2` và `Tách câu bằng LLM`?
 
-| 选项 | 时机 | 作用 |
+| Tùy chọn | Thời điểm | Tác dụng |
 |------|------|------|
-| **LLM重新断句** | 语音识别后 | AI 修正错别字、重新切分长文本 |
-| **二次识别** | 配音完成后 | 对配音音频再次识别，生成更精准的时间轴 |
+| **Tách câu bằng LLM** | Sau khi nhận dạng giọng nói | AI sửa lỗi chính tả, chia lại đoạn văn dài |
+| **Nhận dạng lần 2** | Sau khi lồng tiếng xong | Nhận dạng lại tệp lồng tiếng để có dấu thời gian chuẩn hơn |
 
-> 使用 `clone` 角色时，**不建议**使用 LLM 重新断句。
+> Khi dùng giọng `clone`, **không nên** dùng tách câu bằng LLM.
 
-### 46. 嵌入字幕类型如何选择？
+### 46. Chọn kiểu nhúng phụ đề thế nào?
 
-| 类型 | 说明 | 适用场景 |
+| Kiểu | Mô tả | Trường hợp dùng |
 |------|------|---------|
-| 不嵌入字幕 | 只替换声音，不添加字幕 | 仅需配音 |
-| 嵌入硬字幕 | 字幕永久烧录到画面，无法关闭 | 任何播放器都能显示 |
-| 嵌入软字幕 | 字幕作为独立轨道，播放器可开关 | 需要灵活控制字幕显示 |
-| 嵌入硬字幕(双) | 中英双语硬字幕 | 需要双语对照 |
-| 嵌入软字幕(双) | 中英双语软字幕 | 需要双语对照且可关闭 |
+| Không nhúng phụ đề | Chỉ thay tiếng, không thêm phụ đề | Chỉ cần lồng tiếng |
+| Nhúng phụ đề cứng | Phụ đề khắc vĩnh viễn vào hình, không tắt được | Trình phát nào cũng hiển thị được |
+| Nhúng phụ đề mềm | Phụ đề là một luồng riêng, trình phát bật/tắt được | Cần linh hoạt bật tắt phụ đề |
+| Phụ đề cứng song ngữ | Phụ đề cứng hai ngôn ngữ | Cần đối chiếu song ngữ |
+| Phụ đề mềm song ngữ | Phụ đề mềm hai ngôn ngữ | Cần đối chiếu song ngữ và tắt được |
 
 ---
 
-## 第十部分：文件与路径问题
+## Phần 10: Vấn đề tệp và đường dẫn
 
-### 47. 输入文件路径有什么要求？
+### 47. Đường dẫn tệp đầu vào có yêu cầu gì?
 
-1.  **路径长度**：Windows 命令行有 260 字符限制，文件路径应尽量简短
-2.  **特殊符号**：文件名中不应包含 `?*`、表情符号等特殊符号
-3.  **中文路径**：虽然支持，但建议使用英文路径以避免兼容性问题
-4.  **空格**：路径中可以有空格，但建议避免
+1.  **Độ dài đường dẫn**: dòng lệnh Windows giới hạn 260 ký tự, nên để đường dẫn càng ngắn càng tốt
+2.  **Ký tự đặc biệt**: tên tệp không nên chứa `?*`, biểu tượng cảm xúc hay ký tự đặc biệt khác
+3.  **Đường dẫn có dấu tiếng Việt**: tuy hỗ trợ nhưng nên dùng đường dẫn không dấu để tránh lỗi tương thích
+4.  **Khoảng trắng**: đường dẫn có thể có khoảng trắng nhưng nên tránh
 
-### 48. 输出文件保存在哪里？
+### 48. Tệp kết quả lưu ở đâu?
 
-*   **默认位置**：原视频目录下的 `_video_out/` 文件夹
-*   **独立功能输出**：批量转录、配音、翻译 SRT 等功能输出到 `output/` 目录
-*   **自定义输出**：可在主界面设置输出目录
+*   **Mặc định**: thư mục `_video_out/` nằm cùng cấp với video gốc
+*   **Các chức năng độc lập**: bóc phụ đề hàng loạt, lồng tiếng, dịch SRT... xuất vào thư mục `output/`
+*   **Tùy chỉnh**: có thể đặt thư mục đầu ra trên giao diện chính
 
-### 49. 如何导入已有的 SRT 字幕？
+### 49. Nhập tệp phụ đề SRT có sẵn thế nào?
 
-1.  在视频文件同级目录下创建 `_video_out/` 文件夹
-2.  在其中创建视频同名子文件夹（如 `myvideo-mp4`，必须带格式后缀）
-3.  将字幕文件复制到子文件夹，重命名为 `zh-cn.srt`（源语言）和 `en.srt`（目标语言）
-4.  导入视频执行翻译，软件会自动跳过 ASR 和翻译阶段
+1.  Tạo thư mục `_video_out/` cùng cấp với tệp video
+2.  Trong đó tạo thư mục con trùng tên video (ví dụ `myvideo-mp4`, bắt buộc kèm phần mở rộng)
+3.  Chép tệp phụ đề vào thư mục con, đổi tên thành `zh-cn.srt` (ngôn ngữ nguồn) và `vi.srt` (ngôn ngữ đích)
+4.  Nhập video rồi chạy dịch, phần mềm sẽ tự bỏ qua bước nhận dạng và dịch
 
 ---
 
-## 第十一部分：CLI 命令行问题
+## Phần 11: Vấn đề dòng lệnh (CLI)
 
-### 50. CLI 基本用法
+### 50. Cách dùng CLI cơ bản
 
 ```bash
-uv run cli.py --task <任务类型> --name "<文件路径>" [其他参数]
+uv run cli.py --task <loại tác vụ> --name "<đường dẫn tệp>" [tham số khác]
 ```
 
-任务类型：`stt`(语音转录)、`tts`(文字配音)、`sts`(字幕翻译)、`vtv`(视频翻译)
+Các loại tác vụ: `stt` (nhận dạng giọng nói), `tts` (lồng tiếng), `sts` (dịch phụ đề), `vtv` (dịch video)
 
-### 51. 如何查看可用的渠道和语言？
+### 51. Xem danh sách kênh và ngôn ngữ khả dụng thế nào?
 
 ```bash
-uv run cli.py --list providers    # 查看所有渠道
-uv run cli.py --list languages    # 查看所有语言代码
-uv run cli.py --list models       # 查看 faster-whisper 模型
+uv run cli.py --list providers    # xem mọi kênh
+uv run cli.py --list languages    # xem mọi mã ngôn ngữ
+uv run cli.py --list models       # xem các mô hình faster-whisper
 ```
 
-### 52. CLI 常见报错
+### 52. Lỗi CLI thường gặp
 
-*   **`--name is required`**：未指定输入文件
-*   **`File not found`**：文件路径错误或文件不存在
-*   **`--voice_role is required`**：TTS 模式下必须指定配音角色
-*   **`--target_language_code is required`**：STS/VTV 模式下必须指定目标语言
-
----
-
-## 第十二部分：综合信息
-
-### 53. 软件是否支持 Docker 部署？
-
-目前**不支持**。
-
-### 54. 能否识别视频画面中的硬字幕（OCR 功能）？
-
-**不能**。本软件的原理是分析视频中的**音频轨道**，识别出人类的语音并转换为文字。它不具备图像文字识别（OCR）功能。
-[若有需要，可以点击查看另一个项目，提取视频中硬字幕](https://pyvideotrans.com/ocrsp)
-
-### 55. 我可以添加新的语言支持吗？
-
-**[可以新增目标语言，具体查看](https://pyvideotrans.com/newlanguage)**
-
-### 56. 软件是否收费？可以商用吗？
-
-*   **费用**：本项目是一个**免费且开源**的软件，您可以免费使用所有功能。请注意，如果您使用第三方的翻译或TTS或语音转录接口，这些服务商可能会收取费用，但这与本软件无关。
-*   **商用**：个人和公司均可**自由使用**本软件。但如果您希望将本项目的代码集成到您自己的商业产品中，则必须遵守 **GPL-v3 开源协议**。此外某些渠道使用的模型或在线API可能有他们自己的协议要求，是否允许商用，请咨询所使用的渠道对应的平台。
-
-### 57. 是否提供人工客服？
-
-没有。本项目为个人开发的免费开源软件，没有盈利，因此无法配备专门的人工客服团队。如果您遇到问题，请先仔细阅读本 FAQ。
-或你也可以选择软件右下角微信二维码打赏，留言你的微信号，获取有偿技术支持。
-
-### 58. 从哪里下载软件和模型？
-
-*   **软件下载地址**：[pyvideotrans.com/downpackage](https://pyvideotrans.com/downpackage)
-*   **源码仓库地址**：[github.com/jianchang512/pyvideotrans](https://github.com/jianchang512/pyvideotrans)
-
-### 59. 报错与日志
-
-*   **日志位置**：软件根目录下的 `logs` 文件夹有当前年月日命名的 log 格式日志文件
-*   **反馈方式**：报错时点击弹窗的"报告错误"可自动提交至官方论坛；或复制日志底部 30 行内容询问 AI
-
-### 60. 新版本为什么在发音语言列表中没有了"自动检测"？
-
-在 "批量语音转字幕" 功能面板中可以选择"自动检测"，在"翻译视频或音频"功能中去掉了自动检测。因为视频翻译后续工作如字幕翻译、配音（涉及参考音频）等某些渠道需要明确指定原始语言，否则会报错。如果你仅仅想转录语音为字幕，可单独使用左侧面板中的"批量语音转字幕"功能。
+*   **`--name is required`**: chưa chỉ định tệp đầu vào
+*   **`File not found`**: sai đường dẫn hoặc tệp không tồn tại
+*   **`--voice_role is required`**: chế độ TTS bắt buộc phải chỉ định giọng lồng tiếng
+*   **`--target_language_code is required`**: chế độ STS/VTV bắt buộc phải chỉ định ngôn ngữ đích
 
 ---
 
-## 快速问题排查表
+## Phần 12: Thông tin chung
 
-| 问题 | 可能原因 | 解决方案 |
+### 53. Phần mềm có hỗ trợ triển khai bằng Docker không?
+
+**Có**. Thư mục gốc dự án có sẵn `Dockerfile`, dựng được cả bản CPU lẫn bản GPU:
+
+```bash
+docker build -t phiendichvideo-webui .                                  # bản CPU
+docker build --build-arg USE_CUDA=true -t phiendichvideo-webui:gpu .    # bản GPU
+```
+
+Xem hướng dẫn chi tiết tại [tài liệu WebUI](webui.md).
+
+### 54. Có nhận dạng được phụ đề cứng in trên hình không (chức năng OCR)?
+
+**Không**. Nguyên lý của phần mềm là phân tích **luồng âm thanh** trong video, nhận ra tiếng người rồi chuyển thành văn bản. Phần mềm không có khả năng nhận dạng chữ trong ảnh (OCR).
+[Nếu cần, xem một dự án khác chuyên bóc phụ đề cứng trong video](https://pyvideotrans.com/ocrsp)
+
+### 55. Tôi có thể thêm ngôn ngữ mới không?
+
+Có. Xem [hướng dẫn thêm gói ngôn ngữ giao diện](language.md), hoặc [hướng dẫn thêm ngôn ngữ đích của dự án gốc](https://pyvideotrans.com/newlanguage).
+
+### 56. Phần mềm có thu phí không? Có dùng cho mục đích thương mại được không?
+
+*   **Chi phí**: đây là phần mềm **miễn phí và mã nguồn mở**, bạn dùng được mọi chức năng mà không mất phí. Lưu ý rằng nếu bạn dùng dịch vụ dịch, TTS hay nhận dạng của bên thứ ba thì các nhà cung cấp đó có thể thu phí, việc này không liên quan tới phần mềm.
+*   **Thương mại**: cá nhân và công ty đều được **tự do sử dụng**. Nhưng nếu bạn muốn tích hợp mã nguồn của dự án này vào sản phẩm thương mại của mình thì phải tuân thủ **giấy phép mã nguồn mở GPL-v3**. Ngoài ra, mô hình hoặc API trực tuyến của một số kênh có thể có điều khoản riêng — có được dùng cho mục đích thương mại hay không, vui lòng hỏi nền tảng tương ứng.
+
+### 57. Có hỗ trợ khách hàng trực tiếp không?
+
+Không. Đây là phần mềm mã nguồn mở miễn phí do cá nhân phát triển, không có lợi nhuận nên không có đội ngũ hỗ trợ riêng. Gặp vấn đề, trước hết hãy đọc kỹ tài liệu này.
+
+### 58. Tải phần mềm và mô hình ở đâu?
+
+*   **Kho mã nguồn của bản Việt hóa này**: [github.com/haianh02034/VideoTrans](https://github.com/haianh02034/VideoTrans)
+*   **Trang tải của dự án gốc**: [pyvideotrans.com/downpackage](https://pyvideotrans.com/downpackage)
+*   **Kho mã nguồn dự án gốc**: [github.com/jianchang512/pyvideotrans](https://github.com/jianchang512/pyvideotrans)
+
+> Lưu ý: bản dựng sẵn trên trang của dự án gốc **không có phần Việt hóa**. Muốn dùng giao diện tiếng Việt, hãy chạy từ mã nguồn của kho này.
+
+### 59. Báo lỗi và nhật ký
+
+*   **Vị trí nhật ký**: thư mục `logs` ở thư mục gốc phần mềm chứa các tệp `.log` đặt tên theo ngày tháng năm
+*   **Cách phản hồi**: khi báo lỗi, bấm "Báo lỗi" trên hộp thoại để mở trang gửi lỗi; hoặc chép 30 dòng cuối nhật ký để hỏi AI
+
+> Lưu ý về quyền riêng tư: nội dung gửi qua nút "Báo lỗi" bao gồm cả đường dẫn cài đặt phần mềm trên máy bạn, và trang đó là diễn đàn công khai của dự án gốc. Bạn vẫn phải bấm nút đăng lần nữa trên trang web thì nội dung mới thực sự được gửi đi.
+
+### 60. Vì sao bản mới không còn "tự động nhận diện" trong danh sách ngôn ngữ nói?
+
+Ở chức năng "Bóc phụ đề hàng loạt" vẫn chọn được "Tự động nhận diện", nhưng chức năng "Dịch video hoặc audio" đã bỏ mục này. Lý do là các bước sau của quy trình dịch video — như dịch phụ đề, lồng tiếng (có liên quan tới âm thanh mẫu) — ở một số kênh bắt buộc phải biết rõ ngôn ngữ gốc, nếu không sẽ báo lỗi. Nếu bạn chỉ muốn bóc phụ đề, hãy dùng riêng chức năng "Bóc phụ đề hàng loạt" ở bảng bên trái.
+
+---
+
+## Bảng tra nhanh
+
+| Vấn đề | Nguyên nhân có thể | Cách xử lý |
 |------|---------|---------|
-| 软件无法启动 | 杀毒软件拦截 / 路径问题 | 添加信任白名单 / 移至英文路径 |
-| 缺少 python310.dll | 只下载了补丁包 | 下载完整包再覆盖补丁 |
-| 识别结果为空 | 语言选择错误 / 无有效人声 | 正确选择语言 / 开启降噪 |
-| 显存不足 | 模型太大 | 换小模型 / 改 int8 / 降 beam_size |
-| GPU 未启用 | CUDA 未安装 / 驱动过旧 | 安装 CUDA 12.8+ / 更新驱动 |
-| 翻译有空白行 | AI 合并了字幕行 | 取消"发送完整字幕" / 用在线模型 |
-| Edge-TTS 403 | 微软限流 | 降并发 / 加暂停秒数 |
-| 声音字幕不同步 | 语言时长差异 | 启用音频加速 / 视频慢速 |
-| ffprobe 报错 | 路径过长或特殊符号 | 简化文件名 / 移至浅层目录 |
-| 硬盘空间占满 | 视频慢速产生大量临时文件 | 清理 tmp/ 文件夹 |
-| clone 配音差 | 参考音频时长不当 | 控制 3-10 秒 / 禁用 LLM 断句 |
-| GPT-SoVITS 404 | API 版本不匹配 | 检查 api.py vs api_v2.py |
+| Phần mềm không khởi động | Bị diệt virus chặn / lỗi đường dẫn | Thêm vào danh sách tin cậy / chuyển sang đường dẫn không dấu |
+| Thiếu python310.dll | Chỉ tải gói vá | Tải gói đầy đủ rồi ghi đè gói vá |
+| Kết quả nhận dạng rỗng | Chọn sai ngôn ngữ / không có giọng người | Chọn đúng ngôn ngữ / bật khử nhiễu |
+| Thiếu VRAM | Mô hình quá lớn | Đổi mô hình nhỏ / dùng int8 / giảm beam_size |
+| Không dùng được GPU | Chưa cài CUDA / driver cũ | Cài CUDA 12.8+ / cập nhật driver |
+| Bản dịch có dòng trống | AI gộp dòng phụ đề | Bỏ "Gửi toàn bộ phụ đề" / dùng mô hình trực tuyến |
+| Edge-TTS lỗi 403 | Microsoft giới hạn tần suất | Giảm số luồng / tăng thời gian nghỉ |
+| Tiếng và phụ đề lệch nhau | Khác biệt độ dài giữa các ngôn ngữ | Bật tăng tốc âm thanh / làm chậm video |
+| Lỗi ffprobe | Đường dẫn quá dài hoặc có ký tự đặc biệt | Rút gọn tên tệp / chuyển sang thư mục nông |
+| Ổ cứng đầy | Làm chậm video sinh nhiều tệp tạm | Dọn thư mục tmp/ |
+| Giọng clone kém | Âm thanh mẫu sai độ dài | Giữ 3-10 giây / tắt tách câu bằng LLM |
+| GPT-SoVITS lỗi 404 | Sai phiên bản API | Kiểm tra api.py hay api_v2.py |
