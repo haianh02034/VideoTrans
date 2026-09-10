@@ -1,190 +1,89 @@
-[English](./language.md#adding-language-packs)
+﻿# Thêm gói ngôn ngữ
 
-# 添加语言包
+Phần mềm tự động phát hiện mọi tệp `*.json` trong thư mục `phiendichvideo/language/`. Thêm một tệp vào đó là có thêm một ngôn ngữ, **không cần sửa dòng mã nào**.
 
-1. 首先在控制台执行下面代码，查看系统当前语言代码
+Hiện có sẵn ba gói: `vi.json` (Tiếng Việt), `en.json` (Tiếng Anh), `zh.json` (Tiếng Trung).
 
-```
-    import locale
-    locale.getdefaultlocale()[0]
-```
-将输出内容的前2个字符小写，拼接上`.json`作为文件名创建json文件，比如输出的是`en_US`,就创建 `en.json` 到 phiendichvideo/language 目录下，这个`en.json`就是语言文件。
+---
 
+## 1. Cấu trúc tệp ngôn ngữ
 
-> 
-> 在软件启动时，会以该方式locale.getdefaultlocale()[0]的前2个字符小写，然后拼接`.json`，组成文件名，到 phiendichvideo/language目录下搜寻,如果存在则使用，不存在则显示英文界面。
-> 如果在 `phiendichvideo/set.ini` 文件中  `lang=` 设置了值，则以该值为默认语言代码，否则以 `locale.getdefaultlocale()` 结果为准。
->  
+Mỗi tệp là một đối tượng JSON **phẳng**, gồm các cặp `"khóa": "văn bản hiển thị"`. Hiện mỗi tệp có 873 khóa.
 
-
-已存在`en.json` `zh.json` 2种语言文件，可直接复制后修改名称，在此基础上制作新的语言文件
-
-每个语言文件都是一个json对象，最外层有4个字段，分别是
-
-```
+```json
 {
-"translate_language":{},
-"ui_lang":{},
-"toolbox_lang":{}, 
-"language_code_list":{}
+    "&Help": "Trợ giúp/Giới thiệu(&H)",
+    "Start": "Bắt đầu",
+    "Dubbing role": "Chọn giọng đọc",
+    "Dubbing succeeded {}，failed {}": "Thành công: {}, Thất bại: {}"
 }
 ```
 
-其中 `translate_language` 是用于进度显示、错误提示、各种交互状态的文本，`ui_lang` 软件界面各个部件的显示名称，`toolbox_lang` 是视频工具箱界面各个部件的显示名称, `language_code_list` 是支持的语言显示名称
+**Chỉ sửa phần giá trị bên phải. Tuyệt đối không đổi tên khóa** — khóa chính là thứ mã nguồn dùng để tra cứu, đổi tên là phần đó mất bản dịch.
 
-## translate_language 修改
+### Về dấu ngoặc nhọn `{}`
 
-```
-"translate_language": {
-    "qianyiwenjian": "The video path or name contains non ASCII spaces. To avoid errors, it has been migrated to ",
-    "mansuchucuo": "Video automatic slow error, please try to cancel the 'Video auto down' option",
-}
-```
-
-如上，translate_language 是 `字段名:字段值` 组成的json对象，字段名不要动，字段值改为相应语言的文本即可。
-
-
-## ui_lang 修改
-
-"ui_lang": {
-    "SP-video Translate Dubbing": "SP-video Translate Dubbing",
-    "Multiple MP4 videos can be selected and automatically queued for processing": "Multiple MP4 videos can be selected and automatically queued for processing",
-    "Select video..": "Select video..",
-}
-同 `translate_language` 的修改一样，字段名不要动，将字段值改为相应语言的文本即可。
-
-## toolbox_lang 修改
-
-"toolbox_lang": {
-    "No voice video":"无声视频",
-    "Open dir":"打开目录",
-    "Audio Wav":"音频文件",
-}
-同 `translate_language` 的修改一样，字段名不要动，将字段值改为相应语言的文本即可。
-
-## language_code_list 的修改
+Một số giá trị chứa `{}` — đó là chỗ điền biến lúc chạy (tên tệp, số lượng, thông báo lỗi...). Bản dịch **phải giữ đúng số lượng `{}`** như bản gốc, nếu không phần mềm sẽ báo lỗi khi hiển thị chuỗi đó.
 
 ```
-"language_code_list": {
-    "zh-cn":"Simplified Chinese",
-    "zh-tw":"Traditional Chinese",
-    "en":"English",
-    "fr":"French",
-    "de":"German",
-    "ja":"Japanese",
-    "ko":"Korean",
-    "ru":"Russian",
-    "es":"Spanish",
-    "th":"Thai",
-    "it":"Italian",
-    "pt":"Portuguese",
-    "vi":"Vietnamese",
-    "ar":"Arabic",
-    "tr":"Turkish",
-    "hi":"Hindi"
-  }
+Đúng : "Dubbing succeeded {}，failed {}" -> "Thành công: {}, Thất bại: {}"      (2 dấu, 2 dấu)
+Sai   : "Dubbing succeeded {}，failed {}" -> "Thành công và thất bại"           (mất dấu -> lỗi)
 ```
 
-和其他一样，该内容字段名不要动，字段值改为要显示的名称
+Thứ tự `{}` trong câu có thể thay đổi cho hợp ngữ pháp tiếng Việt, miễn giữ đủ số lượng.
 
-**制作完成后，确认符合正确的 json 格式，然后放到 phiendichvideo/language 目录下，重启软件就会自动应用该语言，如何你制作的语言包和默认语言不同，可通过设置 `set.ini`中 lang=语言代码和强制使用，比如 `lang=zh`将强制显示 zh.json 内容**
+---
 
+## 2. Các bước tạo gói ngôn ngữ mới
 
+1. Chép `en.json` thành tệp mới, đặt tên theo **mã ngôn ngữ 2 chữ cái viết thường** rồi thêm `.json`. Ví dụ tiếng Thái là `th.json`, tiếng Nhật là `ja.json`.
+2. Dịch phần giá trị của từng khóa, giữ nguyên tên khóa và số lượng `{}`.
+3. Lưu tệp bằng mã hóa **UTF-8**.
+4. Đặt vào thư mục `phiendichvideo/language/`.
+5. Khởi động lại phần mềm.
 
-----
+Kiểm tra tệp trước khi dùng — sai cú pháp JSON là phần mềm bỏ qua và quay về tiếng Anh:
 
-
-----
-
-
-
-# Adding Language Packs
-
-
-
-1. First, execute the following code in the console to check the system's current language code
-
-```
-    import locale
-    locale.getdefaultlocale()[0]
-```
-Lowercase the first 2 characters of the output content and append `.json` to create a json file as the filename. For example, if the output is `en_US`, create `en.json` in the phiendichvideo/language directory, where `en.json` is the language file.
-
-
-> 
-> When the software starts, the system will take the first 2 characters lowercase from locale.getdefaultlocale()[0] and append `.json` to form the filename, and then look for it under the phiendichvideo/language directory. If it exists, it will be used; otherwise, the English interface will be displayed.
-> If the `lang=` in the `phiendichvideo/set.ini` file has a value set, then this value will be taken as the default language code, otherwise the result of `locale.getdefaultlocale()` will be used.
-> 
-
-
-There are already `en.json` and `zh.json` 2 language files. You can copy and modify the name directly to create new language files.
-
-Each language file is a json object. The outermost layer has 4 fields, which are
-
-```
-{
-"translate_language":{},
-"ui_lang":{},
-"toolbox_lang":{}, 
-"language_code_list":{}
-}
+```bash
+python -c "import json,io; d=json.load(io.open('phiendichvideo/language/th.json',encoding='utf-8')); print(len(d),'khóa, JSON hợp lệ')"
 ```
 
-Here `translate_language` is used for progress display, error prompts, various interaction states of text, `ui_lang` software interface display name of each component, `toolbox_lang` video toolbox interface display name of each component, `language_code_list` is the supported language display name
+Đối chiếu xem có thiếu khóa nào so với bản gốc không:
 
-## Modification of translate_language 
-
-```
-"translate_language": {
-    "qianyiwenjian": "The video path or name contains non ASCII spaces. To avoid errors, it has been migrated to ",
-    "mansuchucuo": "Video automatic slow error, please try to cancel the 'Video auto down' option",
-}
-```
-
-As mentioned above, translate_language is a json object composed of `field name: field value`. Do not move the field name and change the field value to the corresponding language text.
-
-
-## Modification of ui_lang 
-
-"ui_lang": {
-    "SP-video Translate Dubbing": "SP-video Translate Dubbing",
-    "Multiple MP4 videos can be selected and automatically queued for processing": "Multiple MP4 videos can be selected and automatically queued for processing",
-    "Select video..": "Select video..",
-}
-The same as the modification of `translate_language`, do not move the field name and change the field value to the corresponding language text.
-
-## Modification of toolbox_lang 
-
-"toolbox_lang": {
-    "No voice video":"Silent video",
-    "Open dir":"Open directory",
-    "Audio Wav":"Audio file",
-}
-The same as the modification of `translate_language`, do not move the field name, and change the field value to the relevant language text.
-
-## Modification of language_code_list 
-
-```
-"language_code_list": {
-    "zh-cn":"Simplified Chinese",
-    "zh-tw":"Traditional Chinese",
-    "en":"English",
-    "fr":"French",
-    "de":"German",
-    "ja":"Japanese",
-    "ko":"Korean",
-    "ru":"Russian",
-    "es":"Spanish",
-    "th":"Thai",
-    "it":"Italian",
-    "pt":"Portuguese",
-    "vi":"Vietnamese",
-    "ar":"Arabic",
-    "tr":"Turkish",
-    "hi":"Hindi"
-  }
+```bash
+python -c "
+import json,io
+en=json.load(io.open('phiendichvideo/language/en.json',encoding='utf-8'))
+new=json.load(io.open('phiendichvideo/language/th.json',encoding='utf-8'))
+print('Thiếu:',sorted(set(en)-set(new)))
+print('Thừa :',sorted(set(new)-set(en)))
+"
 ```
 
-Like the others, do not modify the field name of this content, change the field value to the display name
+Khóa nào thiếu thì phần mềm hiển thị chính tên khóa đó thay vì bản dịch — không gây lỗi, chỉ xấu giao diện.
 
-**After the production is completed, make sure it meets the correct json format, put it into the phiendichvideo/language directory, and the software will automatically apply the language when restarted. If the language pack you made is different from the default language, you can set `set.ini` in lang= language code and use it forcibly, such as `lang=zh` will forcibly display the content of zh.json**
+---
+
+## 3. Phần mềm chọn ngôn ngữ như thế nào
+
+Theo thứ tự ưu tiên (xem `phiendichvideo/configure/_i18n.py`):
+
+1. **Biến môi trường `PYVIDEOTRANS_LANG`** — cũng chính là thứ mà tham số dòng lệnh `--lang` đặt vào.
+   ```bash
+   python sp.py --lang vi
+   ```
+2. **Giá trị `lang` trong tệp cấu hình** `phiendichvideo/cfg.json`. Đây là giá trị được lưu khi bạn đổi ngôn ngữ trong phần mềm qua **Công cụ → Tùy chọn nâng cao → Ngôn ngữ giao diện**.
+3. **Ngôn ngữ hệ thống** — lấy 2 ký tự đầu của locale hệ điều hành, viết thường.
+
+Nếu mã ngôn ngữ tìm được không có tệp `.json` tương ứng, phần mềm quay về **tiếng Anh**.
+
+Lần chạy đầu tiên, mã ngôn ngữ xác định được sẽ tự động ghi vào `cfg.json`.
+
+---
+
+## 4. Một số lưu ý
+
+- **Ký tự `&` trong khóa menu** (ví dụ `"&Help": "Trợ giúp/Giới thiệu(&H)"`) đánh dấu phím tắt Alt. Giữ lại nếu muốn có phím tắt, đặt ở vị trí phù hợp với ngôn ngữ của bạn.
+- **Ký tự xuống dòng** viết là `\n` trong JSON.
+- **Không dịch tên riêng** như `Edge-TTS`, `faster-whisper`, `CosyVoice`, `API`, `CUDA`, `SRT`, hay tên các mô hình.
+- Ô chọn ngôn ngữ trong phần mềm đọc danh sách trực tiếp từ các tệp có trong thư mục, nên gói mới sẽ tự xuất hiện sau khi khởi động lại.

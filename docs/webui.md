@@ -1,20 +1,20 @@
-﻿# Phiên Dịch Video WebUI 使用指南
+﻿# Hướng dẫn dùng Phiên Dịch Video WebUI
 
-## ⚠️ 重要提示
+## ⚠️ Lưu ý quan trọng
 
-> **WebUI 版本仅实现了部分功能**，主要用于以下场景：
-> - 云服务器部署（远程访问翻译服务）
-> - 局域网内部署（服务器与使用机分离）
-> - Docker 容器化部署
+> **Bản WebUI chỉ có một phần chức năng**, chủ yếu dùng cho các trường hợp:
+> - Triển khai trên máy chủ đám mây (truy cập dịch vụ dịch từ xa)
+> - Triển khai trong mạng nội bộ (máy chủ tách khỏi máy sử dụng)
+> - Triển khai bằng Docker
 >
-> **如需完整功能**，请使用桌面客户端（`sp.exe`）或源码运行（`sp.py`）。
-> 桌面版支持更多 API 渠道配置、实时交互编辑、批量处理等高级功能。
+> **Nếu cần đầy đủ chức năng**, hãy dùng bản desktop (`sp.exe`) hoặc chạy từ mã nguồn (`sp.py`).
+> Bản desktop hỗ trợ cấu hình nhiều kênh API hơn, chỉnh sửa xen giữa theo thời gian thực, xử lý hàng loạt và các tính năng nâng cao khác.
 
 ---
 
-## 一、部署方式
+## 1. Cách triển khai
 
-### 1.1 源码部署（推荐）
+### 1.1 Chạy từ mã nguồn (khuyến nghị)
 
 ```bash
 git clone https://github.com/haianh02034/VideoTrans.git
@@ -22,127 +22,131 @@ cd VideoTrans
 uv sync --extra webui
 ```
 
-启动服务：
+Khởi động dịch vụ:
 
 ```bash
-uv run webui.py                    # 默认 0.0.0.0:7860
-uv run webui.py --port 8080        # 指定端口
-uv run webui.py --host 127.0.0.1   # 仅本机访问
-uv run webui.py --share            # 创建 Gradio 公网链接
+uv run webui.py                    # mặc định 0.0.0.0:7860
+uv run webui.py --port 8080        # chỉ định cổng
+uv run webui.py --host 127.0.0.1   # chỉ truy cập được từ máy này
+uv run webui.py --share            # tạo liên kết Gradio công khai ra Internet
 ```
 
-访问：`http://127.0.0.1:7860` 或 `http://<服务器IP>:7860`
+Truy cập: `http://127.0.0.1:7860` hoặc `http://<IP máy chủ>:7860`
 
-### 1.2 Docker 部署
+> ⚠️ **Về bảo mật:** mặc định WebUI lắng nghe trên `0.0.0.0`, nghĩa là **mọi máy trong mạng đều vào được và không có bước xác thực nào**. Nếu chỉ dùng trên máy mình, hãy luôn thêm `--host 127.0.0.1`. Cờ `--share` tạo liên kết công khai ra Internet — chỉ bật khi bạn thực sự cần và ý thức được rằng ai có liên kết đều dùng được.
+
+### 1.2 Triển khai bằng Docker
 
 ```bash
-# 构建镜像
+# Dựng image
 git clone https://github.com/haianh02034/VideoTrans.git
 cd VideoTrans
 docker build -t phiendichvideo-webui .
 
-# 运行
+# Chạy
 docker run -d -p 7860:7860 --name phiendichvideo phiendichvideo-webui
 
-# 持久化配置和输出
+# Giữ lại kết quả và mô hình đã tải
 docker run -d -p 7860:7860 \
   -v ./data/output:/app/output \
   -v ./data/models:/app/models \
   --name phiendichvideo phiendichvideo-webui
 
-# GPU 加速
+# Tăng tốc bằng GPU
 docker run -d -p 7860:7860 --gpus all \
   -v ./data/output:/app/output \
   -v ./data/models:/app/models \
   --name phiendichvideo phiendichvideo-webui
 ```
 
+> ⚠️ Đừng gắn volume vào `/app/phiendichvideo` — đó là thư mục mã nguồn của phần mềm, gắn đè lên sẽ che mất và container không khởi động được.
+
 ### 1.3 Google Colab
 
-1. 打开 https://colab.research.google.com/drive/1kPTeAMz3LnWRnGmabcz4AWW42hiehmfm?usp=sharing
-2. 登录 Google 账号 → 点击 **全部运行**
-3. 等待 `*.gradio.live` 链接出现，点击使用
+1. Mở https://colab.research.google.com/drive/1kPTeAMz3LnWRnGmabcz4AWW42hiehmfm?usp=sharing
+2. Đăng nhập tài khoản Google → bấm **Chạy tất cả**
+3. Đợi liên kết `*.gradio.live` hiện ra rồi bấm vào để dùng
 
-> ⚠️ Colab 免费版有 4-6 小时使用时长限制。
-
----
-
-## 二、界面说明
-
-WebUI 分为三个标签页：
-
-### 2.1 🎬 视频翻译（主界面）
-
-**文件选择**：支持 mp4/mkv/avi/mov/webm/wav/mp3/m4a/flac 等格式
-
-**语音识别**：可选 faster-whisper/openai-whisper/Qwen-ASR/FunASR/Huggingface_ASR（均为本地内置免费渠道）
-
-**字幕翻译**：可选 Google/Microsoft/M2M100（免费渠道）
-
-**字幕配音**：可选 Edge-TTS/Qwen3-TTS/MOSS-TTS/Piper/VITS/Supertonic/ChatterBox/gTTS（免费/本地内置渠道）
-
-**对齐与字幕**：配音加速、视频慢速、语速/音量/音调调节、字幕嵌入类型
-
-**更多设置**：降噪、标点处理、人声分离、背景声嵌入、CUDA 加速
-
-**硬字幕样式编辑**：字体、颜色、描边、阴影、对齐等全面自定义
-
-### 2.2 ⚙️ 渠道设置
-
-配置各渠道的 API 地址、SK 密钥、模型等。**与桌面版通用**，配置保存在 `phiendichvideo/params.json` 中。
-
-包含：翻译渠道、语音识别渠道、配音渠道、参考音频设置
-
-> 使用 API 渠道前，需先用桌面版（sp.exe）配置好 API 地址和 SK 密钥。
-
-### 2.3 🔧 高级选项
-
-配置全局高级参数，与桌面版 `菜单 → 工具 → 高级选项` 完全通用。
-
-包含：通用设置、视频输出控制、语音识别参数、字幕翻译调整、字幕配音调整、字幕声音画面对齐、Whisper模型提示词
+> ⚠️ Bản Colab miễn phí giới hạn thời gian dùng 4-6 tiếng.
 
 ---
 
-## 三、执行翻译
+## 2. Giới thiệu giao diện
 
-1. 选择视频/音频文件
-2. 配置识别/翻译/配音参数
-3. 点击「🚀 开始执行」
+WebUI chia thành ba thẻ:
 
-执行过程：
-- 按钮变为「⏳ 执行中...」并禁用
-- 右侧日志实时显示 8 个阶段进度
-- 完成后按钮恢复，视频预览区可在线播放，文件区可下载
+### 2.1 🎬 Dịch video (màn hình chính)
+
+**Chọn tệp**: hỗ trợ các định dạng mp4/mkv/avi/mov/webm/wav/mp3/m4a/flac...
+
+**Nhận dạng giọng nói**: chọn faster-whisper / openai-whisper / Qwen-ASR / FunASR / Huggingface_ASR (đều là kênh cục bộ tích hợp sẵn, miễn phí)
+
+**Dịch phụ đề**: chọn Google / Microsoft / M2M100 (kênh miễn phí)
+
+**Lồng tiếng phụ đề**: chọn Edge-TTS / Qwen3-TTS / MOSS-TTS / Piper / VITS / Supertonic / ChatterBox / gTTS (kênh miễn phí hoặc cục bộ tích hợp sẵn)
+
+**Đồng bộ và phụ đề**: tăng tốc lồng tiếng, làm chậm video, chỉnh tốc độ đọc / âm lượng / cao độ, kiểu nhúng phụ đề
+
+**Thêm cài đặt**: khử nhiễu, xử lý dấu câu, tách giọng nói khỏi nhạc nền, nhúng lại nhạc nền, tăng tốc CUDA
+
+**Chỉnh kiểu phụ đề cứng**: tùy chỉnh đầy đủ phông chữ, màu sắc, viền, đổ bóng, căn lề...
+
+### 2.2 ⚙️ Cài đặt kênh
+
+Cấu hình địa chỉ API, khóa SK, mô hình... của từng kênh. **Dùng chung với bản desktop**, cấu hình được lưu trong `phiendichvideo/params.json`.
+
+Bao gồm: kênh dịch, kênh nhận dạng giọng nói, kênh lồng tiếng, cài đặt âm thanh mẫu.
+
+> Trước khi dùng kênh API, cần cấu hình sẵn địa chỉ API và khóa SK bằng bản desktop (sp.exe).
+
+### 2.3 🔧 Tùy chọn nâng cao
+
+Cấu hình tham số nâng cao toàn cục, dùng chung hoàn toàn với **Menu → Công cụ → Tùy chọn nâng cao** của bản desktop.
+
+Bao gồm: cài đặt chung, kiểm soát video đầu ra, tham số nhận dạng giọng nói, điều chỉnh dịch phụ đề, điều chỉnh lồng tiếng, đồng bộ phụ đề với hình và tiếng, prompt cho mô hình Whisper.
 
 ---
 
-## 四、与桌面版对比
+## 3. Thực hiện dịch
 
-| 功能 | WebUI | 桌面版 |
+1. Chọn tệp video/audio
+2. Cấu hình tham số nhận dạng / dịch / lồng tiếng
+3. Bấm **🚀 Bắt đầu**
+
+Trong quá trình chạy:
+- Nút chuyển thành **⏳ Đang chạy...** và bị vô hiệu hóa
+- Nhật ký bên phải hiển thị tiến độ 8 giai đoạn theo thời gian thực
+- Xong thì nút trở lại bình thường, khu vực xem trước phát được video ngay, khu vực tệp cho phép tải về
+
+---
+
+## 4. So sánh với bản desktop
+
+| Chức năng | WebUI | Bản desktop |
 |------|:-----:|:-----:|
-| 视频翻译完整流程 | ✅ | ✅ |
-| API 渠道（需先用桌面版配置） | ✅ | ✅ |
-| 高级选项配置 | ✅ | ✅ |
-| 实时交互编辑字幕 | ❌ | ✅ |
-| 批量处理 | ❌ | ✅ |
-| 视频预览播放 | ✅ | ❌ |
-| 远程访问 / Docker | ✅ | ❌ |
+| Quy trình dịch video đầy đủ | ✅ | ✅ |
+| Kênh API (cần cấu hình trước bằng bản desktop) | ✅ | ✅ |
+| Cấu hình tùy chọn nâng cao | ✅ | ✅ |
+| Chỉnh sửa phụ đề xen giữa | ❌ | ✅ |
+| Xử lý hàng loạt | ❌ | ✅ |
+| Xem trước video | ✅ | ❌ |
+| Truy cập từ xa / Docker | ✅ | ❌ |
 
 ---
 
-## 五、常见问题
+## 5. Câu hỏi thường gặp
 
-**Q: 启动报错 No module named gradio**
-`uv sync --extra webui`
+**Hỏi: Khởi động báo lỗi No module named gradio**
+Chạy `uv sync --extra webui`
 
-**Q: Docker 如何持久化配置**
+**Hỏi: Docker giữ lại dữ liệu thế nào**
 `-v ./data/output:/app/output -v ./data/models:/app/models`
 
-**Q: Docker 如何使用 GPU**
-安装 nvidia-container-toolkit 后：`docker run --gpus all ...`
+**Hỏi: Docker dùng GPU thế nào**
+Cài nvidia-container-toolkit rồi chạy: `docker run --gpus all ...`
 
-**Q: 如何使用 API 渠道**
-先用桌面版配置好 API 地址和 SK，WebUI 自动读取 `params.json`
+**Hỏi: Dùng kênh API thế nào**
+Cấu hình sẵn địa chỉ API và khóa SK bằng bản desktop, WebUI sẽ tự đọc `params.json`
 
-**Q: 如何创建公网链接**
-`uv run webui.py --share`，控制台输出临时 `*.gradio.live` 链接
+**Hỏi: Tạo liên kết công khai thế nào**
+`uv run webui.py --share`, cửa sổ dòng lệnh sẽ in ra liên kết `*.gradio.live` tạm thời
