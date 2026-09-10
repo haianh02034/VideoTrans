@@ -1,95 +1,95 @@
-# Phiên Dịch Video 命令行（CLI）使用指南
+# Hướng dẫn dùng Phiên Dịch Video qua dòng lệnh (CLI)
 
-Phiên Dịch Video 支持通过命令行进行无界面操作，适合服务器部署、批量处理、自动化流水线等场景。
-
----
-
-## 目录
-
-- [环境要求](#环境要求)
-- [基本用法](#基本用法)
-- [全局选项](#全局选项)
-- [任务类型总览](#任务类型总览)
-- [STT — 语音转录](#stt--语音转录)
-- [TTS — 文字配音](#tts--文字配音)
-- [STS — 字幕翻译](#sts--字幕翻译)
-- [VTV — 视频翻译](#vtv--视频翻译)
-- [查询工具](#查询工具)
-- [完整示例](#完整示例)
-- [常见问题](#常见问题)
+Phiên Dịch Video hỗ trợ chạy không cần giao diện, phù hợp cho triển khai trên máy chủ, xử lý hàng loạt và các quy trình tự động.
 
 ---
 
-## 环境要求
+## Mục lục
 
-| 项目 | 要求 |
+- [Yêu cầu môi trường](#yêu-cầu-môi-trường)
+- [Cách dùng cơ bản](#cách-dùng-cơ-bản)
+- [Tùy chọn chung](#tùy-chọn-chung)
+- [Tổng quan các loại tác vụ](#tổng-quan-các-loại-tác-vụ)
+- [STT — Nhận dạng giọng nói](#stt--nhận-dạng-giọng-nói)
+- [TTS — Lồng tiếng từ văn bản](#tts--lồng-tiếng-từ-văn-bản)
+- [STS — Dịch phụ đề](#sts--dịch-phụ-đề)
+- [VTV — Dịch video](#vtv--dịch-video)
+- [Công cụ tra cứu](#công-cụ-tra-cứu)
+- [Ví dụ đầy đủ](#ví-dụ-đầy-đủ)
+- [Câu hỏi thường gặp](#câu-hỏi-thường-gặp)
+
+---
+
+## Yêu cầu môi trường
+
+| Hạng mục | Yêu cầu |
 |------|------|
 | Python | 3.10 |
-| 包管理 | [uv](https://docs.astral.sh/uv/) |
-| FFmpeg | 必须安装并配置环境变量（Windows 打包版已内置） |
-| GPU 加速（可选） | NVIDIA 显卡 + CUDA 12.8 + cuDNN 9.11 |
+| Quản lý gói | [uv](https://docs.astral.sh/uv/) |
+| FFmpeg | Bắt buộc cài và thêm vào biến môi trường PATH (bản đóng gói cho Windows đã tích hợp sẵn) |
+| Tăng tốc GPU (tùy chọn) | Card NVIDIA + CUDA 12.8 + cuDNN 9.11 |
 
-### 启动方式
-
-```bash
-# 源码部署
-uv run cli.py [参数...]
-
-# Windows 打包版
-cli.exe [参数...]
-```
-
-> **注意**：Windows 打包版（`cli.exe`）无需安装 Python，直接运行即可。
-
----
-
-## 基本用法
+### Cách khởi động
 
 ```bash
-uv run cli.py --task <任务类型> --name "<文件路径>" [其他参数]
+# Chạy từ mã nguồn
+uv run cli.py [tham số...]
+
+# Bản đóng gói cho Windows
+cli.exe [tham số...]
 ```
 
-**四种任务类型：**
-
-| 任务 | 说明 | 流水线 |
-|------|------|--------|
-| `stt` | 语音转录 — 将音频/视频中的人声转为 SRT 字幕 | 预处理 → 语音识别 → 说话人分离 → 输出字幕 |
-| `tts` | 文字配音 — 将 SRT 字幕或文本转为语音音频 | 预处理 → 配音 → 音画对齐 → 输出音频 |
-| `sts` | 字幕翻译 — 将 SRT 字幕翻译为目标语言 | 预处理 → 翻译 → 输出字幕 |
-| `vtv` | 视频翻译 — 全流程：识别 → 翻译 → 配音 → 合成视频 | 预处理 → 识别 → 说话人分离 → 翻译 → 配音 → 对齐 → 二次识别 → 合成视频 |
+> **Lưu ý**: bản đóng gói cho Windows (`cli.exe`) không cần cài Python, chạy trực tiếp là được.
 
 ---
 
-## 全局选项
+## Cách dùng cơ bản
 
-| 选项 | 说明 | 默认值 |
+```bash
+uv run cli.py --task <loại tác vụ> --name "<đường dẫn tệp>" [tham số khác]
+```
+
+**Bốn loại tác vụ:**
+
+| Tác vụ | Mô tả | Quy trình |
 |------|------|--------|
-| `--task {stt,tts,sts,vtv}` | **必选** — 任务类型 | — |
-| `--name FILE` | **必选** — 输入文件的绝对路径 | — |
-| `--output-dir DIR` | 输出目录 | `<软件目录>/output/<文件名>/` |
-| `--list {providers,languages,models}` | 查询可用渠道/语言/模型列表 | — |
-| `--log-level {DEBUG,INFO,WARNING,ERROR}` | 日志级别 | `WARNING` |
-| `-v, --verbose` | 详细输出（等同 `--log-level INFO`） | 否 |
-| `-q, --quiet` | 静默模式，仅输出错误 | 否 |
-| `--version` | 显示版本号 | — |
-| `-h, --help` | 显示帮助信息 | — |
+| `stt` | Nhận dạng giọng nói — chuyển tiếng nói trong audio/video thành phụ đề SRT | Tiền xử lý → nhận dạng → phân tách người nói → xuất phụ đề |
+| `tts` | Lồng tiếng — chuyển phụ đề SRT hoặc văn bản thành âm thanh | Tiền xử lý → lồng tiếng → đồng bộ hình tiếng → xuất âm thanh |
+| `sts` | Dịch phụ đề — dịch tệp SRT sang ngôn ngữ đích | Tiền xử lý → dịch → xuất phụ đề |
+| `vtv` | Dịch video — trọn quy trình: nhận dạng → dịch → lồng tiếng → dựng video | Tiền xử lý → nhận dạng → phân tách người nói → dịch → lồng tiếng → đồng bộ → nhận dạng lần 2 → dựng video |
 
 ---
 
-## 任务类型总览
+## Tùy chọn chung
 
-### 各任务必选参数
+| Tùy chọn | Mô tả | Mặc định |
+|------|------|--------|
+| `--task {stt,tts,sts,vtv}` | **Bắt buộc** — loại tác vụ | — |
+| `--name FILE` | **Bắt buộc** — đường dẫn tuyệt đối của tệp đầu vào | — |
+| `--output-dir DIR` | Thư mục đầu ra | `<thư mục phần mềm>/output/<tên tệp>/` |
+| `--list {providers,languages,models}` | Tra cứu danh sách kênh / ngôn ngữ / mô hình | — |
+| `--log-level {DEBUG,INFO,WARNING,ERROR}` | Mức nhật ký | `WARNING` |
+| `-v, --verbose` | In chi tiết (tương đương `--log-level INFO`) | không |
+| `-q, --quiet` | Chế độ im lặng, chỉ in lỗi | không |
+| `--version` | Hiện số phiên bản | — |
+| `-h, --help` | Hiện trợ giúp | — |
 
-| 任务 | `--name` | `--voice_role` | `--source_language_code` | `--target_language_code` |
+---
+
+## Tổng quan các loại tác vụ
+
+### Tham số bắt buộc theo từng tác vụ
+
+| Tác vụ | `--name` | `--voice_role` | `--source_language_code` | `--target_language_code` |
 |------|:---:|:---:|:---:|:---:|
 | `stt` | ✅ | — | — | — |
 | `tts` | ✅ | ✅ | — | — |
-| `sts` | ✅ | — | 可选（默认 auto） | ✅ |
-| `vtv` | ✅ | 可选（默认 No） | ✅ | ✅ |
+| `sts` | ✅ | — | tùy chọn (mặc định auto) | ✅ |
+| `vtv` | ✅ | tùy chọn (mặc định No) | ✅ | ✅ |
 
-### 各任务参数范围
+### Tham số áp dụng cho tác vụ nào
 
-| 参数 | stt | tts | sts | vtv |
+| Tham số | stt | tts | sts | vtv |
 |------|:---:|:---:|:---:|:---:|
 | `--recogn_type` | ✅ | — | — | ✅ |
 | `--detect_language` | ✅ | — | — | ✅ |
@@ -118,357 +118,355 @@ uv run cli.py --task <任务类型> --name "<文件路径>" [其他参数]
 
 ---
 
-## STT — 语音转录
+## STT — Nhận dạng giọng nói
 
-将音频或视频中的人声转录为带时间轴的 SRT 字幕文件。
+Chuyển tiếng nói trong audio hoặc video thành tệp phụ đề SRT có dấu thời gian.
 
-### 参数说明
+### Tham số
 
-| 参数 | 类型 | 默认值 | 说明 |
+| Tham số | Kiểu | Mặc định | Mô tả |
 |------|------|--------|------|
-| `--recogn_type` | int | `0` | 语音识别渠道编号（0=faster-whisper, 1=openai-whisper, ...） |
-| `--detect_language` | str | `auto` | 音频发音语言（auto=自动检测, zh-cn, en, ja, ...） |
-| `--model_name` | str | `tiny` | 模型名称（仅 faster-whisper/openai-whisper 有效） |
-| `--cuda` | flag | 否 | 启用 CUDA GPU 加速 |
-| `--remove_noise` | flag | 否 | 启用降噪 |
-| `--enable_diariz` | flag | 否 | 启用说话人识别 |
-| `--nums_diariz` | int | `-1` | 说话人数量（-1=自动检测） |
-| `--rephrase` | int | `0` | 重新断句（0=默认, 1=LLM 断句） |
-| `--fix_punc` | flag | 否 | 恢复标点符号 |
+| `--recogn_type` | int | `0` | Chỉ mục kênh nhận dạng (0=faster-whisper, 1=openai-whisper, ...) |
+| `--detect_language` | str | `auto` | Ngôn ngữ nói trong audio (auto=tự nhận diện, vi, zh-cn, en, ja, ...) |
+| `--model_name` | str | `tiny` | Tên mô hình (chỉ có tác dụng với faster-whisper/openai-whisper) |
+| `--cuda` | cờ | không | Bật tăng tốc GPU bằng CUDA |
+| `--remove_noise` | cờ | không | Bật khử nhiễu |
+| `--enable_diariz` | cờ | không | Bật nhận dạng người nói |
+| `--nums_diariz` | int | `-1` | Số người nói (-1 = tự nhận diện) |
+| `--rephrase` | int | `0` | Tách câu lại (0=mặc định, 1=dùng LLM) |
+| `--fix_punc` | cờ | không | Khôi phục dấu câu |
 
-### 示例
+### Ví dụ
 
-**最简用法 — 使用 faster-whisper 转录中文视频：**
+**Đơn giản nhất — dùng faster-whisper bóc phụ đề:**
 
 ```bash
 uv run cli.py --task stt --name "60.mp4"
 ```
 
-> 默认使用 faster-whisper + tiny 模型，输出 SRT 字幕到 `output/60-mp4/` 目录。
+> Mặc định dùng faster-whisper + mô hình tiny, xuất tệp SRT vào thư mục `output/60-mp4/`.
 
-**指定 large-v3 模型 + GPU 加速：**
+**Dùng mô hình large-v3 + tăng tốc GPU:**
 
 ```bash
 uv run cli.py --task stt --name "60.mp4" --recogn_type 0 --model_name large-v3 --cuda
 ```
 
-**指定源语言为中文 + 降噪：**
+**Chỉ định ngôn ngữ nguồn là tiếng Việt + khử nhiễu:**
 
 ```bash
-uv run cli.py --task stt --name "60.mp4" --detect_language zh-cn --remove_noise --cuda
+uv run cli.py --task stt --name "60.mp4" --detect_language vi --remove_noise --cuda
 ```
 
-**使用 openai-whisper 渠道：**
+**Dùng kênh openai-whisper:**
 
 ```bash
 uv run cli.py --task stt --name "60.mp4" --recogn_type 1 --model_name large-v3 --cuda
 ```
 
-**启用说话人识别（指定 2 人）：**
+**Bật nhận dạng người nói (chỉ định 2 người):**
 
 ```bash
 uv run cli.py --task stt --name "60.mp4" --enable_diariz --nums_diariz 2 --cuda
 ```
 
-**启用 LLM 重新断句 + 恢复标点：**
+**Bật tách câu bằng LLM + khôi phục dấu câu:**
 
 ```bash
 uv run cli.py --task stt --name "60.mp4" --rephrase 1 --fix_punc --cuda
 ```
 
-**自定义输出目录：**
+**Tùy chỉnh thư mục đầu ra:**
 
 ```bash
-uv run cli.py --task stt --name "60.mp4" --output-dir "D:/my_output" --cuda
+uv run cli.py --task stt --name "60.mp4" --output-dir "D:/ket_qua" --cuda
 ```
 
 ---
 
-## TTS — 文字配音
+## TTS — Lồng tiếng từ văn bản
 
-将 SRT 字幕文件或纯文本文件转换为语音音频。
+Chuyển tệp phụ đề SRT hoặc tệp văn bản thuần thành âm thanh.
 
-### 参数说明
+### Tham số
 
-| 参数 | 类型 | 默认值 | 说明 |
+| Tham số | Kiểu | Mặc định | Mô tả |
 |------|------|--------|------|
-| `--tts_type` | int | `0` | 配音渠道编号（0=Edge-TTS, ...） |
-| `--voice_role` | str | **必选** | 音色名称 |
-| `--voice_rate` | str | `+0%` | 语速（如 `+20%` 加速, `-10%` 减速） |
-| `--volume` | str | `+0%` | 音量（如 `+50%` 增大, `-30%` 减小） |
-| `--pitch` | str | `+0Hz` | 音调（如 `+10Hz` 变尖锐, `-5Hz` 变低沉） |
-| `--voice_autorate` | flag | 否 | 自动加速音频以对齐字幕时间轴 |
-| `--align_sub_audio` | flag | 否 | 强制修改字幕时间轴以对齐音频 |
-| `--target_language_code` | str | `None` | 目标语言代码 |
+| `--tts_type` | int | `0` | Chỉ mục kênh lồng tiếng (0=Edge-TTS, ...) |
+| `--voice_role` | str | **bắt buộc** | Tên giọng đọc |
+| `--voice_rate` | str | `+0%` | Tốc độ đọc (`+20%` nhanh hơn, `-10%` chậm lại) |
+| `--volume` | str | `+0%` | Âm lượng (`+50%` to hơn, `-30%` nhỏ đi) |
+| `--pitch` | str | `+0Hz` | Cao độ (`+10Hz` cao hơn, `-5Hz` trầm hơn) |
+| `--voice_autorate` | cờ | không | Tự tăng tốc âm thanh để khớp dấu thời gian phụ đề |
+| `--align_sub_audio` | cờ | không | Ép sửa dấu thời gian phụ đề để khớp âm thanh |
+| `--target_language_code` | str | `None` | Mã ngôn ngữ đích |
 
-### 示例
+### Ví dụ
 
-**最简用法 — 使用 Edge-TTS 为中文字幕配音：**
-
-```bash
-uv run cli.py --task tts --name "zw.srt" --voice_role "zh-CN-YunyangNeural"
-```
-
-> 使用微软免费 Edge-TTS 的云扬（男声）为中文字幕生成配音音频。
-
-**英文配音（从中文翻译后配音）：**
+**Đơn giản nhất — dùng Edge-TTS lồng tiếng Việt cho phụ đề:**
 
 ```bash
-uv run cli.py --task tts --name "zw.srt" --voice_role "en-US-GuyNeural" --target_language_code en
+uv run cli.py --task tts --name "phude.srt" --voice_role "vi-VN-NamMinhNeural"
 ```
 
-**调整语速和音量：**
+> Dùng giọng nam NamMinh miễn phí của Microsoft Edge-TTS để tạo âm thanh cho phụ đề tiếng Việt.
+
+**Lồng tiếng Anh:**
 
 ```bash
-uv run cli.py --task tts --name "zw.srt" --voice_role "zh-CN-YunyangNeural" --voice_rate=+20% --volume=+10%
+uv run cli.py --task tts --name "phude.srt" --voice_role "en-US-GuyNeural" --target_language_code en
 ```
 
-**调整音调（变低沉）：**
+**Chỉnh tốc độ đọc và âm lượng:**
 
 ```bash
-uv run cli.py --task tts --name "zw.srt" --voice_role "zh-CN-YunyangNeural" --pitch=-5Hz
+uv run cli.py --task tts --name "phude.srt" --voice_role "vi-VN-HoaiMyNeural" --voice_rate=+20% --volume=+10%
 ```
 
-**启用自动加速对齐：**
+**Chỉnh cao độ (trầm hơn):**
 
 ```bash
-uv run cli.py --task tts --name "zw.srt" --voice_role "zh-CN-YunyangNeural" --voice_autorate
+uv run cli.py --task tts --name "phude.srt" --voice_role "vi-VN-NamMinhNeural" --pitch=-5Hz
 ```
 
-**使用其他 TTS 渠道（如 OpenAI TTS，渠道编号需通过 `--list providers` 查看）：**
+**Bật tự tăng tốc để khớp phụ đề:**
 
 ```bash
-uv run cli.py --task tts --name "zw.srt" --tts_type <渠道编号> --voice_role "alloy"
+uv run cli.py --task tts --name "phude.srt" --voice_role "vi-VN-NamMinhNeural" --voice_autorate
 ```
 
-### 常用 Edge-TTS 音色
+**Dùng kênh TTS khác (ví dụ OpenAI TTS, xem chỉ mục kênh bằng `--list providers`):**
 
-| 音色名称 | 性别 | 语言 | 说明 |
+```bash
+uv run cli.py --task tts --name "phude.srt" --tts_type <chỉ mục kênh> --voice_role "alloy"
+```
+
+### Một số giọng Edge-TTS hay dùng
+
+| Tên giọng | Giới tính | Ngôn ngữ | Ghi chú |
 |----------|------|------|------|
-| `zh-CN-YunyangNeural` | 男 | 中文 | 云扬 — 新闻播报风格 |
-| `zh-CN-XiaoxiaoNeural` | 女 | 中文 | 晓晓 — 自然对话 |
-| `zh-CN-YunxiNeural` | 男 | 中文 | 云希 — 年轻活泼 |
-| `en-US-GuyNeural` | 男 | 英文 | Guy — 自然男声 |
-| `en-US-JennyNeural` | 女 | 英文 | Jenny — 自然女声 |
-| `en-US-AriaNeural` | 女 | 英文 | Aria — 专业女声 |
-| `en-US-EmmaNeural` | 女 | 英文 | Emma — 温暖女声 |
-| `en-US-BrianNeural` | 男 | 英文 | Brian — 沉稳男声 |
+| `vi-VN-NamMinhNeural` | Nam | Tiếng Việt | Nam Minh — giọng nam tự nhiên |
+| `vi-VN-HoaiMyNeural` | Nữ | Tiếng Việt | Hoài My — giọng nữ tự nhiên |
+| `zh-CN-YunyangNeural` | Nam | Tiếng Trung | Vân Dương — phong cách đọc bản tin |
+| `zh-CN-XiaoxiaoNeural` | Nữ | Tiếng Trung | Hiểu Hiểu — hội thoại tự nhiên |
+| `en-US-GuyNeural` | Nam | Tiếng Anh | Guy — giọng nam tự nhiên |
+| `en-US-JennyNeural` | Nữ | Tiếng Anh | Jenny — giọng nữ tự nhiên |
+| `en-US-AriaNeural` | Nữ | Tiếng Anh | Aria — giọng nữ chuyên nghiệp |
+| `en-US-BrianNeural` | Nam | Tiếng Anh | Brian — giọng nam điềm đạm |
 
-> 完整音色列表请运行 `uv run cli.py --list providers` 或在软件 GUI 的 TTS 设置中查看。
+> Xem danh sách giọng đầy đủ bằng `uv run cli.py --list providers`, hoặc trong phần cài đặt TTS của giao diện đồ họa.
 
 ---
 
-## STS — 字幕翻译
+## STS — Dịch phụ đề
 
-将 SRT 字幕文件从一种语言翻译为另一种语言。
+Dịch tệp phụ đề SRT từ ngôn ngữ này sang ngôn ngữ khác.
 
-### 参数说明
+### Tham số
 
-| 参数 | 类型 | 默认值 | 说明 |
+| Tham số | Kiểu | Mặc định | Mô tả |
 |------|------|--------|------|
-| `--translate_type` | int | `0` | 翻译渠道编号（0=Google, ...） |
-| `--source_language_code` | str | `auto` | 源语言代码（auto=自动检测） |
-| `--target_language_code` | str | **必选** | 目标语言代码 |
+| `--translate_type` | int | `0` | Chỉ mục kênh dịch (0=Google, ...) |
+| `--source_language_code` | str | `auto` | Mã ngôn ngữ nguồn (auto=tự nhận diện) |
+| `--target_language_code` | str | **bắt buộc** | Mã ngôn ngữ đích |
 
-### 示例
+### Ví dụ
 
-**最简用法 — 将中文字幕翻译为英文：**
+**Đơn giản nhất — dịch phụ đề sang tiếng Việt:**
 
 ```bash
-uv run cli.py --task sts --name "zw.srt" --target_language_code en
+uv run cli.py --task sts --name "subs.srt" --target_language_code vi
 ```
 
-> 默认使用 Google 翻译，源语言自动检测。
+> Mặc định dùng Google Dịch, ngôn ngữ nguồn tự nhận diện.
 
-**指定源语言为中文：**
+**Chỉ định ngôn ngữ nguồn là tiếng Trung:**
 
 ```bash
-uv run cli.py --task sts --name "zw.srt" --source_language_code zh-cn --target_language_code en
+uv run cli.py --task sts --name "subs.srt" --source_language_code zh-cn --target_language_code vi
 ```
 
-**使用其他翻译渠道（如 DeepSeek，渠道编号需通过 `--list providers` 查看）：**
+**Dùng kênh dịch khác (ví dụ DeepSeek, xem chỉ mục kênh bằng `--list providers`):**
 
 ```bash
-uv run cli.py --task sts --name "zw.srt" --translate_type <渠道编号> --target_language_code en
+uv run cli.py --task sts --name "subs.srt" --translate_type <chỉ mục kênh> --target_language_code vi
 ```
 
-**翻译为日文：**
+**Dịch sang tiếng Anh:**
 
 ```bash
-uv run cli.py --task sts --name "zw.srt" --target_language_code ja
+uv run cli.py --task sts --name "subs.srt" --target_language_code en
 ```
 
-**翻译为韩文：**
+**Dịch sang tiếng Nhật:**
 
 ```bash
-uv run cli.py --task sts --name "zw.srt" --target_language_code ko
+uv run cli.py --task sts --name "subs.srt" --target_language_code ja
 ```
 
 ---
 
-## VTV — 视频翻译
+## VTV — Dịch video
 
-全流程视频翻译：语音识别 → 字幕翻译 → 配音 → 音画合成。这是最常用也是最复杂的任务类型。
+Dịch video trọn quy trình: nhận dạng giọng nói → dịch phụ đề → lồng tiếng → dựng lại video. Đây là loại tác vụ hay dùng nhất và cũng phức tạp nhất.
 
-### 参数说明
+### Tham số
 
-VTV 模式包含 STT + TTS + STS 的所有参数，加上以下额外参数：
+Chế độ VTV nhận toàn bộ tham số của STT, TTS và STS, cộng thêm:
 
-| 参数 | 类型 | 默认值 | 说明 |
+| Tham số | Kiểu | Mặc định | Mô tả |
 |------|------|--------|------|
-| `--source_language_code` | str | **必选** | 源语言代码（不可为 auto） |
-| `--target_language_code` | str | **必选** | 目标语言代码 |
-| `--voice_role` | str | `No` | 配音角色（`No`=不配音） |
-| `--video_autorate` | flag | 否 | 自动慢速视频以对齐配音 |
-| `--is_separate` | flag | 否 | 分离人声背景声 |
-| `--recogn2pass` | flag | 否 | 二次语音识别（生成更精准字幕） |
-| `--subtitle_type` | int | `1` | 字幕类型（0=无, 1=硬字幕, 2=软字幕, 3=硬字幕双语, 4=软字幕双语） |
-| `--clear_cache` | flag | 是 | 完成后清理缓存 |
-| `--no-clear-cache` | flag | — | 不清理缓存 |
+| `--source_language_code` | str | **bắt buộc** | Mã ngôn ngữ nguồn (không được để auto) |
+| `--target_language_code` | str | **bắt buộc** | Mã ngôn ngữ đích |
+| `--voice_role` | str | `No` | Giọng lồng tiếng (`No` = không lồng tiếng) |
+| `--video_autorate` | cờ | không | Tự làm chậm video để khớp lồng tiếng |
+| `--is_separate` | cờ | không | Tách giọng nói khỏi nhạc nền |
+| `--recogn2pass` | cờ | không | Nhận dạng lần 2 (cho phụ đề chuẩn hơn) |
+| `--subtitle_type` | int | `1` | Kiểu phụ đề (0=không, 1=cứng, 2=mềm, 3=cứng song ngữ, 4=mềm song ngữ) |
+| `--clear_cache` | cờ | có | Dọn bộ nhớ đệm sau khi xong |
+| `--no-clear-cache` | cờ | — | Không dọn bộ nhớ đệm |
 
-### 示例
+### Ví dụ
 
-**最简用法 — 中文视频翻译为英文（不配音，仅替换字幕）：**
+**Đơn giản nhất — dịch video tiếng Trung sang tiếng Việt (không lồng tiếng, chỉ thay phụ đề):**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi
 ```
 
-> 默认使用 faster-whisper 识别 + Google 翻译 + 不配音（voice_role=No），嵌入硬字幕。
+> Mặc định dùng faster-whisper để nhận dạng + Google Dịch + không lồng tiếng (voice_role=No), nhúng phụ đề cứng.
 
-**完整流程 — 中文视频翻译为英文并配音：**
+**Trọn quy trình — dịch sang tiếng Việt và lồng tiếng:**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural"
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural"
 ```
 
-> 使用 Edge-TTS 的 Guy 男声为翻译后的英文字幕配音。
+> Dùng giọng nam Nam Minh của Edge-TTS để lồng tiếng cho phụ đề tiếng Việt đã dịch.
 
-**GPU 加速 + 高精度模型：**
+**Tăng tốc GPU + mô hình độ chính xác cao:**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --cuda --recogn_type 0 --model_name large-v3
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --cuda --recogn_type 0 --model_name large-v3
 ```
 
-**分离人声背景声（提高识别和配音质量）：**
+**Tách giọng nói khỏi nhạc nền (tăng chất lượng nhận dạng và lồng tiếng):**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --is_separate --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --is_separate --cuda
 ```
 
-**双语硬字幕 + 二次识别：**
+**Phụ đề cứng song ngữ + nhận dạng lần 2:**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --subtitle_type 3 --recogn2pass --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --subtitle_type 3 --recogn2pass --cuda
 ```
 
-**软字幕（播放器可开关）+ 音频自动加速：**
+**Phụ đề mềm (bật/tắt được trong trình phát) + tự tăng tốc âm thanh:**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --subtitle_type 2 --voice_autorate --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --subtitle_type 2 --voice_autorate --cuda
 ```
 
-**视频慢速对齐（配音比视频长时放慢视频）：**
+**Làm chậm video để khớp (khi lồng tiếng dài hơn video):**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --video_autorate --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --video_autorate --cuda
 ```
 
-**自定义输出目录 + 保留缓存：**
+**Tùy chỉnh thư mục đầu ra + giữ lại bộ nhớ đệm:**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --output-dir "D:/translated" --no-clear-cache
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --output-dir "D:/da_dich" --no-clear-cache
 ```
 
-**翻译为日文并配音：**
+**Dịch video tiếng Anh sang tiếng Việt:**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code ja --voice_role "ja-JP-KeitaNeural" --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code en --target_language_code vi --voice_role "vi-VN-HoaiMyNeural" --cuda
 ```
 
-**翻译为韩文并配音：**
+**Dịch sang tiếng Nhật và lồng tiếng:**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code ko --voice_role "ko-KR-InJoonNeural" --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code vi --target_language_code ja --voice_role "ja-JP-KeitaNeural" --cuda
 ```
 
-**静默模式运行（仅输出错误）：**
+**Chạy chế độ im lặng (chỉ in lỗi):**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" -q
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" -q
 ```
 
-**详细日志模式（调试用）：**
+**Chế độ nhật ký chi tiết (để gỡ lỗi):**
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" -v
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" -v
 ```
 
 ---
 
-## 查询工具
+## Công cụ tra cứu
 
-### 列出所有可用渠道
+### Liệt kê mọi kênh khả dụng
 
 ```bash
 uv run cli.py --list providers
 ```
 
-输出示例：
+Ví dụ kết quả:
 
 ```
-=== Available Providers ===
+=== Kênh khả dụng ===
 
---- Speech Recognition (STT) ---
-  0 = faster-whisper(本地)
-  1 = openai-whisper(本地)
-  2 = 字节语音识别大模型极速版
+--- Nhận dạng giọng nói (STT) ---
+   0 = faster-whisper(Cục bộ Tích hợp sẵn)
+   1 = openai-whisper(Cục bộ Tích hợp sẵn)
+   2 = Qwen-ASR(Cục bộ Tích hợp sẵn)
   ...
 
---- Translation ---
-  0 = Google翻译
-  1 = 微软翻译
-  2 = 百度翻译
+--- Dịch thuật ---
+   0 = Google (miễn phí)
+   1 = Microsoft (miễn phí)
+   2 = Dịch Baidu
   ...
 
---- Text-to-Speech (TTS) ---
-  0 = Edge-TTS
-  1 = Azure TTS
-  2 = OpenAI TTS
+--- Lồng tiếng (TTS) ---
+   0 = Edge-TTS (miễn phí)
+   1 = Qwen3-TTS(Cục bộ Tích hợp sẵn)
   ...
 ```
 
-### 列出所有支持的语言
+### Liệt kê mọi ngôn ngữ hỗ trợ
 
 ```bash
 uv run cli.py --list languages
 ```
 
-输出示例：
+Ví dụ kết quả:
 
 ```
-=== Available Language Codes ===
-  en         English
-  zh-cn      简体中文
-  zh-tw      繁體中文
-  ja         日本語
-  ko         한국어
-  fr         Français
-  de         Deutsch
-  es         Español
+=== Mã ngôn ngữ khả dụng ===
+  vi         Tiếng Việt
+  en         Tiếng Anh
+  zh-cn      Tiếng Trung giản thể
+  zh-tw      Tiếng Trung phồn thể
+  ja         Tiếng Nhật
+  ko         Tiếng Hàn
+  fr         Tiếng Pháp
   ...
 ```
 
-### 列出 faster-whisper 可用模型
+### Liệt kê các mô hình faster-whisper
 
 ```bash
 uv run cli.py --list models
 ```
 
-输出示例：
+Ví dụ kết quả:
 
 ```
-=== faster-whisper Models ===
+=== Mô hình faster-whisper ===
   tiny                      Systran/faster-whisper-tiny
   base                      Systran/faster-whisper-base
   small                     Systran/faster-whisper-small
@@ -480,209 +478,211 @@ uv run cli.py --list models
 
 ---
 
-## 完整示例
+## Ví dụ đầy đủ
 
-以下示例均假设：
-- 中文原始视频文件为 `60.mp4`
-- 中文字幕文件为 `zw.srt`
-- 翻译目标语言为英文
-- 配音使用 Edge-TTS 的 `en-US-GuyNeural` 音色
-- 其他非必须参数保持默认
+Các ví dụ dưới đây đều giả định:
+- Tệp video gốc tiếng Trung là `60.mp4`
+- Tệp phụ đề là `subs.srt`
+- Ngôn ngữ đích là tiếng Việt
+- Lồng tiếng bằng giọng `vi-VN-NamMinhNeural` của Edge-TTS
+- Các tham số không bắt buộc khác giữ mặc định
 
-### 场景 1：仅语音转录（中文字幕生成）
+### Tình huống 1: Chỉ bóc phụ đề
 
 ```bash
 uv run cli.py --task stt --name "60.mp4" --detect_language zh-cn --cuda
 ```
 
-**说明**：将 `60.mp4` 中的中文语音转录为 `zh-cn.srt` 字幕文件，输出到 `output/60-mp4/`。
+**Giải thích**: chuyển tiếng nói trong `60.mp4` thành tệp phụ đề `zh-cn.srt`, xuất ra `output/60-mp4/`.
 
-### 场景 2：仅字幕翻译（中文字幕 → 英文字幕）
-
-```bash
-uv run cli.py --task sts --name "zw.srt" --source_language_code zh-cn --target_language_code en
-```
-
-**说明**：将 `zw.srt` 翻译为 `en.srt`，输出到 `output/zw-srt/`。
-
-### 场景 3：仅文字配音（为中文字幕生成英文配音）
+### Tình huống 2: Chỉ dịch phụ đề (tiếng Trung → tiếng Việt)
 
 ```bash
-uv run cli.py --task tts --name "zw.srt" --voice_role "en-US-GuyNeural" --target_language_code en
+uv run cli.py --task sts --name "subs.srt" --source_language_code zh-cn --target_language_code vi
 ```
 
-**说明**：为 `zw.srt` 中的文本生成英文配音 WAV 文件，输出到 `output/zw-srt/`。
+**Giải thích**: dịch `subs.srt` thành `vi.srt`, xuất ra `output/subs-srt/`.
 
-### 场景 4：完整视频翻译（中文 → 英文，带配音）
+### Tình huống 3: Chỉ lồng tiếng (tạo giọng tiếng Việt cho phụ đề)
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --cuda
+uv run cli.py --task tts --name "subs.srt" --voice_role "vi-VN-NamMinhNeural" --target_language_code vi
 ```
 
-**说明**：全流程处理：
-1. 识别 `60.mp4` 中的中文语音 → 生成中文字幕
-2. 将中文字幕翻译为英文字幕
-3. 使用 Edge-TTS Guy 男声生成英文配音
-4. 将英文字幕和配音合成到视频中
+**Giải thích**: tạo tệp WAV lồng tiếng Việt cho nội dung trong `subs.srt`, xuất ra `output/subs-srt/`.
 
-输出：`output/60-mp4/60.mp4`（翻译后的视频）
-
-### 场景 5：高质量视频翻译（分离人声 + GPU 加速 + 二次识别）
+### Tình huống 4: Dịch video trọn gói (tiếng Trung → tiếng Việt, có lồng tiếng)
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --cuda --is_separate --recogn2pass --model_name large-v3
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --cuda
 ```
 
-**说明**：
-- `--is_separate`：分离人声和背景声，提高识别和配音质量
-- `--recogn2pass`：配音完成后再次识别，生成更精准的字幕时间轴
-- `--model_name large-v3`：使用最高精度的识别模型
-- `--cuda`：GPU 加速
+**Giải thích**: xử lý trọn quy trình:
+1. Nhận dạng tiếng Trung trong `60.mp4` → tạo phụ đề tiếng Trung
+2. Dịch phụ đề tiếng Trung sang tiếng Việt
+3. Dùng giọng Nam Minh của Edge-TTS tạo lồng tiếng Việt
+4. Ghép phụ đề tiếng Việt và lồng tiếng vào video
 
-### 场景 6：双语字幕视频
+Kết quả: `output/60-mp4/60.mp4` (video đã dịch)
+
+### Tình huống 5: Dịch video chất lượng cao (tách giọng + GPU + nhận dạng lần 2)
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --subtitle_type 3 --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --cuda --is_separate --recogn2pass --model_name large-v3
 ```
 
-**说明**：`--subtitle_type 3` 生成硬字幕双语（中英同时显示）。
+**Giải thích**:
+- `--is_separate`: tách giọng nói khỏi nhạc nền, tăng chất lượng nhận dạng và lồng tiếng
+- `--recogn2pass`: nhận dạng lại sau khi lồng tiếng xong, cho dấu thời gian phụ đề chuẩn hơn
+- `--model_name large-v3`: dùng mô hình nhận dạng chính xác nhất
+- `--cuda`: tăng tốc GPU
 
-### 场景 7：视频翻译到日文
+### Tình huống 6: Video phụ đề song ngữ
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code ja --voice_role "ja-JP-KeitaNeural" --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --subtitle_type 3 --cuda
 ```
 
-### 场景 8：批量处理多个文件（Shell 循环）
+**Giải thích**: `--subtitle_type 3` tạo phụ đề cứng song ngữ (hiện đồng thời cả hai ngôn ngữ).
+
+### Tình huống 7: Dịch video tiếng Anh sang tiếng Việt
+
+```bash
+uv run cli.py --task vtv --name "60.mp4" --source_language_code en --target_language_code vi --voice_role "vi-VN-HoaiMyNeural" --cuda
+```
+
+### Tình huống 8: Xử lý hàng loạt nhiều tệp (vòng lặp shell)
 
 ```bash
 # Bash / Git Bash
 for f in *.mp4; do
-  uv run cli.py --task vtv --name "$f" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --cuda
+  uv run cli.py --task vtv --name "$f" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --cuda
 done
 ```
 
 ```powershell
 # PowerShell
 Get-ChildItem *.mp4 | ForEach-Object {
-  uv run cli.py --task vtv --name $_.FullName --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --cuda
+  uv run cli.py --task vtv --name $_.FullName --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --cuda
 }
 ```
 
 ---
 
-## 常见问题
+## Câu hỏi thường gặp
 
-### Q: 如何查看所有可用的配音渠道和音色？
+### Hỏi: Xem danh sách kênh lồng tiếng và giọng đọc ở đâu?
 
 ```bash
 uv run cli.py --list providers
 ```
 
-或者在软件 GUI 中，选择配音渠道后查看音色下拉列表。
+Hoặc mở giao diện đồ họa, chọn kênh lồng tiếng rồi xem ô danh sách giọng đọc.
 
-### Q: 如何查看所有支持的语言代码？
+### Hỏi: Xem danh sách mã ngôn ngữ ở đâu?
 
 ```bash
 uv run cli.py --list languages
 ```
 
-### Q: 路径中包含空格怎么办？
+### Hỏi: Đường dẫn có khoảng trắng thì làm sao?
 
-使用英文双引号包裹路径：
+Bọc đường dẫn trong dấu ngoặc kép:
 
 ```bash
-uv run cli.py --task vtv --name "D:/my videos/60.mp4" --source_language_code zh-cn --target_language_code en
+uv run cli.py --task vtv --name "D:/video cua toi/60.mp4" --source_language_code zh-cn --target_language_code vi
 ```
 
-### Q: 如何启用 GPU 加速？
+### Hỏi: Bật tăng tốc GPU thế nào?
 
-添加 `--cuda` 参数：
+Thêm tham số `--cuda`:
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --cuda
 ```
 
-> 前提：已安装 NVIDIA 显卡驱动、CUDA 12.8+、cuDNN 9.11+。
+> Điều kiện: đã cài driver card NVIDIA, CUDA 12.8+ và cuDNN 9.11+.
 
-### Q: 如何使用本地大模型翻译？
+### Hỏi: Dùng mô hình ngôn ngữ lớn chạy trên máy để dịch thế nào?
 
-需要先在本地部署兼容 OpenAI 接口的大模型（如 Ollama），然后：
+Trước hết cần triển khai một mô hình tương thích giao diện OpenAI trên máy (ví dụ Ollama), sau đó:
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --translate_type <兼容AI渠道编号> --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --translate_type <chỉ mục kênh AI tương thích> --cuda
 ```
 
-> 翻译渠道的 API 地址需要在软件 GUI 的翻译设置中预先配置。
+> Địa chỉ API của kênh dịch phải được cấu hình trước trong phần cài đặt dịch của giao diện đồ họa.
 
-### Q: 处理速度太慢怎么办？
+### Hỏi: Xử lý quá chậm thì làm sao?
 
-1. **启用 GPU 加速**：添加 `--cuda`
-2. **使用小模型**：`--model_name tiny`（速度快但精度低）
-3. **跳过人声分离**：不加 `--is_separate`
-4. **跳过二次识别**：不加 `--recogn2pass`
+1. **Bật tăng tốc GPU**: thêm `--cuda`
+2. **Dùng mô hình nhỏ**: `--model_name tiny` (nhanh nhưng độ chính xác thấp)
+3. **Bỏ qua tách giọng**: không thêm `--is_separate`
+4. **Bỏ qua nhận dạng lần 2**: không thêm `--recogn2pass`
 
-### Q: 翻译后的字幕和声音不同步怎么办？
+### Hỏi: Phụ đề và tiếng bị lệch nhau thì làm sao?
 
-添加 `--voice_autorate`（自动加速音频）或 `--video_autorate`（自动慢速视频）：
+Thêm `--voice_autorate` (tự tăng tốc âm thanh) hoặc `--video_autorate` (tự làm chậm video):
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --voice_autorate --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --voice_autorate --cuda
 ```
 
-### Q: 如何只翻译不配音？
+### Hỏi: Chỉ dịch mà không lồng tiếng thì làm sao?
 
-不指定 `--voice_role` 或指定为 `No`：
+Không truyền `--voice_role`, hoặc đặt là `No`:
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi
 ```
 
-### Q: 如何查看详细的处理日志？
+### Hỏi: Xem nhật ký xử lý chi tiết thế nào?
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" -v
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" -v
 ```
 
-或者指定日志级别：
+Hoặc chỉ định mức nhật ký:
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --log-level DEBUG
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --log-level DEBUG
 ```
 
-### Q: 如何使用软字幕（播放器可开关）？
+### Hỏi: Dùng phụ đề mềm (bật/tắt được trong trình phát) thế nào?
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --subtitle_type 2 --cuda
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --subtitle_type 2 --cuda
 ```
 
-> `--subtitle_type 2` = 软字幕，`--subtitle_type 1` = 硬字幕（默认）。
+> `--subtitle_type 2` = phụ đề mềm, `--subtitle_type 1` = phụ đề cứng (mặc định).
 
-### Q: 如何保留处理缓存以便调试？
+### Hỏi: Giữ lại bộ nhớ đệm để gỡ lỗi thế nào?
 
 ```bash
-uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code en --voice_role "en-US-GuyNeural" --no-clear-cache
+uv run cli.py --task vtv --name "60.mp4" --source_language_code zh-cn --target_language_code vi --voice_role "vi-VN-NamMinhNeural" --no-clear-cache
 ```
 
 ---
 
-## 退出码
+## Mã thoát
 
-| 退出码 | 含义 |
+| Mã thoát | Ý nghĩa |
 |--------|------|
-| `0` | 任务成功完成 |
-| `1` | 任务执行出错 |
-| `130` | 用户中断（Ctrl+C） |
-| `2` | 参数错误（argparse 自动退出） |
+| `0` | Tác vụ hoàn tất thành công |
+| `1` | Có lỗi khi thực thi |
+| `130` | Người dùng ngắt giữa chừng (Ctrl+C) |
+| `2` | Sai tham số (argparse tự thoát) |
 
 ---
 
-## 相关文档
+## Tài liệu liên quan
 
-- [使用入门](https://pyvideotrans.com/getstart)
-- [CLI 命令行模式文档](https://pyvideotrans.com/cli)
-- [语音识别渠道说明](https://pyvideotrans.com/yuyinshibiequdao)
-- [翻译渠道说明](https://pyvideotrans.com/fanyiqudao)
-- [配音渠道说明](https://pyvideotrans.com/peiyinqudao)
-- [常见问题 FAQ](https://pyvideotrans.com/faq)
-- [技术架构](https://pyvideotrans.com/yuanli)
+Các liên kết dưới đây trỏ tới tài liệu của dự án gốc pyVideoTrans:
+
+- [Hướng dẫn nhập môn](https://pyvideotrans.com/getstart)
+- [Tài liệu chế độ dòng lệnh](https://pyvideotrans.com/cli)
+- [Giới thiệu các kênh nhận dạng giọng nói](https://pyvideotrans.com/yuyinshibiequdao)
+- [Giới thiệu các kênh dịch](https://pyvideotrans.com/fanyiqudao)
+- [Giới thiệu các kênh lồng tiếng](https://pyvideotrans.com/peiyinqudao)
+- [Câu hỏi thường gặp](https://pyvideotrans.com/faq)
+- [Kiến trúc kỹ thuật](https://pyvideotrans.com/yuanli)
