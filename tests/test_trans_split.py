@@ -1,5 +1,5 @@
 import pytest
-from videotrans.task.trans_create import TransCreate
+from phiendichvideo.task.trans_create import TransCreate
 
 
 EXPECTED_METHODS = [
@@ -54,16 +54,16 @@ def test_all_methods_exist():
 
 
 def test_class_hierarchy():
-    from videotrans.task._base import BaseTask
-    from videotrans.task._stage_prepare import PrepareMixin
-    from videotrans.task._stage_recogn import RecognMixin
-    from videotrans.task._stage_diariz import DiarizMixin
-    from videotrans.task._stage_translate import TranslateMixin
-    from videotrans.task._stage_dubbing import DubbingMixin
-    from videotrans.task._stage_align import AlignMixin
-    from videotrans.task._stage_audio import AudioMixin
-    from videotrans.task._stage_subtitle import SubtitleMixin
-    from videotrans.task._stage_assemble import AssembleMixin
+    from phiendichvideo.task._base import BaseTask
+    from phiendichvideo.task._stage_prepare import PrepareMixin
+    from phiendichvideo.task._stage_recogn import RecognMixin
+    from phiendichvideo.task._stage_diariz import DiarizMixin
+    from phiendichvideo.task._stage_translate import TranslateMixin
+    from phiendichvideo.task._stage_dubbing import DubbingMixin
+    from phiendichvideo.task._stage_align import AlignMixin
+    from phiendichvideo.task._stage_audio import AudioMixin
+    from phiendichvideo.task._stage_subtitle import SubtitleMixin
+    from phiendichvideo.task._stage_assemble import AssembleMixin
 
     assert issubclass(TransCreate, BaseTask)
     assert issubclass(TransCreate, PrepareMixin)

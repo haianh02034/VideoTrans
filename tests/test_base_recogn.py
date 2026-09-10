@@ -1,6 +1,6 @@
-from videotrans.recognition._base import BaseRecogn
-from videotrans.task.taskcfg import SrtItem
-from videotrans.configure.config import settings
+from phiendichvideo.recognition._base import BaseRecogn
+from phiendichvideo.task.taskcfg import SrtItem
+from phiendichvideo.configure.config import settings
 
 
 def _make_srt(text, start, end, line=1):

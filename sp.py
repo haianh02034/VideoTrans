@@ -1,5 +1,5 @@
 """
-pyVideoTrans: Translate the video from one language to another and add dubbing
+Phiên Dịch Video: Dich video tu ngon ngu nay sang ngon ngu khac va long tieng
 
 Home-page: https://github.com/jianchang512/pyvideotrans
 Author: jianchang512@gmail.com
@@ -32,7 +32,7 @@ import tempfile
 from pathlib import Path
 from PySide6.QtCore import QSize, QSettings
 import traceback
-from videotrans import VERSION
+from phiendichvideo import VERSION
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -67,14 +67,14 @@ class StartWindow(QWidget):
         self.LoadNotif = None
         self.start_time = time.time()
         self.loader = None
-        self.setWindowTitle('pyVideoTrans')
+        self.setWindowTitle('Phiên Dịch Video')
 
         self.resize(560, 350)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # Nền trong suốt
 
         self.background_label = QLabel(self)
-        self.pixmap = QPixmap("./videotrans/styles/logo.png")
+        self.pixmap = QPixmap("./phiendichvideo/styles/logo.png")
         self.background_label.setPixmap(self.pixmap)
         self.background_label.setScaledContents(True)
         self.background_label.setGeometry(self.rect())
@@ -82,7 +82,7 @@ class StartWindow(QWidget):
         # Văn bản chồng lên nền
         v_layout = QVBoxLayout(self)
         v_layout.addStretch(1)
-        self.status_label = QLabel(f"pyVideoTrans {VERSION} Đang tải...")
+        self.status_label = QLabel(f"Phiên Dịch Video {VERSION} Đang tải...")
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.status_label.setStyleSheet("font-size:16px; color:white; background-color:transparent;")
 
@@ -141,16 +141,16 @@ def initialize_full_app(start_window, app_instance):
     start_window.update_lable('Đang tải tài nguyên...')
     QApplication.processEvents()
     # Nhập tài nguyên qss image
-    import videotrans.ui.dark.darkstyle_rc
-    with open('./videotrans/styles/style.qss', 'r', encoding='utf-8') as f:
+    import phiendichvideo.ui.dark.darkstyle_rc
+    with open('./phiendichvideo/styles/style.qss', 'r', encoding='utf-8') as f:
         app_instance.setStyleSheet(f.read())
     start_window.update_lable('Đang tải cửa sổ chính...')
     QApplication.processEvents()
 
-    from videotrans.mainwin.main_win import MainWindow
+    from phiendichvideo.mainwin.main_win import MainWindow
     try:
         screen = QGuiApplication.primaryScreen().geometry()
-        sets = QSettings("pyvideotrans", "settings")
+        sets = QSettings("phiendichvideo", "settings")
         w, h = int(screen.width() * 0.85), int(screen.height() * 0.85)
         size = sets.value("windowSize", QSize(w, h))
         w, h = size.width(), size.height()
@@ -202,7 +202,7 @@ if __name__ == "__main__":
         app.quit()
     else:
         splash = StartWindow()
-        splash.setWindowIcon(QIcon("./videotrans/styles/icon.ico"))
+        splash.setWindowIcon(QIcon("./phiendichvideo/styles/icon.ico"))
         splash.center()
         splash.show()
 

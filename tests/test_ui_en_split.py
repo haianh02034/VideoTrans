@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QMainWindow, QApplication
 
 app = QApplication.instance() or QApplication([])
 
-from videotrans.ui.en import Ui_MainWindow
+from phiendichvideo.ui.en import Ui_MainWindow
 
 
 class _TestWindow(QMainWindow, Ui_MainWindow):
@@ -14,12 +14,12 @@ class _TestWindow(QMainWindow, Ui_MainWindow):
 
 
 def test_import():
-    from videotrans.ui.en import Ui_MainWindow
+    from phiendichvideo.ui.en import Ui_MainWindow
     assert Ui_MainWindow is not None
 
 
 def test_has_setup_methods():
-    from videotrans.ui.en import Ui_MainWindow
+    from phiendichvideo.ui.en import Ui_MainWindow
     ui = Ui_MainWindow()
     assert callable(getattr(ui, 'setupUi', None))
     assert callable(getattr(ui, '_set_Ui_Text', None))
@@ -114,7 +114,7 @@ def test_checkable_actions():
 
 
 def test_setup_rows_module():
-    from videotrans.ui._setup_rows import (
+    from phiendichvideo.ui._setup_rows import (
         _create_file_row, _create_asr_row, _create_translation_row,
         _create_tts_row, _create_alignment_row,
     )
@@ -126,7 +126,7 @@ def test_setup_rows_module():
 
 
 def test_setup_menus_module():
-    from videotrans.ui._setup_menus import (
+    from phiendichvideo.ui._setup_menus import (
         _setup_actions_and_menus, _make_action, _fill_menu,
     )
     assert callable(_setup_actions_and_menus)

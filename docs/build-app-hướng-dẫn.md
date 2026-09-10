@@ -40,10 +40,10 @@ Sử dụng PyInstaller để đóng gói `sp.py`:
 pyinstaller --onefile --windowed --name "pyVideoTrans" sp.py
 
 # Với icon
-pyinstaller --onefile --windowed --name "pyVideoTrans" --icon "./videotrans/styles/icon.ico" sp.py
+pyinstaller --onefile --windowed --name "pyVideoTrans" --icon "./phiendichvideo/styles/icon.ico" sp.py
 
 # Thêm dữ liệu kèm theo
-pyinstaller --onefile --windowed --name "pyVideoTrans" --icon "./videotrans/styles/icon.ico" --add-data "videotrans:videotrans" sp.py
+pyinstaller --onefile --windowed --name "pyVideoTrans" --icon "./phiendichvideo/styles/icon.ico" --add-data "phiendichvideo:phiendichvideo" sp.py
 ```
 
 ### b. Build WebUI App
@@ -77,26 +77,26 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('videotrans/styles/*', 'videotrans/styles'),
-        ('videotrans/language/*', 'videotrans/language'),
-        ('videotrans/prompts/**/*', 'videotrans/prompts'),
-        ('videotrans/voicejson/*', 'videotrans/voicejson'),
+        ('phiendichvideo/styles/*', 'phiendichvideo/styles'),
+        ('phiendichvideo/language/*', 'phiendichvideo/language'),
+        ('phiendichvideo/prompts/**/*', 'phiendichvideo/prompts'),
+        ('phiendichvideo/voicejson/*', 'phiendichvideo/voicejson'),
     ],
     hiddenimports=[
         'PySide6.QtCore',
         'PySide6.QtGui',
         'PySide6.QtWidgets',
-        'videotrans.ui.dark.darkstyle_rc',
-        'videotrans.recognition',
-        'videotrans.translator',
-        'videotrans.tts',
-        'videotrans.process',
-        'videotrans.task',
-        'videotrans.util',
-        'videotrans.mainwin',
-        'videotrans.component',
-        'videotrans.configure',
-        'videotrans.winform',
+        'phiendichvideo.ui.dark.darkstyle_rc',
+        'phiendichvideo.recognition',
+        'phiendichvideo.translator',
+        'phiendichvideo.tts',
+        'phiendichvideo.process',
+        'phiendichvideo.task',
+        'phiendichvideo.util',
+        'phiendichvideo.mainwin',
+        'phiendichvideo.component',
+        'phiendichvideo.configure',
+        'phiendichvideo.winform',
     ],
     hookspath=[],
     hooksconfig={},
@@ -130,7 +130,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='./videotrans/styles/icon.ico',
+    icon='./phiendichvideo/styles/icon.ico',
 )
 ```
 

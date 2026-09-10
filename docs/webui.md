@@ -47,13 +47,13 @@ docker run -d -p 7860:7860 --name pyvideotrans pyvideotrans-webui
 # 持久化配置和输出
 docker run -d -p 7860:7860 \
   -v ./data/output:/app/output \
-  -v ./data/config:/app/videotrans \
+  -v ./data/config:/app/phiendichvideo \
   --name pyvideotrans pyvideotrans-webui
 
 # GPU 加速
 docker run -d -p 7860:7860 --gpus all \
   -v ./data/output:/app/output \
-  -v ./data/config:/app/videotrans \
+  -v ./data/config:/app/phiendichvideo \
   --name pyvideotrans pyvideotrans-webui
 ```
 
@@ -89,7 +89,7 @@ WebUI 分为三个标签页：
 
 ### 2.2 ⚙️ 渠道设置
 
-配置各渠道的 API 地址、SK 密钥、模型等。**与桌面版通用**，配置保存在 `videotrans/params.json` 中。
+配置各渠道的 API 地址、SK 密钥、模型等。**与桌面版通用**，配置保存在 `phiendichvideo/params.json` 中。
 
 包含：翻译渠道、语音识别渠道、配音渠道、参考音频设置
 
@@ -136,7 +136,7 @@ WebUI 分为三个标签页：
 `uv sync --extra webui`
 
 **Q: Docker 如何持久化配置**
-`-v ./data/output:/app/output -v ./data/config:/app/videotrans`
+`-v ./data/output:/app/output -v ./data/config:/app/phiendichvideo`
 
 **Q: Docker 如何使用 GPU**
 安装 nvidia-container-toolkit 后：`docker run --gpus all ...`

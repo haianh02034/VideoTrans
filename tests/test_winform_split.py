@@ -1,11 +1,11 @@
 import pytest
-from videotrans.winform import _module_map, get_win
+from phiendichvideo.winform import _module_map, get_win
 
 KNOWN_MISSING = {"qwenasrlocal", "mitts"}
 
 
 def test_helpers_importable():
-    from videotrans.winform._helpers import make_feed_translator, make_feed_stt, make_feed_tts, make_setallmodels
+    from phiendichvideo.winform._helpers import make_feed_translator, make_feed_stt, make_feed_tts, make_setallmodels
     assert callable(make_feed_translator)
     assert callable(make_feed_stt)
     assert callable(make_feed_tts)
@@ -40,7 +40,7 @@ def test_registered_module_count():
 
 
 def test_helpers_factory_returns_callable():
-    from videotrans.winform._helpers import make_setallmodels
+    from phiendichvideo.winform._helpers import make_setallmodels
     mock_form = type('MockForm', (), {
         'edit_allmodels': type('W', (), {'toPlainText': lambda self: 'm1,m2'})()
     })()

@@ -28,7 +28,7 @@
 
 ### 1.2 流程控制标志位
 
-定义在 `videotrans/task/_base.py:20-29`，五个标志位在 `TransCreate.__post_init__()` 中根据配置自动计算：
+定义在 `phiendichvideo/task/_base.py:20-29`，五个标志位在 `TransCreate.__post_init__()` 中根据配置自动计算：
 
 ```python
 should_recogn: bool    # 是否需要语音识别（无已有字幕则为 True）
@@ -64,7 +64,7 @@ should_separate: bool  # 是否需要人声背景分离
 
 ## 二、任务配置数据类体系
 
-v4.03 重构了任务配置为分层继承的 `@dataclass` 体系（`videotrans/task/taskcfg.py`，261 行）：
+v4.03 重构了任务配置为分层继承的 `@dataclass` 体系（`phiendichvideo/task/taskcfg.py`，261 行）：
 
 ```
 @dataclass TaskCfgBase              ← 通用字段（路径、语言代码、缓存目录等）
@@ -150,7 +150,7 @@ WorkerTaskDone (×1)
 
 ### 3.2 Worker 基类设计
 
-所有工作线程继承自 `BaseWorker(QThread)`（`videotrans/task/job.py:13-66`）：
+所有工作线程继承自 `BaseWorker(QThread)`（`phiendichvideo/task/job.py:13-66`）：
 
 ```python
 class BaseWorker(QThread):
@@ -202,7 +202,7 @@ WorkerTaskDone   →  (终止)
 
 ### 3.4 线程数量动态计算
 
-`start_thread()`（`videotrans/task/job.py:206-245`）根据 GPU 配置动态决定各 Worker 的实例数：
+`start_thread()`（`phiendichvideo/task/job.py:206-245`）根据 GPU 配置动态决定各 Worker 的实例数：
 
 | Worker | 实例数 | 原因 |
 |--------|--------|------|
@@ -220,7 +220,7 @@ WorkerTaskDone   →  (终止)
 
 ### 3.5 批量任务提交：MultVideo
 
-`MultVideo(QThread)`（`videotrans/task/mult_video.py`，54 行）负责将用户选择的多个视频文件逐个创建 `TransCreate` 对象并推入 `prepare_queue`。支持通过 `batch_nums` 参数控制每批并发数量：
+`MultVideo(QThread)`（`phiendichvideo/task/mult_video.py`，54 行）负责将用户选择的多个视频文件逐个创建 `TransCreate` 对象并推入 `prepare_queue`。支持通过 `batch_nums` 参数控制每批并发数量：
 
 - `batch_nums == 0`：全部任务一次性推入队列（最大并发）
 - `batch_nums == 1`：逐次推入，每个任务完成后再推下一个
@@ -237,24 +237,24 @@ WorkerTaskDone   →  (终止)
 ### 4.1 类继承体系
 
 ```
-@dataclass BaseCon                    ← videotrans/configure/base.py
+@dataclass BaseCon                    ← phiendichvideo/configure/base.py
     │                                  基础属性和工具方法
-    ├── @dataclass BaseTask           ← videotrans/task/_base.py
+    ├── @dataclass BaseTask           ← phiendichvideo/task/_base.py
     │       │                          定义 8 个阶段空方法和 5 个标志位
-    │       ├── @dataclass TransCreate ← videotrans/task/trans_create.py (~1678 行核心)
-    │       ├── @dataclass SpeechToText ← videotrans/task/speech2text.py (批量语音识别)
-    │       ├── @dataclass DubbingSrt  ← videotrans/task/dubbing.py (批量字幕配音)
-    │       └── @dataclass TranslateSrt ← videotrans/task/translate_srt.py (批量字幕翻译)
+    │       ├── @dataclass TransCreate ← phiendichvideo/task/trans_create.py (~1678 行核心)
+    │       ├── @dataclass SpeechToText ← phiendichvideo/task/speech2text.py (批量语音识别)
+    │       ├── @dataclass DubbingSrt  ← phiendichvideo/task/dubbing.py (批量字幕配音)
+    │       └── @dataclass TranslateSrt ← phiendichvideo/task/translate_srt.py (批量字幕翻译)
     │
-    ├── @dataclass BaseRecogn         ← videotrans/recognition/_base.py
+    ├── @dataclass BaseRecogn         ← phiendichvideo/recognition/_base.py
     │       │                          VAD 音频切分、字幕合并、CJK 处理
     │       └── 22 个子类（懒加载）    各 ASR 渠道具体实现
     │
-    ├── @dataclass BaseTrans          ← videotrans/translator/_base.py
+    ├── @dataclass BaseTrans          ← phiendichvideo/translator/_base.py
     │       │                          MD5 缓存、逐行/全文翻译调度
     │       └── 24 个子类（懒加载）    各翻译渠道具体实现
     │
-    └── @dataclass BaseTTS            ← videotrans/tts/_base.py
+    └── @dataclass BaseTTS            ← phiendichvideo/tts/_base.py
             │                          异步/多线程并发调度
             └── 34 个子类（懒加载）    各 TTS 渠道具体实现
 ```
@@ -263,7 +263,7 @@ WorkerTaskDone   →  (终止)
 
 ### 4.2 BaseCon——顶层基类
 
-`videotrans/configure/base.py`（296 行）定义了所有类共用的核心能力：
+`phiendichvideo/configure/base.py`（296 行）定义了所有类共用的核心能力：
 
 | 方法 | 职责 |
 |------|------|
@@ -280,7 +280,7 @@ WorkerTaskDone   →  (终止)
 
 ### 4.3 BaseTask——任务基类
 
-`videotrans/task/_base.py:10-167` 定义了所有任务子类的阶段空方法和共享工具：
+`phiendichvideo/task/_base.py:10-167` 定义了所有任务子类的阶段空方法和共享工具：
 
 **阶段方法**（均为空实现，由子类重写）：
 `prepare()`、`recogn()`、`diariz()`、`trans()`、`dubbing()`、`align()`、`assembling()`、`task_done()`
@@ -298,7 +298,7 @@ WorkerTaskDone   →  (终止)
 
 ### 4.4 TransCreate——视频翻译核心实现
 
-`videotrans/task/trans_create.py`（约 1678 行）是完整 9 阶段处理逻辑的实现类。关键内部方法：
+`phiendichvideo/task/trans_create.py`（约 1678 行）是完整 9 阶段处理逻辑的实现类。关键内部方法：
 
 | 方法 | 职责 |
 |------|------|
@@ -322,13 +322,13 @@ WorkerTaskDone   →  (终止)
 
 ## 五、配置系统
 
-软件将配置分为三个层次（`videotrans/configure/config.py`，902 行），均为 `@dataclass`：
+软件将配置分为三个层次（`phiendichvideo/configure/config.py`，902 行），均为 `@dataclass`：
 
 | 配置类 | 持久化 | 用途 | 示例字段 |
 |--------|--------|------|---------|
 | `AppCfg` | 纯内存 | 队列、状态、线程控制、运行时上下文 | `prepare_queue`, `exit_soft`, `stoped_uuid_set`, `current_status`, `line_roles`, `exec_mode`, `video_codec`, `onlyone_source_sub`, `onlyone_target_sub`, `proxy`, `SUPPORT_LANG` |
-| `AppSettings` | `videotrans/cfg.json` | 全局默认设置、模型列表 | `homedir`, `model_list`, `vad_type`, `cuda_com_type` |
-| `AppParams` | `videotrans/params.json` | 用户偏好、API 密钥 | `source_language`, `recogn_type`, `chatgpt_key`, `voice_role`, `app_mode` |
+| `AppSettings` | `phiendichvideo/cfg.json` | 全局默认设置、模型列表 | `homedir`, `model_list`, `vad_type`, `cuda_com_type` |
+| `AppParams` | `phiendichvideo/params.json` | 用户偏好、API 密钥 | `source_language`, `recogn_type`, `chatgpt_key`, `voice_role`, `app_mode` |
 
 关键单例变量在模块加载时自动初始化：
 
@@ -364,7 +364,7 @@ params: AppParams = AppParams()    # 从 params.json 加载
 
 ### 5.4 环境变量初始化
 
-`_set_env()` 在模块加载时自动执行（`videotrans/configure/config.py:44-72`），设置：
+`_set_env()` 在模块加载时自动执行（`phiendichvideo/configure/config.py:44-72`），设置：
 - `MODELSCOPE_CACHE` / `HF_HOME` / `HF_HUB_CACHE` → `ROOT_DIR/models`
 - `QT_API = 'pyside6'`
 - `PATH` 追加 ffmpeg/sox 目录
@@ -376,7 +376,7 @@ params: AppParams = AppParams()    # 从 params.json 加载
 
 ## 六、GlobalProcessManager——子进程池管理
 
-`videotrans/process/signelobj.py`（167 行）实现了一个类级别单例的 `GlobalProcessManager`：
+`phiendichvideo/process/signelobj.py`（167 行）实现了一个类级别单例的 `GlobalProcessManager`：
 
 ```
 GlobalProcessManager (类级别单例)
@@ -414,7 +414,7 @@ GlobalProcessManager.submit_task_gpu(func, **kwargs)   → AsyncResultFutureWrap
 
 ## 七、SignalHub——跨线程消息中心
 
-`videotrans/configure/signal_hub.py`（33 行）实现了基于 Qt 信号的单例消息传递：
+`phiendichvideo/configure/signal_hub.py`（33 行）实现了基于 Qt 信号的单例消息传递：
 
 ```python
 class SignalHub(QObject):
@@ -472,13 +472,13 @@ BaseCon.signal(**kwargs)
 
 ## 八、动态通道加载
 
-`videotrans/__init__.py`（35 行）提供了通用的懒加载机制：
+`phiendichvideo/__init__.py`（35 行）提供了通用的懒加载机制：
 
 ```python
 @dataclass
 class ChannelProvider:
     name: str           # 界面显示名称
-    imp: str            # 模块导入后缀（如 "._whisper" → "videotrans.recognition._whisper"）
+    imp: str            # 模块导入后缀（如 "._whisper" → "phiendichvideo.recognition._whisper"）
     key_name: str|None  # 对应 params.json 中的 API key 字段（用于 is_input_api 校验）
     win: str|None       # 对应 winform 中的设置窗口名称
 
@@ -486,7 +486,7 @@ def get_class(channel_id=0, provider_type=None, _ID_NAME_DICT=None):
     _key = f'{provider_type}-{channel_id}'
     if _key in _loaded_modules:
         return _loaded_modules[_key]
-    module = importlib.import_module(f'videotrans.{provider_type}{_module_map.imp}')
+    module = importlib.import_module(f'phiendichvideo.{provider_type}{_module_map.imp}')
     for _, obj in inspect.getmembers(module, inspect.isclass):
         if obj.__module__ == module.__name__:
             _loaded_modules[_key] = obj
@@ -497,9 +497,9 @@ def get_class(channel_id=0, provider_type=None, _ID_NAME_DICT=None):
 
 | 模块 | 渠道数 | 定义位置 |
 |------|--------|---------|
-| 识别 (recognition) | 22 | `videotrans/recognition/__init__.py:48-79` |
-| 翻译 (translator) | 24 | `videotrans/translator/__init__.py:60-90` |
-| 配音 (tts) | **34** | `videotrans/tts/__init__.py:75-116` |
+| 识别 (recognition) | 22 | `phiendichvideo/recognition/__init__.py:48-79` |
+| 翻译 (translator) | 24 | `phiendichvideo/translator/__init__.py:60-90` |
+| 配音 (tts) | **34** | `phiendichvideo/tts/__init__.py:75-116` |
 
 ### 8.1 统一入口函数
 
@@ -528,14 +528,14 @@ def run(*, queue_tts, language, tts_type, ...) -> None:
 
 ### 8.3 翻译缓存
 
-`BaseTrans`（`videotrans/translator/_base.py`）实现了基于 MD5 的翻译缓存：
+`BaseTrans`（`phiendichvideo/translator/_base.py`）实现了基于 MD5 的翻译缓存：
 - 缓存 key = `md5(channel_name + api_url + model + source_lang + target_lang + text)`
 - 缓存文件存储在 `{TEMP_ROOT}/translate_cache/`
 - 写入接口 `_set_cache()`，读取接口 `_get_cache()`
 
 ### 8.4 CJK 特殊处理
 
-`BaseRecogn`（`videotrans/recognition/_base.py:58-80`）在 `__post_init__` 中对中日韩等语言进行特殊处理：
+`BaseRecogn`（`phiendichvideo/recognition/_base.py:58-80`）在 `__post_init__` 中对中日韩等语言进行特殊处理：
 - `join_word_flag`：CJK 语言（zh, ja, ko, yu, th, km, yue）字幕词间不加空格（其他语言加空格）
 - `maxlen`：CJK 语言每行最大字符数为 `settings.cjk_len`（默认 15），其他语言为 `settings.other_len`（默认 40）
 - `jianfan`：中文语言且 `settings.zh_hant_s=True` 时启用繁简转换
@@ -568,7 +568,7 @@ def run(*, queue_tts, language, tts_type, ...) -> None:
 
 ### 9.1 实现：Worker(QThread)
 
-`videotrans/task/only_one.py`（148 行）中的 `Worker` 类在**单个 QThread 内串行执行**全部 9 个阶段，通过 `uito = Signal(str, SignMsg)` 与主线程通信：
+`phiendichvideo/task/only_one.py`（148 行）中的 `Worker` 类在**单个 QThread 内串行执行**全部 9 个阶段，通过 `uito = Signal(str, SignMsg)` 与主线程通信：
 
 ```
 Worker.run()
@@ -621,7 +621,7 @@ Worker.run()
 
 ## 十、音画对齐引擎（SpeedRate）
 
-`videotrans/task/_rate.py`（877 行）实现了 `SpeedRate` 和 `TtsSpeedRate` 两个对齐引擎：
+`phiendichvideo/task/_rate.py`（877 行）实现了 `SpeedRate` 和 `TtsSpeedRate` 两个对齐引擎：
 
 ### 10.1 SpeedRate（视频翻译场景）
 
@@ -666,7 +666,7 @@ sp.py (if __name__ == "__main__")
   │           ├── 设置全局异常钩子 show_global_error_dialog
   │           ├── 解析 --lang CLI 参数
   │           ├── 导入 darkstyle_rc（编译后的 QRC 资源）
-  │           ├── 加载 QSS 样式表 (videotrans/styles/style.qss)
+  │           ├── 加载 QSS 样式表 (phiendichvideo/styles/style.qss)
   │           ├── 恢复上次窗口大小 (QSettings)
   │           └── 实例化 MainWindow → uito 连接 splash.update_lable
   │               └── MainWindow.__init__()
@@ -695,23 +695,23 @@ sp.py (if __name__ == "__main__")
 ### 11.3 UI 架构分层
 
 ```
-UI 定义层         videotrans/ui/         ← PySide6 UI 布局文件（~75 个），dark/ 资源文件
+UI 定义层         phiendichvideo/ui/         ← PySide6 UI 布局文件（~75 个），dark/ 资源文件
     ↓
-UI 逻辑层         videotrans/component/   ← 通用组件：进度条、设置表单、字幕编辑器、实时语音识别、视频裁剪、文本比对
+UI 逻辑层         phiendichvideo/component/   ← 通用组件：进度条、设置表单、字幕编辑器、实时语音识别、视频裁剪、文本比对
     ↓
-窗口管理层        videotrans/winform/     ← 懒加载的 ~65 个设置/功能窗口模块
+窗口管理层        phiendichvideo/winform/     ← 懒加载的 ~65 个设置/功能窗口模块
     ↓
-主窗口层          videotrans/mainwin/
+主窗口层          phiendichvideo/mainwin/
     ├── main_win.py                      ← MainWindow(QMainWindow): UI 初始化、信号绑定、Worker 启动、窗口生命周期（528 行）
     ├── _actions.py                       ← WinAction: 核心业务逻辑 → 参数收集 → 任务启动 → 状态分发（798 行）
     └── _actions_base.py                 ← WinActionBase: 代理管理、模式切换、文件选择、CUDA 检测、试听（590 行）
     ↓
-任务层            videotrans/task/        ← TransCreate、SpeechToText、DubbingSrt、TranslateSrt、Worker 线程、SpeedRate
+任务层            phiendichvideo/task/        ← TransCreate、SpeechToText、DubbingSrt、TranslateSrt、Worker 线程、SpeedRate
 ```
 
 ### 11.4 MainWindow——主窗口
 
-`videotrans/mainwin/main_win.py`（528 行）职责：
+`phiendichvideo/mainwin/main_win.py`（528 行）职责：
 - `setupUi()`：加载 UI 布局，填充下拉列表（翻译渠道、识别渠道、TTS 渠道、语言、字幕类型）
 - `_bind_signal()`：绑定约 60 个控件事件到 `WinAction` 方法
 - `_start_workers(status)`：GPU 检测完成后启动 9 种 Worker 后台线程
@@ -747,7 +747,7 @@ UI 逻辑层         videotrans/component/   ← 通用组件：进度条、设�
 
 ## 十二、异常体系
 
-`videotrans/configure/excepts.py`（376 行）定义了分层异常：
+`phiendichvideo/configure/excepts.py`（376 行）定义了分层异常：
 
 ```
 VideoTransError (基类)
@@ -783,7 +783,7 @@ VideoTransError (基类)
 │   ├── _temp/                  # 进程级临时目录
 │   └── translate_cache/        # 翻译 MD5 缓存目录
 │
-└── videotrans/                 # 核心业务逻辑代码
+└── phiendichvideo/                 # 核心业务逻辑代码
     │   __init__.py             # ★ VERSION, ChannelProvider 定义, get_class() 懒加载
     │   cfg.json                # settings 持久化文件
     │   params.json             # params 持久化文件
@@ -926,11 +926,11 @@ VideoTransError (基类)
 
 #### Step 1: 创建通道实现文件
 
-在 `videotrans/translator/` 下创建 `_mytranslator.py`：
+在 `phiendichvideo/translator/` 下创建 `_mytranslator.py`：
 
 ```python
 from dataclasses import dataclass
-from videotrans.translator._base import BaseTrans
+from phiendichvideo.translator._base import BaseTrans
 
 @dataclass
 class MyTranslator(BaseTrans):
@@ -948,7 +948,7 @@ class MyTranslator(BaseTrans):
 
 #### Step 2: 分配渠道 ID 并注册
 
-在 `videotrans/translator/__init__.py` 中：
+在 `phiendichvideo/translator/__init__.py` 中：
 
 ```python
 MYTRANSLATOR_INDEX = 24   # 分配不重复的整数 ID
@@ -964,7 +964,7 @@ _ID_NAME_DICT[MYTRANSLATOR_INDEX] = ChannelProvider(
 
 #### Step 3: 添加用户配置字段
 
-在 `videotrans/configure/config.py` 的 `AppParams._get_defaults()` 中添加：
+在 `phiendichvideo/configure/config.py` 的 `AppParams._get_defaults()` 中添加：
 
 ```python
 "mytranslator_key": "",
@@ -973,7 +973,7 @@ _ID_NAME_DICT[MYTRANSLATOR_INDEX] = ChannelProvider(
 
 #### Step 4: 创建设置窗口
 
-在 `videotrans/winform/` 下创建 `mytranslator.py`，实现 `openwin()` 函数。在 `videotrans/winform/__init__.py` 的 `_module_map` 中注册：
+在 `phiendichvideo/winform/` 下创建 `mytranslator.py`，实现 `openwin()` 函数。在 `phiendichvideo/winform/__init__.py` 的 `_module_map` 中注册：
 
 ```python
 "mytranslator": ".mytranslator",
@@ -991,12 +991,12 @@ _ID_NAME_DICT[MYTRANSLATOR_INDEX] = ChannelProvider(
 
 步骤与翻译通道类似：
 
-1. 创建 `videotrans/tts/_mytts.py`，继承 `BaseTTS`
-2. 在 `videotrans/tts/__init__.py` 中分配 ID 并注册 `_ID_NAME_DICT`
+1. 创建 `phiendichvideo/tts/_mytts.py`，继承 `BaseTTS`
+2. 在 `phiendichvideo/tts/__init__.py` 中分配 ID 并注册 `_ID_NAME_DICT`
 3. 如需声音克隆支持，将 ID 加入 `SUPPORT_CLONE` 列表
 4. 如需语言跟随角色变化，将 ID 加入 `CHANGE_BY_LANGUAGE` 列表
 5. 在 `AppParams._get_defaults()` 中添加对应的 API Key / URL 配置字段
-6. 在 `videotrans/winform/` 和 `_module_map` 中注册设置窗口
+6. 在 `phiendichvideo/winform/` 和 `_module_map` 中注册设置窗口
 
 ### 14.3 新增一个识别通道
 

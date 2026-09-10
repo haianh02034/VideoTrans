@@ -1,4 +1,4 @@
-from videotrans.configure import contants
+from phiendichvideo.configure import contants
 
 
 class TestCJKLang:

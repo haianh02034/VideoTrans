@@ -27,13 +27,13 @@ ffmpeg/ffmpeg.exe
 ffmpeg/ffprobe.exe
 ffmpeg/ffplay.exe
 ffmpeg/ytwin32.exe
-videotrans/ass.json
-videotrans/codec.json
-videotrans/cfg.json
-videotrans/params.json
-videotrans/webui_state.json
-videotrans/glossary.txt
-videotrans/newlang.txt
+phiendichvideo/ass.json
+phiendichvideo/codec.json
+phiendichvideo/cfg.json
+phiendichvideo/params.json
+phiendichvideo/webui_state.json
+phiendichvideo/glossary.txt
+phiendichvideo/newlang.txt
 
 g2pW/
 output/

@@ -14,7 +14,7 @@ description: 菜单栏--帮助/关于 中有很多链接，比如模型下载地
 
 > **如何查看日志**：软件根目录下的 `logs/` 文件夹有按日期命名的 `.log` 日志文件。报错时可复制日志底部约 30 行内容寻求帮助。
 >
-> **如何恢复出厂设置**：删除 `videotrans/` 目录下的 `cfg.json`、`params.json`、`codec.json`、`ass.json` 四个文件，重启软件即可。
+> **如何恢复出厂设置**：删除 `phiendichvideo/` 目录下的 `cfg.json`、`params.json`、`codec.json`、`ass.json` 四个文件，重启软件即可。
 
 ---
 
@@ -178,7 +178,7 @@ description: 菜单栏--帮助/关于 中有很多链接，比如模型下载地
 *   **原因**：本地小模型（如 7B）智能不足，或提示词过于复杂
 *   **解决方案**：
     1.  使用更强的在线模型（DeepSeek-V3、GPT-4o 等）
-    2.  精简提示词（在 `videotrans/prompts/recharge/recharge-llm.txt` 中修改）
+    2.  精简提示词（在 `phiendichvideo/prompts/recharge/recharge-llm.txt` 中修改）
     3.  使用 `clone` 角色克隆原音色时，**不建议**使用 LLM 重新断句
 
 ### 18. 配音后字幕和声音不同步

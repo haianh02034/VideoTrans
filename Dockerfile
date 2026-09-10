@@ -1,8 +1,8 @@
 # ============================================================
-# pyVideoTrans WebUI Dockerfile
+# Phiên Dịch Video WebUI Dockerfile
 #
-# CPU:  docker build -t pyvideotrans-webui .
-# GPU:  docker build --build-arg USE_CUDA=true -t pyvideotrans-webui:gpu .
+# CPU:  docker build -t phiendichvideo-webui .
+# GPU:  docker build --build-arg USE_CUDA=true -t phiendichvideo-webui:gpu .
 # ============================================================
 
 ARG USE_CUDA=false

@@ -1,6 +1,6 @@
 import uuid as _uuid
 
-from videotrans.task.taskcfg import (
+from phiendichvideo.task.taskcfg import (
     InputFile,
     SignMsg,
     SrtItem,

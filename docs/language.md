@@ -8,12 +8,12 @@
     import locale
     locale.getdefaultlocale()[0]
 ```
-将输出内容的前2个字符小写，拼接上`.json`作为文件名创建json文件，比如输出的是`en_US`,就创建 `en.json` 到 videotrans/language 目录下，这个`en.json`就是语言文件。
+将输出内容的前2个字符小写，拼接上`.json`作为文件名创建json文件，比如输出的是`en_US`,就创建 `en.json` 到 phiendichvideo/language 目录下，这个`en.json`就是语言文件。
 
 
 > 
-> 在软件启动时，会以该方式locale.getdefaultlocale()[0]的前2个字符小写，然后拼接`.json`，组成文件名，到 videotrans/language目录下搜寻,如果存在则使用，不存在则显示英文界面。
-> 如果在 `videotrans/set.ini` 文件中  `lang=` 设置了值，则以该值为默认语言代码，否则以 `locale.getdefaultlocale()` 结果为准。
+> 在软件启动时，会以该方式locale.getdefaultlocale()[0]的前2个字符小写，然后拼接`.json`，组成文件名，到 phiendichvideo/language目录下搜寻,如果存在则使用，不存在则显示英文界面。
+> 如果在 `phiendichvideo/set.ini` 文件中  `lang=` 设置了值，则以该值为默认语言代码，否则以 `locale.getdefaultlocale()` 结果为准。
 >  
 
 
@@ -87,7 +87,7 @@
 
 和其他一样，该内容字段名不要动，字段值改为要显示的名称
 
-**制作完成后，确认符合正确的 json 格式，然后放到 videotrans/language 目录下，重启软件就会自动应用该语言，如何你制作的语言包和默认语言不同，可通过设置 `set.ini`中 lang=语言代码和强制使用，比如 `lang=zh`将强制显示 zh.json 内容**
+**制作完成后，确认符合正确的 json 格式，然后放到 phiendichvideo/language 目录下，重启软件就会自动应用该语言，如何你制作的语言包和默认语言不同，可通过设置 `set.ini`中 lang=语言代码和强制使用，比如 `lang=zh`将强制显示 zh.json 内容**
 
 
 
@@ -108,12 +108,12 @@
     import locale
     locale.getdefaultlocale()[0]
 ```
-Lowercase the first 2 characters of the output content and append `.json` to create a json file as the filename. For example, if the output is `en_US`, create `en.json` in the videotrans/language directory, where `en.json` is the language file.
+Lowercase the first 2 characters of the output content and append `.json` to create a json file as the filename. For example, if the output is `en_US`, create `en.json` in the phiendichvideo/language directory, where `en.json` is the language file.
 
 
 > 
-> When the software starts, the system will take the first 2 characters lowercase from locale.getdefaultlocale()[0] and append `.json` to form the filename, and then look for it under the videotrans/language directory. If it exists, it will be used; otherwise, the English interface will be displayed.
-> If the `lang=` in the `videotrans/set.ini` file has a value set, then this value will be taken as the default language code, otherwise the result of `locale.getdefaultlocale()` will be used.
+> When the software starts, the system will take the first 2 characters lowercase from locale.getdefaultlocale()[0] and append `.json` to form the filename, and then look for it under the phiendichvideo/language directory. If it exists, it will be used; otherwise, the English interface will be displayed.
+> If the `lang=` in the `phiendichvideo/set.ini` file has a value set, then this value will be taken as the default language code, otherwise the result of `locale.getdefaultlocale()` will be used.
 > 
 
 
@@ -187,4 +187,4 @@ The same as the modification of `translate_language`, do not move the field name
 
 Like the others, do not modify the field name of this content, change the field value to the display name
 
-**After the production is completed, make sure it meets the correct json format, put it into the videotrans/language directory, and the software will automatically apply the language when restarted. If the language pack you made is different from the default language, you can set `set.ini` in lang= language code and use it forcibly, such as `lang=zh` will forcibly display the content of zh.json**
+**After the production is completed, make sure it meets the correct json format, put it into the phiendichvideo/language directory, and the software will automatically apply the language when restarted. If the language pack you made is different from the default language, you can set `set.ini` in lang= language code and use it forcibly, such as `lang=zh` will forcibly display the content of zh.json**

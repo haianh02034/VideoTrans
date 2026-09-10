@@ -6,58 +6,58 @@ import pytest
 
 class TestActionsSplitImports:
     def test_actions_check_importable(self):
-        mod = importlib.import_module('videotrans.mainwin._actions_check')
+        mod = importlib.import_module('phiendichvideo.mainwin._actions_check')
         assert hasattr(mod, 'WinActionCheckMixin')
 
     def test_actions_config_importable(self):
-        mod = importlib.import_module('videotrans.mainwin._actions_config')
+        mod = importlib.import_module('phiendichvideo.mainwin._actions_config')
         assert hasattr(mod, 'WinActionConfigMixin')
 
     def test_actions_task_importable(self):
-        mod = importlib.import_module('videotrans.mainwin._actions_task')
+        mod = importlib.import_module('phiendichvideo.mainwin._actions_task')
         assert hasattr(mod, 'WinActionTaskMixin')
 
     def test_actions_importable(self):
-        mod = importlib.import_module('videotrans.mainwin._actions')
+        mod = importlib.import_module('phiendichvideo.mainwin._actions')
         assert hasattr(mod, 'WinAction')
 
     def test_actions_base_mode_importable(self):
-        mod = importlib.import_module('videotrans.mainwin._actions_base_mode')
+        mod = importlib.import_module('phiendichvideo.mainwin._actions_base_mode')
         assert hasattr(mod, 'WinActionBaseModeMixin')
 
     def test_actions_base_file_importable(self):
-        mod = importlib.import_module('videotrans.mainwin._actions_base_file')
+        mod = importlib.import_module('phiendichvideo.mainwin._actions_base_file')
         assert hasattr(mod, 'WinActionBaseFileMixin')
 
     def test_actions_base_misc_importable(self):
-        mod = importlib.import_module('videotrans.mainwin._actions_base_misc')
+        mod = importlib.import_module('phiendichvideo.mainwin._actions_base_misc')
         assert hasattr(mod, 'WinActionBaseMiscMixin')
 
     def test_actions_base_importable(self):
-        mod = importlib.import_module('videotrans.mainwin._actions_base')
+        mod = importlib.import_module('phiendichvideo.mainwin._actions_base')
         assert hasattr(mod, 'WinActionBase')
 
 
 class TestActionsClassHierarchy:
     def test_winaction_inherits_winactionbase(self):
-        from videotrans.mainwin._actions import WinAction
-        from videotrans.mainwin._actions_base import WinActionBase
+        from phiendichvideo.mainwin._actions import WinAction
+        from phiendichvideo.mainwin._actions_base import WinActionBase
         assert issubclass(WinAction, WinActionBase)
 
     def test_winaction_inherits_mixins(self):
-        from videotrans.mainwin._actions import WinAction
-        from videotrans.mainwin._actions_check import WinActionCheckMixin
-        from videotrans.mainwin._actions_config import WinActionConfigMixin
-        from videotrans.mainwin._actions_task import WinActionTaskMixin
+        from phiendichvideo.mainwin._actions import WinAction
+        from phiendichvideo.mainwin._actions_check import WinActionCheckMixin
+        from phiendichvideo.mainwin._actions_config import WinActionConfigMixin
+        from phiendichvideo.mainwin._actions_task import WinActionTaskMixin
         assert issubclass(WinAction, WinActionCheckMixin)
         assert issubclass(WinAction, WinActionConfigMixin)
         assert issubclass(WinAction, WinActionTaskMixin)
 
     def test_winactionbase_inherits_mixins(self):
-        from videotrans.mainwin._actions_base import WinActionBase
-        from videotrans.mainwin._actions_base_mode import WinActionBaseModeMixin
-        from videotrans.mainwin._actions_base_file import WinActionBaseFileMixin
-        from videotrans.mainwin._actions_base_misc import WinActionBaseMiscMixin
+        from phiendichvideo.mainwin._actions_base import WinActionBase
+        from phiendichvideo.mainwin._actions_base_mode import WinActionBaseModeMixin
+        from phiendichvideo.mainwin._actions_base_file import WinActionBaseFileMixin
+        from phiendichvideo.mainwin._actions_base_misc import WinActionBaseMiscMixin
         assert issubclass(WinActionBase, WinActionBaseModeMixin)
         assert issubclass(WinActionBase, WinActionBaseFileMixin)
         assert issubclass(WinActionBase, WinActionBaseMiscMixin)
@@ -85,19 +85,19 @@ class TestActionsMethods:
     }
 
     def test_winaction_has_expected_methods(self):
-        from videotrans.mainwin._actions import WinAction
+        from phiendichvideo.mainwin._actions import WinAction
         actual = {m for m in dir(WinAction) if not m.startswith('__')}
         missing = self.EXPECTED_WINACTION_METHODS - actual
         assert not missing, f"WinAction missing methods: {missing}"
 
     def test_winactionbase_has_expected_methods(self):
-        from videotrans.mainwin._actions_base import WinActionBase
+        from phiendichvideo.mainwin._actions_base import WinActionBase
         actual = {m for m in dir(WinActionBase) if not m.startswith('__')}
         missing = self.EXPECTED_WINACTIONBASE_METHODS - actual
         assert not missing, f"WinActionBase missing methods: {missing}"
 
     def test_winaction_method_count(self):
-        from videotrans.mainwin._actions import WinAction
+        from phiendichvideo.mainwin._actions import WinAction
         user_methods = [
             m for m in dir(WinAction)
             if not m.startswith('_') or m in ('_reset', '_check_all_done')
@@ -109,7 +109,7 @@ class TestActionsMethods:
         assert len(user_methods) >= 23, f"Expected >= 23 user methods, got {len(user_methods)}"
 
     def test_winactionbase_method_count(self):
-        from videotrans.mainwin._actions_base import WinActionBase
+        from phiendichvideo.mainwin._actions_base import WinActionBase
         user_methods = [
             m for m in dir(WinActionBase)
             if not m.startswith('__')

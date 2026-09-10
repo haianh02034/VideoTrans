@@ -1,5 +1,5 @@
 """
-pyVideoTrans CLI — command-line interface for video translation, dubbing, and transcription.
+Phiên Dịch Video CLI — giao dien dong lenh de dich video, long tieng va nhan dang giong noi.
 
 Usage examples:
   # Speech to text
@@ -45,9 +45,9 @@ TEXT_DB: Dict[str, Dict[str, str]] = {
 
     # --- Argparse descriptions ---
     "cli_desc": {
-        "zh": "pyVideoTrans 命令行模式\n文档: https://pyvideotrans.com/cli",
-        "en": "pyVideoTrans CLI Mode\nDocs: https://pyvideotrans.com/cli",
-        "vi": "pyVideoTrans Chế độ dòng lệnh\nTài liệu: https://pyvideotrans.com/cli"
+        "zh": "Phiên Dịch Video 命令行模式\n文档: https://pyvideotrans.com/cli",
+        "en": "Phiên Dịch Video CLI Mode\nDocs: https://pyvideotrans.com/cli",
+        "vi": "Phiên Dịch Video Chế độ dòng lệnh\nTài liệu: https://pyvideotrans.com/cli"
     },
     "cli_epilog": {
         "zh": "示例:\n"
@@ -217,9 +217,9 @@ def tr(key: str, *args) -> str:
 # ---------------------------------------------------------------------------
 def stt_fun(params: dict) -> None:
     """Execute speech-to-text task."""
-    from videotrans.configure.config import app_cfg
-    from videotrans.task.speech2text import SpeechToText
-    from videotrans.task.taskcfg import TaskCfgSTT
+    from phiendichvideo.configure.config import app_cfg
+    from phiendichvideo.task.speech2text import SpeechToText
+    from phiendichvideo.task.taskcfg import TaskCfgSTT
 
     print(f"\n{tr('exec_stt_task')}")
     print(tr('process_file', params.get('name')))
@@ -237,8 +237,8 @@ def stt_fun(params: dict) -> None:
 
 def tts_fun(params: dict) -> None:
     """Execute text-to-speech task."""
-    from videotrans.task.dubbing import DubbingSrt
-    from videotrans.task.taskcfg import TaskCfgTTS
+    from phiendichvideo.task.dubbing import DubbingSrt
+    from phiendichvideo.task.taskcfg import TaskCfgTTS
 
     print(f"\n{tr('exec_tts_task')}")
     print(tr('process_file', params.get('name')))
@@ -256,8 +256,8 @@ def tts_fun(params: dict) -> None:
 
 def sts_fun(params: dict) -> None:
     """Execute subtitle translation task."""
-    from videotrans.task.translate_srt import TranslateSrt
-    from videotrans.task.taskcfg import TaskCfgSTS
+    from phiendichvideo.task.translate_srt import TranslateSrt
+    from phiendichvideo.task.taskcfg import TaskCfgSTS
 
     print(f"\n{tr('exec_sts_task')}")
     print(tr('process_file', params.get('name')))
@@ -274,9 +274,9 @@ def sts_fun(params: dict) -> None:
 
 def vtv_fun(params: dict) -> None:
     """Execute full video translation task."""
-    from videotrans.configure.config import app_cfg
-    from videotrans.task.trans_create import TransCreate
-    from videotrans.task.taskcfg import TaskCfgVTT
+    from phiendichvideo.configure.config import app_cfg
+    from phiendichvideo.task.trans_create import TransCreate
+    from phiendichvideo.task.taskcfg import TaskCfgVTT
 
     app_cfg.current_status = 'ing'
     print(f"\n{tr('exec_vtv_task')}")
@@ -303,7 +303,7 @@ def vtv_fun(params: dict) -> None:
 # ---------------------------------------------------------------------------
 def list_providers() -> None:
     """Print available providers for all categories."""
-    from videotrans import recognition, translator, tts
+    from phiendichvideo import recognition, translator, tts
 
     print(tr('list_providers_header'))
     for i, name in enumerate(recognition.RECOGN_NAME_LIST):
@@ -320,7 +320,7 @@ def list_providers() -> None:
 
 def list_languages() -> None:
     """Print available language codes."""
-    from videotrans import translator
+    from phiendichvideo import translator
 
     print(tr('list_languages_header'))
     for code, name in translator.LANGNAME_DICT.items():
@@ -329,7 +329,7 @@ def list_languages() -> None:
 
 def list_models() -> None:
     """Print available faster-whisper models."""
-    from videotrans.configure.contants import FASTER_MODELS_DICT
+    from phiendichvideo.configure.contants import FASTER_MODELS_DICT
 
     print(tr('list_models_header'))
     for name, repo in FASTER_MODELS_DICT.items():
@@ -435,9 +435,9 @@ def validate_task_params(args: argparse.Namespace, parser: argparse.ArgumentPars
 # ---------------------------------------------------------------------------
 def build_common_params(args: argparse.Namespace, output_dir: Optional[str] = None) -> dict:
     """Build common parameters dict from parsed args."""
-    from videotrans.configure.config import ROOT_DIR, TEMP_DIR
-    from videotrans.util import tools
-    from videotrans.util.gpus import getset_gpu
+    from phiendichvideo.configure.config import ROOT_DIR, TEMP_DIR
+    from phiendichvideo.util import tools
+    from phiendichvideo.util.gpus import getset_gpu
 
     _file_obj = tools.format_video(Path(args.name).absolute().as_posix())
     _nospacebasename = re.sub(r'[\s. #*?!:"]', '-', _file_obj["basename"])
@@ -543,9 +543,9 @@ def setup_logging(log_level: str, verbose: bool = False, quiet: bool = False) ->
 def main() -> int:
     """Main CLI entry point. Returns exit code (0=success, 1=error)."""
     # Parse language from system before anything else
-    from videotrans.configure import config
+    from phiendichvideo.configure import config
     config.init_run()
-    from videotrans.configure.config import defaulelang, app_cfg
+    from phiendichvideo.configure.config import defaulelang, app_cfg
 
     # Set language for CLI output
     set_lang(defaulelang if defaulelang in ('zh', 'en', 'vi') else 'en')
@@ -579,7 +579,7 @@ def main() -> int:
     app_cfg.exec_mode = 'cli'
 
     # Get GPU info
-    from videotrans.util.gpus import getset_gpu
+    from phiendichvideo.util.gpus import getset_gpu
     getset_gpu()
 
     # Build common params

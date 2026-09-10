@@ -1,4 +1,4 @@
-from videotrans.configure.excepts import (
+from phiendichvideo.configure.excepts import (
     VideoTransError,
     TranslateSrtError,
     DubbingSrtError,
@@ -13,7 +13,7 @@ from videotrans.configure.excepts import (
 
 
 class TestExceptionHierarchy:
-    def test_videotrans_error_is_exception(self):
+    def test_phiendichvideo_error_is_exception(self):
         assert issubclass(VideoTransError, Exception)
 
     def test_translate_srt_error_inherits(self):
@@ -101,7 +101,7 @@ class TestGetMsgFromExcept:
             msg = get_msg_from_except(e)
             assert isinstance(msg, str)
 
-    def test_handles_videotrans_error(self):
+    def test_handles_phiendichvideo_error(self):
         e = VideoTransError("custom message")
         msg = get_msg_from_except(e)
         assert "custom message" in msg

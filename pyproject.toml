@@ -1,5 +1,5 @@
 [project]
-name = "pyVideoTrans"
+name = "phien-dich-video"
 version = "4.04"
 requires-python = ">=3.10, <3.11"
 dependencies = [

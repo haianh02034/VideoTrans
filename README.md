@@ -133,7 +133,7 @@ docker run -d -p 7860:7860 --name pyvideotrans pyvideotrans-webui
 # With persistent config and output
 docker run -d -p 7860:7860 \
   -v ./data/output:/app/output \
-  -v ./data/config:/app/videotrans \
+  -v ./data/config:/app/phiendichvideo \
   --name pyvideotrans pyvideotrans-webui
 ```
 

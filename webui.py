@@ -1,5 +1,5 @@
 """
-pyVideoTrans WebUI — Giao diện web Gradio để dịch video.
+Phiên Dịch Video WebUI — Giao diện web Gradio để dịch video.
 
 Cách dùng:
     uv run webui.py
@@ -28,23 +28,23 @@ CLI_LANG = "zh"
 os.environ['PYVIDEOTRANS_LANG'] = CLI_LANG
 
 # ---------------------------------------------------------------------------
-# Khởi tạo môi trường videotrans
+# Khởi tạo môi trường phiendichvideo
 # ---------------------------------------------------------------------------
-from videotrans.configure import config
+from phiendichvideo.configure import config
 config.init_run()
 
-from videotrans.configure.config import ROOT_DIR, TEMP_DIR, app_cfg, params, settings
-from videotrans.configure.contants import FASTER_MODELS_DICT
-from videotrans import recognition, translator, tts
-from videotrans.util import tools
-from videotrans.util.gpus import getset_gpu
-from videotrans.util.help_role import role_menu
+from phiendichvideo.configure.config import ROOT_DIR, TEMP_DIR, app_cfg, params, settings
+from phiendichvideo.configure.contants import FASTER_MODELS_DICT
+from phiendichvideo import recognition, translator, tts
+from phiendichvideo.util import tools
+from phiendichvideo.util.gpus import getset_gpu
+from phiendichvideo.util.help_role import role_menu
 
 # ---------------------------------------------------------------------------
 # Đường dẫn lưu params / settings
 # ---------------------------------------------------------------------------
-PARAMS_JSON = Path(ROOT_DIR) / "videotrans" / "params.json"
-SETTINGS_JSON = Path(ROOT_DIR) / "videotrans" / "cfg.json"
+PARAMS_JSON = Path(ROOT_DIR) / "phiendichvideo" / "params.json"
+SETTINGS_JSON = Path(ROOT_DIR) / "phiendichvideo" / "cfg.json"
 
 
 def _load_params() -> dict:
@@ -117,7 +117,7 @@ LOOP_BGM_OPTIONS = {"Cắt nhạc nền": 0, "Lặp nhạc nền": 1}
 # ---------------------------------------------------------------------------
 # Kiểu phụ đề ASS
 # ---------------------------------------------------------------------------
-ASS_JSON_FILE = f'{ROOT_DIR}/videotrans/ass.json'
+ASS_JSON_FILE = f'{ROOT_DIR}/phiendichvideo/ass.json'
 
 DEFAULT_ASS_STYLE = {
     'Name': 'Default', 'Fontname': 'Arial', 'Bottom_Fontname': 'Arial',
@@ -586,7 +586,7 @@ def build_channel_settings():
         categories[cat].append((name, cfg))
 
     gr.Markdown("### Cài đặt kênh")
-    gr.Markdown("Cấu hình URL API, SK Key,... cho các kênh. **Đã lưu dùng chung với bản desktop (sp.exe)**, file cấu hình lưu tại `videotrans/params.json`.")
+    gr.Markdown("Cấu hình URL API, SK Key,... cho các kênh. **Đã lưu dùng chung với bản desktop (sp.exe)**, file cấu hình lưu tại `phiendichvideo/params.json`.")
 
     with gr.Tabs():
         for cat_name, channels in categories.items():
@@ -769,7 +769,7 @@ ADVANCED_SECTION_TITLES = {
 
 def build_advanced_settings():
     import gradio as gr
-    gr.Markdown("Cấu hình tham số nâng cao toàn cục. **Đã lưu dùng chung với bản desktop (sp.exe)**, file cấu hình lưu tại `videotrans/cfg.json`.\n⚠️ Một số tham số cần **khởi động lại phần mềm** mới có hiệu lực.")
+    gr.Markdown("Cấu hình tham số nâng cao toàn cục. **Đã lưu dùng chung với bản desktop (sp.exe)**, file cấu hình lưu tại `phiendichvideo/cfg.json`.\n⚠️ Một số tham số cần **khởi động lại phần mềm** mới có hiệu lực.")
 
     # ---- Cài đặt chung ----
     with gr.Accordion("📋 Cài đặt chung", open=True):
@@ -916,9 +916,9 @@ def build_advanced_settings():
 def build_ui():
     import gradio as gr
 
-    with gr.Blocks(title="pyVideoTrans WebUI") as app:
+    with gr.Blocks(title="Phiên Dịch Video WebUI") as app:
         gr.Markdown("""
-# pyVideoTrans WebUI Dịch Video
+# Phiên Dịch Video WebUI
 > [Giao diện này chỉ hỗ trợ một phần chức năng, vui lòng dùng bản desktop (sp.exe hoặc sp.py) để có đầy đủ tính năng](https://pyvideotrans.com)
 >
 >  [Tài liệu](https://pyvideotrans.com) |
@@ -1130,8 +1130,8 @@ def build_ui():
                         yield log(""), None, [], _BTN_RUNNING
 
                         yield log("▶ Bắt đầu dịch video..."), None, [], _BTN_RUNNING
-                        from videotrans.task.trans_create import TransCreate
-                        from videotrans.task.taskcfg import TaskCfgVTT
+                        from phiendichvideo.task.trans_create import TransCreate
+                        from phiendichvideo.task.taskcfg import TaskCfgVTT
                         trk = TransCreate(cfg=TaskCfgVTT(**params_dict))
 
                         stages = [
@@ -1204,7 +1204,7 @@ if __name__ == "__main__":
     try:
         import argparse
         import gradio as gr
-        parser = argparse.ArgumentParser(description="pyVideoTrans WebUI")
+        parser = argparse.ArgumentParser(description="Phiên Dịch Video WebUI")
         parser.add_argument("--host", type=str, default="0.0.0.0", help="Địa chỉ host")
         parser.add_argument("--port", type=int, default=7860, help="Số cổng")
         parser.add_argument("--share", action="store_true", help="Tạo link Gradio công khai")

@@ -1,5 +1,5 @@
 """
-conftest.py — sets up mocks for heavy dependencies so videotrans
+conftest.py — sets up mocks for heavy dependencies so phiendichvideo
 modules can be imported without a full PySide6 / torch installation.
 
 Only mocks packages that are genuinely NOT installed.

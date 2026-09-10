@@ -1,7 +1,7 @@
 import hashlib
 
-from videotrans.translator._base import BaseTrans
-from videotrans.task.taskcfg import SrtItem
+from phiendichvideo.translator._base import BaseTrans
+from phiendichvideo.task.taskcfg import SrtItem
 
 
 def _make_srt_item(text, line=1, start=0, end=1000):

@@ -1,4 +1,4 @@
-from videotrans.tts._base import BaseTTS
+from phiendichvideo.tts._base import BaseTTS
 
 
 class TestBaseTTSCleantts:
